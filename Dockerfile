@@ -13,7 +13,7 @@
 
 # Create a stage for building the application.
 #FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS build
-FROM 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammissample:2.0.19 AS build
+FROM 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammissample:2.0.20 AS build
 
 COPY . /source
 
@@ -44,7 +44,7 @@ RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
 # version (e.g., aspnet:7.0.10-alpine-3.18),
 # or SHA (e.g., mcr.microsoft.com/dotnet/aspnet@sha256:f3d99f54d504a21d38e4cc2f13ff47d67235efeeb85c109d3d1ff1808b38d034).
 #FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine AS final
-FROM 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammissample:2.0.19 AS final
+FROM 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammissample:2.0.20 AS final
 WORKDIR /app
 
 # Copy everything needed to run the app from the "build" stage.
