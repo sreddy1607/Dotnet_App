@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  volumes:
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - emptyDir: {}
+      name: varlibcontainers
+  containers:
+    - name: jnlp
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+    - name: node
+      image: registry.access.redhat.com/ubi8/nodejs-14:latest
+      tty: true
+      command: ["/bin/bash"]
+      securityContext:
+        privileged: true
+      workingDir: /home/jenkins/agent
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: /home/jenkins/agent
+        - name: BRANCH
+          value: master
+    - name: awscli
+      image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammiscloud:1.11
+      tty: true
+      command: ["/bin/bash"]
+      workingDir: /home/jenkins/agent
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: TMP_DIR
+          value: .tmp
+        - name: HOME
+          value: /home/devops
+    - name: buildah
+      image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisbuildah:1.0
+      tty: true
+      command: ["/bin/bash"]
+      workingDir: /home/jenkins/agent
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      securityContext:
+        privileged: true
+      env:
+        - name: HOME
+          value: /home/devops
+        - name: ENVIRONMENT_NAME
+          value: dev
+        - name: DOCKERFILE
+          value: ./Dockerfile
+        - name: CONTEXT
+          value: .
+        - name: TLSVERIFY
+          value: "false"
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers            
