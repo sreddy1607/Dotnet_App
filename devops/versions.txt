@@ -1,0 +1,5 @@
+cammissample:2.0.20
+cammiscloud:3.0.0.keep
+cammisbuildah:1.0.keep
+cammisterraform:1.0.3
+cammisboto3:1.0.1.keep
