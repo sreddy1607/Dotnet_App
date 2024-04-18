@@ -127,7 +127,7 @@ pipeline {
             properties([
               parameters([
                 // booleanParam(name: 'S3', defaultValue: false, description: 'select S3 to upload the truststore file')        
-		string(name: 'CLIENT_EMAIL', defaultValue: 'srinivas.reddy@dhcs.ca.gov', description: 'Client Email Address')
+		//string(name: 'CLIENT_EMAIL', defaultValue: 'srinivas.reddy@dhcs.ca.gov', description: 'Client Email Address')
               ])
             ])
 
@@ -169,15 +169,14 @@ stage('test dotnet image') {
     steps {
          
         container(name: "mspdotnet") {
-		//checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-dev-github', url: 'abc']])
+		
             script {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                 
                    
                     sh """
 		                dotnet --version 
-		  #dotnet clean
-                  #dotnet nuget locals all --clear
+		
                     git clone https://github.com/sreddy1607/Dotnet_App.git
 		    ls -l
                     dotnet restore Dotnet_App/src/
