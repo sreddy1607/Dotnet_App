@@ -181,6 +181,7 @@ stage('test dotnet image') {
                     git clone https://github.com/sreddy1607/Dotnet_App.git
 		    ls -l
                     dotnet restore Dotnet_App/src/
+		    dotnet publish -c Release
 
                     """
                 }
