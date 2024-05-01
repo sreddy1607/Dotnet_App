@@ -183,7 +183,7 @@ stage('test dotnet image') {
 		    #dotnet publish Dotnet_App/src/ -c Release
                     java --version
 		    which java
-                    sonar-scanner --version
+                    /opt/sonar-scanner/sonar-scanner-6.2.0.85879-net-framework --version
 
                     """
                 }
