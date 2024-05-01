@@ -71,7 +71,7 @@ pipeline {
                 - name: jenkins-trusted-ca-bundle
                   mountPath: /etc/pki/tls/certs
             - name: mspdotnet
-              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammismspapp:1.0.31
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammismspapp:1.0.32
               tty: true
               command: ["/bin/bash"]
               securityContext:
@@ -184,10 +184,12 @@ stage('test dotnet image') {
                     java --version
 		    which java
                     echo $PATH
-                    #/opt/sonar-scanner/latest/bin/sonar-scanner -h
+                    
 		
                     ls -l /opt/sonar-scanner/sonar-scanner-5.0.1.3006
 		    #ls -l /opt/sonar-scanner/sonar-scanner-6.2.0.85879-net-framework
+                     ls -l  /opt/sonar-scanner/latest/bin/
+                    /opt/sonar-scanner/latest/bin/sonar-scanner -h
 
                     """
                 }
