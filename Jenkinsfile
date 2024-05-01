@@ -186,7 +186,7 @@ stage('test dotnet image') {
                     echo $PATH
                     #/opt/sonar-scanner/latest/bin/sonar-scanner -h
 		
-                    ls -l /opt/sonar-scanner/ sonar-scanner-5.0.1.3006
+                    ls -l /opt/sonar-scanner/sonar-scanner-5.0.1.3006
 		    #ls -l /opt/sonar-scanner/sonar-scanner-6.2.0.85879-net-framework
 
                     """
