@@ -184,7 +184,9 @@ stage('test dotnet image') {
                     java --version
 		    which java
                     echo $PATH
-                    /opt/sonar-scanner/latest/bin/sonar-scanner -h
+                    #/opt/sonar-scanner/latest/bin/sonar-scanner -h
+		    ls -l /opt
+                    ls -l /opt/sonar-scanner
 
                     """
                 }
