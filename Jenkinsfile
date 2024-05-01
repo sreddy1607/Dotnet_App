@@ -181,6 +181,9 @@ stage('test dotnet image') {
 		    ls -l
                     dotnet restore Dotnet_App/src/
 		    dotnet publish Dotnet_App/src/ -c Release
+                    java --version
+		    which java
+                    sonar --version
 
                     """
                 }
