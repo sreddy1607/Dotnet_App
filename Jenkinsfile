@@ -177,13 +177,13 @@ stage('test dotnet image') {
                     sh """
 		                dotnet --version 
 		
-                    git clone https://github.com/sreddy1607/Dotnet_App.git
-		    ls -l
+                   # git clone https://github.com/sreddy1607/Dotnet_App.git
+		    #ls -l
                     #dotnet restore Dotnet_App/src/
 		    #dotnet publish Dotnet_App/src/ -c Release
                     java --version
 		    which java
-                    /opt/sonar-scanner/sonar-scanner-6.2.0.85879-net-framework --version
+                    sonar-scanner -h
 
                     """
                 }
