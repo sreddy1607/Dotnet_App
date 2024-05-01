@@ -71,7 +71,7 @@ pipeline {
                 - name: jenkins-trusted-ca-bundle
                   mountPath: /etc/pki/tls/certs
             - name: mspdotnet
-              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammismspapp:1.0.32
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammismspapp:1.0.33
               tty: true
               command: ["/bin/bash"]
               securityContext:
