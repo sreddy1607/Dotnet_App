@@ -74,11 +74,11 @@ pipeline {
                     name: jenkins-agent-env
                     optional: true
               env:
-              - name: NEXUS_ACCESS_TOKEN
-		            valueFrom:
+              - name: NEXUS_ACCESS_TOKEN  
+		valueFrom:
                   secretKeyRef:
-		                name: jenkins-token-qqsb2
-	                  key: token
+		    name: jenkins-token-qqsb2
+	            key: token
                 - name: HOME
                   value: ${workingDir}
                 - name: BRANCH
