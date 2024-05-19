@@ -75,7 +75,7 @@ pipeline {
                     optional: true
               env:
               - name: NEXUS_ACCESS_TOKEN  
-		valueFrom:
+	        valueFrom:
                   secretKeyRef:
 		    name: jenkins-token-qqsb2
 	            key: token
