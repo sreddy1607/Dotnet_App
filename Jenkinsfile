@@ -1,13 +1,3 @@
-                                                                                                                                 
-/*
-=======================================================================================
-This file is being updated constantly by the DevOps team to introduce new enhancements
-based on the template.  If you have suggestions for improvement,
-please contact the DevOps team so that we can incorporate the changes into the
-template.  In the meantime, if you have made changes here or don't want this file to be
-updated, please indicate so at the beginning of this file.
-=======================================================================================
-*/
 
 def branch = env.BRANCH_NAME ?: "ecr"
 def namespace = env.NAMESPACE ?: "dev"
@@ -84,11 +74,11 @@ pipeline {
                     name: jenkins-agent-env
                     optional: true
               env:
-                - name: NEXUS_ACCESS_TOKEN
-		  valueFrom:
-                    secretKeyRef:
-		      name: jenkins-token-qqsb2
-	              key: token
+              - name: NEXUS_ACCESS_TOKEN
+		            valueFrom:
+                  secretKeyRef:
+		                name: jenkins-token-qqsb2
+	                  key: token
                 - name: HOME
                   value: ${workingDir}
                 - name: BRANCH
