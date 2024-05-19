@@ -218,40 +218,10 @@ stage('test dotnet image') {
                 }
             }
         }
+
+
 }
 
-}
 
-
-  //pipeline post actions
-  post {
-    always {
-        echo "Build Process complete."
-    } // always
-
-    success {
-        echo "Build Process was success. Site is available at ${env.SITE_URL}"
-        //slackNotification("pipeline", "${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}|build #${BUILD_NUMBER}> was successful :woohoo: after ${currentBuild.durationString}.\n", "#215ACC","false")
-    }//success
-
-    unstable {
-        echo "Build is unstable."
-       // slackNotification("pipeline","${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}|build #${BUILD_NUMBER}> was unstable :shrug: after ${currentBuild.durationString}. Check `SonarQube Quality Gate` status.", "#F6F60F","true")
-    } // unstable
-
-    aborted {
-        echo "Pipeline aborted."
-      //  slackNotification("pipeline", "${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}|build #${BUILD_NUMBER}> aborted :bkpabort: after ${currentBuild.durationString} in stage: `${env_stage_name}` step: `${env_step_name}`.", "#EA6E06","false")
-    } // aborted
-
-    failure {
-        echo "Build encountered failures ."
-      //  slackNotification("pipeline","${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}|build #${BUILD_NUMBER}> failed :crash: after ${currentBuild.durationString} in stage: `${env_stage_name}` step: `${env_step_name}`. @here", "#EA0652","true")
-    } // failure
-
-    changed {
-        echo "Build content was changed."
-    } // changed
-
-  } // post
+ 
 }
