@@ -80,6 +80,11 @@ pipeline {
                   value: ${branch}
                 - name: GIT_SSL_CAINFO
                   value: "/etc/pki/tls/certs/ca-bundle.crt"
+		- name: NEXUS_ACCESS_TOKEN
+                  valueFrom:
+		    secretKeyRef:
+                      name: jenkins-token-qqsb2
+		      key: token
               volumeMounts:
                 - name: jenkins-trusted-ca-bundle
                   mountPath: /etc/pki/tls/certs
