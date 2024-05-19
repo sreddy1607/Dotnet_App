@@ -207,7 +207,7 @@ stage('test dotnet image') {
                 container('nexus') {
                     script {
                         def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group"
-                        def artifactFile = compose.yaml"
+                        def artifactFile = "compose.yaml"
 
                         sh """
                             curl -H "Authorization: Bearer $NEXUS_ACCESS_TOKEN" \
