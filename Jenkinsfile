@@ -78,7 +78,7 @@ pipeline {
                   value: ${workingDir}
                 - name: BRANCH
                   value: ${branch}
-		- name: NEXUS_ACCESS_TOKEN
+                - name: NEXUS_ACCESS_TOKEN
                   valueFrom:
 		    secretKeyRef:
                       name: jenkins-token-qqsb2
