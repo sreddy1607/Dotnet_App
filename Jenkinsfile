@@ -197,7 +197,7 @@ stage('test dotnet image') {
             steps {
                 container('nexus') {
                     script {
-                        def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group"
+                        def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
                         def artifactFile = "compose.yaml"
 
                         sh """
