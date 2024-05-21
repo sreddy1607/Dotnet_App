@@ -75,7 +75,7 @@ pipeline {
                 - name: NEXUS_ACCESS_TOKEN
                   valueFrom:
                     secretKeyRef:
-                      name: builder-token-mpdrp
+                      name: jenkins-token-qqsb2
                       key: token
                 - name: GIT_SSL_CAINFO
                   value: "/etc/pki/tls/certs/ca-bundle.crt"
@@ -172,7 +172,7 @@ pipeline {
 
                 sh '''
                   git clone https://github.com/sreddy1607/Dotnet_App.git
-                  TOKEN_NAME=$(kubectl get serviceaccount builder -n jenkins-builder -o 'jsonpath={.secrets[0].name}'  || true)
+                  TOKEN_NAME=$(kubectl get serviceaccount jenkins -n jenkins-builder -o 'jsonpath={.secrets[0].name}'  || true)
                   if [ -z "$TOKEN_NAME" ]; then
                     echo "Failed to retrieve TOKEN_NAME. Exiting..."
                     exit 1
