@@ -143,7 +143,7 @@ pipeline {
         container(name: "mspdotnet") {
           script {
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-              sh """
+              sh '''
                 dotnet --version
                 # git clone https://github.com/sreddy1607/Dotnet_App.git
                 # ls -l
@@ -151,12 +151,12 @@ pipeline {
                 # dotnet publish Dotnet_App/src/ -c Release
                 java --version
                 which java
-                echo \$PATH
+                echo $PATH
                 ls -l /opt/sonar-scanner/sonar-scanner-5.0.1.3006
                 # ls -l /opt/sonar-scanner/sonar-scanner-6.2.0.85879-net-framework
                 ls -l /opt/sonar-scanner/latest/bin/
                 /opt/sonar-scanner/latest/bin/sonar-scanner --version
-              """
+              '''
             }
           }
         }
@@ -170,12 +170,12 @@ pipeline {
             def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
             def artifactFile = "compose.yaml"
 
-            sh """
+            sh '''
               git clone https://github.com/sreddy1607/Dotnet_App.git
               TOKEN_NAME=$(kubectl get serviceaccount nexus-service-account -o jsonpath='{.secrets[0].name}' -n default)
-              TOKEN=$(kubectl get secret \$TOKEN_NAME -o jsonpath='{.data.token}' -n default | base64 --decode)
-              curl -u service-account:\$TOKEN --upload-file \$artifactFile -H "Authorization: Bearer \$TOKEN" $nexusUrl/\$artifactFile
-            """
+              TOKEN=$(kubectl get secret $TOKEN_NAME -o jsonpath='{.data.token}' -n default | base64 --decode)
+              curl -u service-account:$TOKEN --upload-file $artifactFile -H "Authorization: Bearer $TOKEN" $nexusUrl/$artifactFile
+            '''
           }
         }
       }
