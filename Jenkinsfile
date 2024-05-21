@@ -109,6 +109,7 @@ pipeline {
     env_stage_name=""
     env_step_name=""
     DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+    NEXUS_ACCESS_TOKEN =""
 
 
   }
