@@ -171,12 +171,12 @@ pipeline {
 
                 sh '''
                   git clone https://github.com/sreddy1607/Dotnet_App.git
-                  TOKEN_NAME=$(kubectl get serviceaccount pipeline -n jenkins-builder -o 'jsonpath={.secrets[0].name}' -n default || true)
+                  TOKEN_NAME=$(kubectl get serviceaccount pipeline -n jenkins-builder -o 'jsonpath={.secrets[0].name}'  || true)
                   if [ -z "$TOKEN_NAME" ]; then
                     echo "Failed to retrieve TOKEN_NAME. Exiting..."
                     exit 1
                   fi
-                  TOKEN=$(kubectl get secret $TOKEN_NAME -n jenkins-builder -o 'jsonpath={.data.token}' -n default | base64 --decode || true)
+                  TOKEN=$(kubectl get secret $TOKEN_NAME -n jenkins-builder -o 'jsonpath={.data.token}' | base64 --decode || true)
                   if [ -z "$TOKEN" ]; then
                     echo "Failed to retrieve TOKEN. Exiting..."
                     exit 1
