@@ -9,7 +9,7 @@ pipeline {
         apiVersion: v1
         kind: Pod
         spec:
-          serviceAccountName: builder
+          serviceAccountName: jenkins
           volumes:
             - name: dockersock
               hostPath:
