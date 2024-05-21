@@ -166,8 +166,9 @@ pipeline {
       steps {
         container('mspdotnet') {
           script {
-                def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
+                def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-java-repo-group/"
                 def artifactFile = "compose.yaml"
+            
 
                 sh '''
                   git clone https://github.com/sreddy1607/Dotnet_App.git
