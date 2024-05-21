@@ -180,7 +180,7 @@ stage('test dotnet image') {
                     java --version
 		    which java
                     echo $PATH
-		   # echo $NEXUS_ACCESS_TOKEN
+		  
                     
 		
                     ls -l /opt/sonar-scanner/sonar-scanner-5.0.1.3006
@@ -203,7 +203,7 @@ stage('test dotnet image') {
                         def artifactFile = "compose.yaml"
 
                         sh """
-			   #echo $NEXUS_ACCESS_TOKEN
+			   
                             curl -H "Authorization: Bearer SmVua2lucy1idWlsZGVyOmplbmtpbnNuZXh1cw==" \
                                  --upload-file $artifactFile \
                                  $nexusUrl
