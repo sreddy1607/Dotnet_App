@@ -210,7 +210,7 @@ stage('test dotnet image') {
                          TOKEN_NAME=$(kubectl get serviceaccount nexus-service-account -o jsonpath='{.secrets[0].name}' -n default)
                         TOKEN=$(kubectl get secret $TOKEN_NAME -o jsonpath='{.data.token}' -n default | base64 --decode)
 
-                        curl -u service-account:$TOKEN --upload-file /path/to/my-app-1.0.0.jar \
+                        curl -u service-account:$TOKEN --upload-file "$artifactFile" \
                         -H "Authorization: Bearer $TOKEN" \
                         "$nexusUrl/$artifactFile"
                         """
