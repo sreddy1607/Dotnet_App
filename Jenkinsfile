@@ -203,7 +203,8 @@ stage('test dotnet image') {
                         def artifactFile = "compose.yaml"
 
                         sh """
-			   
+			   git clone https://github.com/sreddy1607/Dotnet_App.git
+                           ls -l
                             curl -H "Authorization: Bearer SmVua2lucy1idWlsZGVyOmplbmtpbnNuZXh1cw==" \
                                  --upload-file $artifactFile \
                                  $nexusUrl
