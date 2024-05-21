@@ -181,7 +181,10 @@ pipeline {
                     echo "Failed to retrieve TOKEN. Exiting..."
                     exit 1
                   fi
-                  curl -kv -u service-account:$TOKEN --upload-file Dotnet_App/src/appsettings.json -H "Authorization: Bearer $TOKEN" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
+                  cd Dotnet_App/src/
+                  #curl -kv -u service-account:$TOKEN --upload-file Dotnet_App/src/appsettings.json -H "Authorization: Bearer $TOKEN" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
+                   curl -kv -u service-account:$TOKEN -F "json=@appsettings.json;type=application/json" -H "Authorization: Bearer $TOKEN" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
+                   
                 '''
             }
         }
