@@ -181,7 +181,7 @@ pipeline {
                     echo "Failed to retrieve TOKEN. Exiting..."
                     exit 1
                   fi
-                  curl -u service-account:$TOKEN --upload-file compose.yaml -H "Authorization: Bearer $TOKEN" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/compose.yaml"
+                  curl -u service-account:$TOKEN --upload-file Dotnet_App/compose.yaml -H "Authorization: Bearer $TOKEN" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/compose.yaml"
                 '''
             }
         }
