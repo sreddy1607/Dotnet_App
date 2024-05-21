@@ -109,7 +109,7 @@ pipeline {
     env_stage_name=""
     env_step_name=""
     DOTNET_CLI_TELEMETRY_OPTOUT = '1'
-    NEXUS_ACCESS_TOKEN=""
+    
 
 
   }
@@ -203,7 +203,7 @@ stage('test dotnet image') {
                         def artifactFile = "compose.yaml"
 
                         sh """
-			   echo $NEXUS_ACCESS_TOKEN
+			   #echo $NEXUS_ACCESS_TOKEN
                             curl -H "Authorization: Bearer SmVua2lucy1idWlsZGVyOmplbmtpbnNuZXh1cw==" \
                                  --upload-file $artifactFile \
                                  $nexusUrl
