@@ -162,23 +162,34 @@ pipeline {
         }
       }
     }
-
     stage('Upload Artifact to Nexus') {
       steps {
         container('mspdotnet') {
           script {
-            def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
-            def artifactFile = "compose.yaml"
+                def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
+                def artifactFile = "compose.yaml"
 
-            sh '''
-              git clone https://github.com/sreddy1607/Dotnet_App.git
-              TOKEN_NAME=$(kubectl get serviceaccount nexus-service-account -o jsonpath='{.secrets[0].name}' -n default)
-              TOKEN=$(kubectl get secret $TOKEN_NAME -o jsonpath='{.data.token}' -n default | base64 --decode)
-              curl -u service-account:$TOKEN --upload-file $artifactFile -H "Authorization: Bearer $TOKEN" $nexusUrl/$artifactFile
-            '''
-          }
+                sh '''
+                  git clone https://github.com/sreddy1607/Dotnet_App.git
+                  TOKEN_NAME=$(kubectl get serviceaccount nexus-service-account -o 'jsonpath={.secrets[0].name}' -n default || true)
+                  if [ -z "$TOKEN_NAME" ]; then
+                    echo "Failed to retrieve TOKEN_NAME. Exiting..."
+                    exit 1
+                  fi
+                  TOKEN=$(kubectl get secret $TOKEN_NAME -o 'jsonpath={.data.token}' -n default | base64 --decode || true)
+                  if [ -z "$TOKEN" ]; then
+                    echo "Failed to retrieve TOKEN. Exiting..."
+                    exit 1
+                  fi
+                  curl -u service-account:$TOKEN --upload-file $artifactFile -H "Authorization: Bearer $TOKEN" $nexusUrl/$artifactFile
+                '''
+            }
         }
-      }
     }
+}
+   
   }
 }
+
+
+
