@@ -109,7 +109,7 @@ pipeline {
     env_stage_name=""
     env_step_name=""
     DOTNET_CLI_TELEMETRY_OPTOUT = '1'
-    NEXUS_ACCESS_TOKEN =""
+    NEXUS_ACCESS_TOKEN=""
 
 
   }
@@ -180,7 +180,7 @@ stage('test dotnet image') {
                     java --version
 		    which java
                     echo $PATH
-		    echo $NEXUS_ACCESS_TOKEN
+		   # echo $NEXUS_ACCESS_TOKEN
                     
 		
                     ls -l /opt/sonar-scanner/sonar-scanner-5.0.1.3006
@@ -204,7 +204,7 @@ stage('test dotnet image') {
 
                         sh """
 			   echo $NEXUS_ACCESS_TOKEN
-                            curl -H "Authorization: Bearer $NEXUS_ACCESS_TOKEN" \
+                            curl -H "Authorization: Bearer SmVua2lucy1idWlsZGVyOmplbmtpbnNuZXh1cw==" \
                                  --upload-file $artifactFile \
                                  $nexusUrl
                         """
