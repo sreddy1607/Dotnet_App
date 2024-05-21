@@ -204,9 +204,10 @@ stage('test dotnet image') {
 
                         sh """
 			   git clone https://github.com/sreddy1607/Dotnet_App.git
-                           ls -l
+                           ls -l Dotnet_App
+			   ls -l Dotnet_App/src/
                             curl -H "Authorization: Bearer SmVua2lucy1idWlsZGVyOmplbmtpbnNuZXh1cw==" \
-                                 --upload-file $artifactFile \
+                                 --upload-file Dotnet_App/$artifactFile \
                                  $nexusUrl
                         """
                     }
