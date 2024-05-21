@@ -204,9 +204,7 @@ stage('test dotnet image') {
 
                         sh """
 			   git clone https://github.com/sreddy1607/Dotnet_App.git
-                           ls -l Dotnet_App
-			   ls -l Dotnet_App/src/
-      
+                                 
                         TOKEN_NAME=$(kubectl get serviceaccount nexus-service-account -o jsonpath='{.secrets[0].name}' -n default)
                         TOKEN=$(kubectl get secret $TOKEN_NAME -o jsonpath='{.data.token}' -n default | base64 --decode)
 
