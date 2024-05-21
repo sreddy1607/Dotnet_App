@@ -166,13 +166,13 @@ pipeline {
       steps {
         container('mspdotnet') {
           script {
-                def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-java-repo-group/"
+                def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
                 def artifactFile = "compose.yaml"
             
 
                 sh '''
                   git clone https://github.com/sreddy1607/Dotnet_App.git
-                  TOKEN_NAME=$(kubectl get serviceaccount jenkins -n jenkins-builder -o 'jsonpath={.secrets[0].name}'  || true)
+                  TOKEN_NAME=$(kubectl get serviceaccount builder -n jenkins-builder -o 'jsonpath={.secrets[0].name}'  || true)
                   if [ -z "$TOKEN_NAME" ]; then
                     echo "Failed to retrieve TOKEN_NAME. Exiting..."
                     exit 1
