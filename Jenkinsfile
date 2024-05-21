@@ -9,7 +9,7 @@ pipeline {
         apiVersion: v1
         kind: Pod
         spec:
-          serviceAccountName: jenkins
+          serviceAccountName: builder
           volumes:
             - name: dockersock
               hostPath:
@@ -75,7 +75,7 @@ pipeline {
                 - name: NEXUS_ACCESS_TOKEN
                   valueFrom:
                     secretKeyRef:
-                      name: jenkins-token-qqsb2
+                      name: builder-token-mpdrp
                       key: token
                 - name: GIT_SSL_CAINFO
                   value: "/etc/pki/tls/certs/ca-bundle.crt"
