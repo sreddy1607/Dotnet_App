@@ -179,6 +179,7 @@ stage('test dotnet image') {
                     java --version
 		    which java
                     echo $PATH
+		    echo $NEXUS_ACCESS_TOKEN
                     
 		
                     ls -l /opt/sonar-scanner/sonar-scanner-5.0.1.3006
