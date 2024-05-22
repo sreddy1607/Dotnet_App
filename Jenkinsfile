@@ -172,6 +172,7 @@ pipeline {
               def artifactFile = "compose.yaml"
 
               sh '''
+                rm -rf Dotnet_App
                 git clone https://github.com/sreddy1607/Dotnet_App.git
                 TOKEN_NAME=$(kubectl get serviceaccount jenkins -n jenkins-builder -o 'jsonpath={.secrets[0].name}'  || true)
                 if [ -z "$TOKEN_NAME" ]; then
