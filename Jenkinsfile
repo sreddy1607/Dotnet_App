@@ -145,15 +145,15 @@ pipeline {
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
               sh '''
                 dotnet --version
-                # git clone https://github.com/sreddy1607/Dotnet_App.git
-                # ls -l
-                # dotnet restore Dotnet_App/src/
-                # dotnet publish Dotnet_App/src/ -c Release
+                // git clone https://github.com/sreddy1607/Dotnet_App.git
+                // ls -l
+                // dotnet restore Dotnet_App/src/
+                // dotnet publish Dotnet_App/src/ -c Release
                 java --version
                 which java
                 echo $PATH
                 ls -l /opt/sonar-scanner/sonar-scanner-5.0.1.3006
-                # ls -l /opt/sonar-scanner/sonar-scanner-6.2.0.85879-net-framework
+                // ls -l /opt/sonar-scanner/sonar-scanner-6.2.0.85879-net-framework
                 ls -l /opt/sonar-scanner/latest/bin/
                 /opt/sonar-scanner/latest/bin/sonar-scanner --version
               '''
@@ -168,7 +168,7 @@ pipeline {
         container('mspdotnet') {
           script {
             withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
-              def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
+              def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group"
               def artifactFile = "compose.yaml"
 
               sh '''
