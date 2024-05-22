@@ -145,7 +145,7 @@ pipeline {
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
               sh '''
                 dotnet --version
-                // git clone https://github.com/sreddy1607/Dotnet_App.git
+                git clone https://github.com/sreddy1607/Dotnet_App.git
                 // ls -l
                 // dotnet restore Dotnet_App/src/
                 // dotnet publish Dotnet_App/src/ -c Release
