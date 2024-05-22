@@ -185,7 +185,7 @@ pipeline {
                   exit 1
                 fi
                 cd Dotnet_App/src/
-                curl -kv -u $NEXUS_USERNAME:$NEXUS_PASSWORD -F "json=@appsettings.json;type=application/json" -H "Authorization: Bearer $TOKEN" "$nexusUrl/appsettings.json"
+                curl -kv -u eshwar:Reddy@1234 -F "json=@appsettings.json;type=application/json" -H "Authorization: Bearer $TOKEN" "$nexusUrl/appsettings.json"
               '''
             }
           }
