@@ -185,7 +185,7 @@ pipeline {
                   exit 1
                 fi
                 cd Dotnet_App/src/
-                curl -kv -u eshwar:Reddy@1234 -F "json=@appsettings.json;type=application/json" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-grou/"
+                curl -kv -u eshwar:Reddy@1234 --upload-fil appsettings.json "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-grou/appsettings.json"
               '''
             }
           }
