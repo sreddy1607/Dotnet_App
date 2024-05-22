@@ -162,38 +162,34 @@ pipeline {
         }
       }
     }
+
     stage('Upload Artifact to Nexus') {
       steps {
         container('mspdotnet') {
           script {
-                def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
-                def artifactFile = "compose.yaml"
-            
+            withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
+              def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
+              def artifactFile = "compose.yaml"
 
-                sh '''
-                  git clone https://github.com/sreddy1607/Dotnet_App.git
-                  TOKEN_NAME=$(kubectl get serviceaccount jenkins -n jenkins-builder -o 'jsonpath={.secrets[0].name}'  || true)
-                  if [ -z "$TOKEN_NAME" ]; then
-                    echo "Failed to retrieve TOKEN_NAME. Exiting..."
-                    exit 1
-                  fi
-                  TOKEN=$(kubectl get secret $TOKEN_NAME -n jenkins-builder -o 'jsonpath={.data.token}' | base64 --decode || true)
-                  if [ -z "$TOKEN" ]; then
-                    echo "Failed to retrieve TOKEN. Exiting..."
-                    exit 1
-                  fi
-                  cd Dotnet_App/src/
-                  #curl -kv -u service-account:$TOKEN --upload-file Dotnet_App/src/appsettings.json -H "Authorization: Bearer $TOKEN" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/"
-                   curl -kv -u service-account:$TOKEN -F "json=@appsettings.json;type=application/json" -H "Authorization: Bearer $TOKEN" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/appsettings.json"
-                   
-                '''
+              sh '''
+                git clone https://github.com/sreddy1607/Dotnet_App.git
+                TOKEN_NAME=$(kubectl get serviceaccount jenkins -n jenkins-builder -o 'jsonpath={.secrets[0].name}'  || true)
+                if [ -z "$TOKEN_NAME" ]; then
+                  echo "Failed to retrieve TOKEN_NAME. Exiting..."
+                  exit 1
+                fi
+                TOKEN=$(kubectl get secret $TOKEN_NAME -n jenkins-builder -o 'jsonpath={.data.token}' | base64 --decode || true)
+                if [ -z "$TOKEN" ]; then
+                  echo "Failed to retrieve TOKEN. Exiting..."
+                  exit 1
+                fi
+                cd Dotnet_App/src/
+                curl -kv -u $NEXUS_USERNAME:$NEXUS_PASSWORD -F "json=@appsettings.json;type=application/json" -H "Authorization: Bearer $TOKEN" "$nexusUrl/appsettings.json"
+              '''
             }
+          }
         }
+      }
     }
-}
-   
   }
 }
-
-
-
