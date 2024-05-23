@@ -163,6 +163,19 @@ pipeline {
       }
     }
 
+   stage('Install CA Certificates') {
+     steps {
+       container('mspdotnet') {
+         script {
+             sh '''
+              apt-get update
+              apt-get install -y ca-certificates
+            '''
+          }
+        }
+      }
+    }
+
    stage('Install NuGet') {
      steps {
        container('mspdotnet') {
