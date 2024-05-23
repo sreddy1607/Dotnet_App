@@ -167,9 +167,9 @@ dotnet --version
                 ls -l
                 dotnet restore Dotnet_App/src/
                 dotnet publish Dotnet_App/src/ -c Release
-                nuget setapikey 7eb5424c-5f47-381c-b1fa-8c8592508455 -source https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/
+                nuget setapikey 7eb5424c-5f47-381c-b1fa-8c8592508455 -source http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/cammis-dotnet-repo-group/
                 
-                #curl -kv -u Eshwar:Redd1234 -F "file=@appsettings.json" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/appsettings.json"
+                #curl -kv -u Eshwar:Redd1234 -F "file=@appsettings.json" "http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/cammis-dotnet-repo-group/appsettings.json"
               '''
             }
           }
