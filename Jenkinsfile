@@ -150,8 +150,9 @@ pipeline {
              
               yum update
               yum install -y ca-certificates
-              wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -O /usr/local/bin/nuget
-              chmod +x /usr/local/bin/nuget
+              sudo apt install nuget
+             # wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -O /usr/local/bin/nuget
+              #chmod +x /usr/local/bin/nuget
                 rm -rf Dotnet_App
                 git clone https://github.com/sreddy1607/Dotnet_App.git
                 ls -l
