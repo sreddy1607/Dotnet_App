@@ -174,18 +174,12 @@ pipeline {
               sh '''
                 rm -rf Dotnet_App
                 git clone https://github.com/sreddy1607/Dotnet_App.git
-                TOKEN_NAME=$(kubectl get serviceaccount jenkins -n jenkins-builder -o 'jsonpath={.secrets[0].name}'  || true)
-                if [ -z "$TOKEN_NAME" ]; then
-                  echo "Failed to retrieve TOKEN_NAME. Exiting..."
-                  exit 1
-                fi
-                TOKEN=$(kubectl get secret $TOKEN_NAME -n jenkins-builder -o 'jsonpath={.data.token}' | base64 --decode || true)
-                if [ -z "$TOKEN" ]; then
-                  echo "Failed to retrieve TOKEN. Exiting..."
-                  exit 1
-                fi
-                cd Dotnet_App/src/
-                curl -kv -u Eshwar:Redd1234 -F "file=@appsettings.json" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/appsettings.json"
+                ls -l
+                dotnet restore Dotnet_App/src/
+                dotnet publish Dotnet_App/src/ -c Release
+                nuget setapikey 7eb5424c-5f47-381c-b1fa-8c8592508455 -source https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/
+                
+                #curl -kv -u Eshwar:Redd1234 -F "file=@appsettings.json" "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/appsettings.json"
               '''
             }
           }
