@@ -151,10 +151,15 @@ pipeline {
               yum update
               yum install -y ca-certificates
               yum update -y
-amazon-linux-extras install epel -y
-amazon-linux-extras enable corretto8
-amazon-linux-extras enable dotnet6
-yum install -y dotnet-sdk-6.0
+# Import the Microsoft repository GPG keys
+sudo rpm -Uvh https://packages.microsoft.com/config/centos/8/packages-microsoft-prod.rpm
+
+# Enable the .NET repository
+sudo yum install -y dotnet-sdk-6.0
+
+# Verify .NET installation
+dotnet --version
+
              # wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -O /usr/local/bin/nuget
               #chmod +x /usr/local/bin/nuget
                 rm -rf Dotnet_App
