@@ -138,35 +138,7 @@ pipeline {
       }
     }
 
-    stage('Test Dotnet Image') {
-      steps {
-        container(name: "mspdotnet") {
-          script {
-            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-              sh '''
-                dotnet --version
-                git clone https://github.com/sreddy1607/Dotnet_App.git
-                ls -l
-                #dotnet restore Dotnet_App/src/
-                #dotnet publish Dotnet_App/src/ -c Release
-                java --version
-                which java
-                echo $PATH
-                ls -l /opt/sonar-scanner/sonar-scanner-5.0.1.3006
-                #ls -l /opt/sonar-scanner/sonar-scanner-6.2.0.85879-net-framework
-                ls -l /opt/sonar-scanner/latest/bin/
-                /opt/sonar-scanner/latest/bin/sonar-scanner --version
-              '''
-            }
-          }
-        }
-      }
-    }
-
-   
-
-
-    stage('Upload Artifact to Nexus') {
+       stage('Upload Artifact to Nexus') {
       steps {
         container('mspdotnet') {
           script {
@@ -176,8 +148,8 @@ pipeline {
 
               sh '''
              
-              apt-get update
-              apt-get install -y ca-certificates
+              yum update
+              yum install -y ca-certificates
               wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -O /usr/local/bin/nuget
               chmod +x /usr/local/bin/nuget
                 rm -rf Dotnet_App
