@@ -1,66 +1,38 @@
-# syntax=docker/dockerfile:1
 
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
+#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
-################################################################################
-
-# Learn about building .NET container images:
-# https://github.com/dotnet/dotnet-docker/blob/main/samples/README.md
-
-# Create a stage for building the application.
-#FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS build
-FROM 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammissample:2.0.20 AS build
-
-COPY . /source
-
-WORKDIR /source/src
-
-# This is the architecture you’re building for, which is passed in by the builder.
-# Placing it here allows the previous steps to be cached across architectures.
-ARG TARGETARCH
-
-# Build the application.
-# Leverage a cache mount to /root/.nuget/packages so that subsequent builds don't have to re-download packages.
-# If TARGETARCH is "amd64", replace it with "x64" - "x64" is .NET's canonical name for this and "amd64" doesn't
-#   work in .NET 6.0.
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
-    dotnet publish -a ${TARGETARCH/amd64/x64} --use-current-runtime --self-contained false -o /app
-
-# If you need to enable globalization and time zones:
-# https://github.com/dotnet/dotnet-docker/blob/main/samples/enable-globalization.md
-################################################################################
-# Create a new stage for running the application that contains the minimal
-# runtime dependencies for the application. This often uses a different base
-# image from the build stage where the necessary files are copied from the build
-# stage.
-#
-# The example below uses an aspnet alpine image as the foundation for running the app.
-# It will also use whatever happens to be the most recent version of that tag when you
-# build your Dockerfile. If reproducability is important, consider using a more specific
-# version (e.g., aspnet:7.0.10-alpine-3.18),
-# or SHA (e.g., mcr.microsoft.com/dotnet/aspnet@sha256:f3d99f54d504a21d38e4cc2f13ff47d67235efeeb85c109d3d1ff1808b38d034).
-#FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine AS final
-FROM 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammissample:2.0.20 AS final
+FROM registry.access.redhat.com/ubi8/dotnet-60-runtime AS base
 WORKDIR /app
+RUN chown 1001:1001 -R .
 
-# Copy everything needed to run the app from the "build" stage.
-COPY --from=build /app .
 
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/go/dockerfile-user-best-practices/
-ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
-USER appuser
+FROM registry.access.redhat.com/ubi8/dotnet-60 AS build
+USER root
+WORKDIR /src
 
-ENTRYPOINT ["dotnet", "myWebApp.dll"]
+RUN chown 1001:1001 -R .
+COPY ["provider-portal-detec-service.csproj", ""]
+RUN dotnet nuget add source https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/nuget.org-proxy/index.json -n nuget.org-proxy -u Jenkins-builder -p  --store-password-in-clear-text
+RUN dotnet nuget setapikey 7eb5424c-5f47-381c-b1fa-8c8592508455 -source https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group/
+RUN dotnet restore "./provider-portal-detec-service.csproj"
+COPY . .
+WORKDIR "/src/."
+RUN mkdir -p /app/build
+RUN mkdir -p /app/publish
+RUN chown 1001:1001 -R /app/build
+RUN chown 1001:1001 -R /app/publish
+RUN chmod -vR 777 /app/build
+RUN chmod -vR 777 /app/publish
+RUN dotnet build "provider-portal-detec-service.csproj" -c Release -o /app/build
+
+#FROM build AS publish
+RUN dotnet publish "provider-portal-detec-service.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+USER 1001
+WORKDIR /app
+#COPY --from=publish /app/publish .
+COPY  --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:9007
+EXPOSE 9007
+ENTRYPOINT ["dotnet", "provider-portal-detec-service.dll"]
