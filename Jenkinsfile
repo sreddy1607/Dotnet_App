@@ -152,10 +152,10 @@ pipeline {
               yum install -y ca-certificates
               yum update -y
 # Import the Microsoft repository GPG keys
-sudo rpm -Uvh https://packages.microsoft.com/config/centos/8/packages-microsoft-prod.rpm
+rpm -Uvh https://packages.microsoft.com/config/centos/8/packages-microsoft-prod.rpm
 
 # Enable the .NET repository
-sudo yum install -y dotnet-sdk-6.0
+yum install -y dotnet-sdk-6.0
 
 # Verify .NET installation
 dotnet --version
