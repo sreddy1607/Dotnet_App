@@ -143,7 +143,7 @@ pipeline {
         container('mspdotnet') {
           script {
             withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
-              def nexusUrl = "https://nexusrepo-tools.apps.bld.cammis.medi-cal.ca.gov/repository/cammis-dotnet-repo-group"
+              def nexusUrl = "http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/cammis-dotnet-repo-group"
               def artifactFile = "compose.yaml"
 
               sh '''
