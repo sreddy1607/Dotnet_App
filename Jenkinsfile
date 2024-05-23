@@ -150,7 +150,7 @@ pipeline {
              
               yum update
               yum install -y ca-certificates
-              sudo apt install nuget
+              yum install -y nuget
              # wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -O /usr/local/bin/nuget
               #chmod +x /usr/local/bin/nuget
                 rm -rf Dotnet_App
