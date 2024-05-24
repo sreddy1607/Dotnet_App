@@ -7,7 +7,7 @@ pipeline {
     docker {
             image 'mcr.microsoft.com/dotnet/sdk:6.0' // Use the appropriate .NET SDK version
             args '-u root:root' // Optional: Run as root user if necessary
-    }
+    
     kubernetes {
       yaml """
         apiVersion: v1
@@ -87,6 +87,7 @@ pipeline {
                 - name: jenkins-trusted-ca-bundle
                   mountPath: /etc/pki/tls/certs
       """
+    }
     }
   }
 
