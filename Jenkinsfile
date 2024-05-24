@@ -143,26 +143,7 @@ pipeline {
       }
     }
 
-stage('Setup NuGet') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD')]) {
-                    sh """
-                        dotnet nuget remove source ${NUGET_SOURCE_NAME} || true
-                        dotnet nuget add source --username \${NEXUS_USER} --password \${NEXUS_PASSWORD} --store-password-in-clear-text --name ${NUGET_SOURCE_NAME} ${NUGET_SOURCE_URL}
-                    """
-                }
-            }
-        }
-        stage('Push Package') {
-            steps {
-                script {
-                    // Push the NuGet package
-                    sh """
-                        dotnet nuget push path/to/your/package.nupkg --source ${NUGET_SOURCE_NAME} --api-key VSTS
-                    """
-                }
-            }
-        }
+
     
     
 
