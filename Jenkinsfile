@@ -143,7 +143,7 @@ pipeline {
         container('mspdotnet') {
           script {
             withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
-              def nexusUrl = "http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/cammis-dotnet-repo-group"
+              def nexusUrl = "http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/nuget-hosted"
               def artifactFile = "compose.yaml"
 
               sh '''
@@ -167,14 +167,14 @@ dotnet --version
                 ls -l
                 dotnet restore Dotnet_App/src/
                 dotnet publish Dotnet_App/src/ -c Release
-                dotnet nuget setapikey 7eb5424c-5f47-381c-b1fa-8c8592508455 -source http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/cammis-dotnet-repo-group/
+                dotnet nuget setapikey 7eb5424c-5f47-381c-b1fa-8c8592508455 -source http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/nuget-hosted/
                 
-                #curl -kv -u Eshwar:Redd1234 -F "file=@appsettings.json" "http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/cammis-dotnet-repo-group/appsettings.json"
+                #curl -kv -u Eshwar:Redd1234 -F "file=@appsettings.json" "http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/nuget-hosted/appsettings.json"
               '''
             }
           }
         }
-      }
+      }    
     }
   }
 }
