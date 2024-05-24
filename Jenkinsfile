@@ -4,6 +4,10 @@ def workingDir = "/home/jenkins/agent"
 
 pipeline {
   agent {
+    docker {
+            image 'mcr.microsoft.com/dotnet/sdk:6.0' // Use the appropriate .NET SDK version
+            args '-u root:root' // Optional: Run as root user if necessary
+    }
     kubernetes {
       yaml """
         apiVersion: v1
@@ -103,7 +107,7 @@ pipeline {
     DOTNET_CLI_TELEMETRY_OPTOUT = '1'
     NUGET_SOURCE_URL = 'http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/nuget-hosted'
     NUGET_SOURCE_NAME = 'nexus'
-    NEXUS_CREDENTIALS = credentials('nexus-credentials') // Assuming you have a credentials entry for Nexus
+    
   }
 
   stages {
@@ -141,13 +145,12 @@ pipeline {
       }
     }
 
-    stage('Setup NuGet') {
+stage('Setup NuGet') {
             steps {
-                script {
-                    // Add NuGet source with credentials
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD')]) {
                     sh """
                         dotnet nuget remove source ${NUGET_SOURCE_NAME} || true
-                        dotnet nuget add source --username ${NEXUS_CREDENTIALS_USR} --password ${NEXUS_CREDENTIALS_PSW} --store-password-in-clear-text --name ${NUGET_SOURCE_NAME} ${NUGET_SOURCE_URL}
+                        dotnet nuget add source --username \${NEXUS_USER} --password \${NEXUS_PASSWORD} --store-password-in-clear-text --name ${NUGET_SOURCE_NAME} ${NUGET_SOURCE_URL}
                     """
                 }
             }
@@ -162,6 +165,7 @@ pipeline {
                 }
             }
         }
+    
     
 
        stage('Upload Artifact to Nexus') {
