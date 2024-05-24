@@ -4,9 +4,6 @@ def workingDir = "/home/jenkins/agent"
 
 pipeline {
   agent {
-    docker {
-            image 'mcr.microsoft.com/dotnet/sdk:6.0' // Use the appropriate .NET SDK version
-            args '-u root:root' // Optional: Run as root user if necessary
     
     kubernetes {
       yaml """
@@ -209,5 +206,5 @@ dotnet --version
     }
   }
 }
-}  
+ 
   
