@@ -88,7 +88,7 @@ pipeline {
                   mountPath: /etc/pki/tls/certs
       """
     }
-    }
+    
   }
 
   options {
@@ -209,3 +209,5 @@ dotnet --version
     }
   }
 }
+}  
+  
