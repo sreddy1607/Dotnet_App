@@ -101,6 +101,9 @@ pipeline {
     env_stage_name = ""
     env_step_name = ""
     DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+    NUGET_SOURCE_URL = 'http://nexusrepo-sonatype-nexus-service.tools.svc.cluster.local:8081/repository/nuget-hosted'
+    NUGET_SOURCE_NAME = 'nexus'
+    NEXUS_CREDENTIALS = credentials('nexus-credentials') // Assuming you have a credentials entry for Nexus
   }
 
   stages {
@@ -137,6 +140,29 @@ pipeline {
         }
       }
     }
+
+    stage('Setup NuGet') {
+            steps {
+                script {
+                    // Add NuGet source with credentials
+                    sh """
+                        dotnet nuget remove source ${NUGET_SOURCE_NAME} || true
+                        dotnet nuget add source --username ${NEXUS_CREDENTIALS_USR} --password ${NEXUS_CREDENTIALS_PSW} --store-password-in-clear-text --name ${NUGET_SOURCE_NAME} ${NUGET_SOURCE_URL}
+                    """
+                }
+            }
+        }
+        stage('Push Package') {
+            steps {
+                script {
+                    // Push the NuGet package
+                    sh """
+                        dotnet nuget push path/to/your/package.nupkg --source ${NUGET_SOURCE_NAME} --api-key VSTS
+                    """
+                }
+            }
+        }
+    
 
        stage('Upload Artifact to Nexus') {
       steps {
