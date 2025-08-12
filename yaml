@@ -1,59 +1,16 @@
-2025-08-12 21:08:55 LifecycleEvent - BeforeInstall
-2025-08-12 21:08:55 Script - \before-install.bat
-2025-08-12 21:08:55 [stdout]
-2025-08-12 21:08:55 [stdout]C:\Windows\System32>REM Install Internet Information Server (IIS).  
-2025-08-12 21:08:55 [stdout]
-2025-08-12 21:08:55 [stdout]C:\Windows\System32>c:\Windows\Sysnative\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command Import-Module -Name ServerManager 
-2025-08-12 21:08:56 [stdout]
-2025-08-12 21:08:56 [stdout]C:\Windows\System32>c:\Windows\Sysnative\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command Install-WindowsFeature Web-Server 
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]Success Restart Needed Exit Code      Feature Result                               
-2025-08-12 21:08:57 [stdout]------- -------------- ---------      --------------                               
-2025-08-12 21:08:57 [stdout]True    No             NoChangeNeeded {}                                           
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]C:\Windows\System32>REM Backup existing configuration for IIS 
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]C:\Windows\System32>C:\Windows\System32\inetsrv\appcmd.exe add backup 
-2025-08-12 21:08:57 [stdout]BACKUP object "20250812T210857" added
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]C:\Windows\System32>REM Ensure that api directory is empty before deploying files 
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]C:\Windows\System32>DEL /S /Q D:\tar-surge-Api-staging\Apiservices\* 
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]C:\Windows\System32>DEL /S /Q D:\tar-surge-Api-staging\serverconfig\* 
-2025-08-12 21:08:57 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1
-2025-08-12 21:08:57 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\index.html
-2025-08-12 21:08:57 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\Cammis.Surge.Api.d\conf.yml
-2025-08-12 21:08:57 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\iis.d\conf.yaml
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]C:\Windows\System32>DEL /S /Q D:\tar-surge-Api-staging\environment\* 
-2025-08-12 21:08:57 [stdout]Deleted file - D:\tar-surge-Api-staging\environment\deploy-environment.ps1
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]C:\Windows\System32>DEL /S /Q D:\tar-surge-Api-staging\scripts\* 
-2025-08-12 21:08:57 [stdout]Deleted file - D:\tar-surge-Api-staging\scripts\deploy-files.ps1
-2025-08-12 21:08:57 [stdout]
-2025-08-12 21:08:57 [stdout]C:\Windows\System32>exit 0 
-2025-08-12 21:08:58 LifecycleEvent - AfterInstall
-2025-08-12 21:08:58 Script - \after-install.bat
-2025-08-12 21:08:59 [stdout]"CONFIG will be deployed"
-2025-08-12 21:08:59 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:155 char:108
-2025-08-12 21:08:59 [stderr]+ ... ontrol.FileSystemAccessRule ('ddagentuser', "ReadAndExecute",ƒ??Conta ...
-2025-08-12 21:08:59 [stderr]+                                                                  ~
-2025-08-12 21:08:59 [stderr]Missing expression after ','.
-2025-08-12 21:08:59 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:155 char:108
-2025-08-12 21:08:59 [stderr]+ ... cessRule ('ddagentuser', "ReadAndExecute",ƒ??ContainerInherit,ObjectI ...
-2025-08-12 21:08:59 [stderr]+                                               ~~~~~~~~~~~~~~~~~~~
-2025-08-12 21:08:59 [stderr]Unexpected token 'ƒ??ContainerInherit' in expression or statement.
-2025-08-12 21:08:59 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:155 char:108
-2025-08-12 21:08:59 [stderr]+ ... ontrol.FileSystemAccessRule ('ddagentuser', "ReadAndExecute",ƒ??Conta ...
-2025-08-12 21:08:59 [stderr]+                                                                  ~
-2025-08-12 21:08:59 [stderr]Missing closing ')' in expression.
-2025-08-12 21:08:59 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:155 char:167
-2025-08-12 21:08:59 [stderr]+ ... Execute",ƒ??ContainerInherit,ObjectInheritƒ??,ƒ??Noneƒ??,ƒ??Allowƒ??)
-2025-08-12 21:08:59 [stderr]+                                                                         ~
-2025-08-12 21:08:59 [stderr]Unexpected token ')' in expression or statement.
-2025-08-12 21:08:59 [stderr]    + CategoryInfo          : ParserError: (:) [], ParseException
-2025-08-12 21:08:59 [stderr]    + FullyQualifiedErrorId : MissingExpressionAfterToken
-2025-08-12 21:08:59 [stderr] 
+Adding ddagentuser to C:\ProgramData\Amazon\CodeDeploy\deployment-logs so Datadog can read the CodeDeploy log file
+2025-08-12 21:43:49 [stdout]
+2025-08-12 21:43:49 [stderr]Method invocation failed because [System.Object[]] does not contain a method named 'op_BitwiseOr'.
+2025-08-12 21:43:49 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:125 char:1
+2025-08-12 21:43:49 [stderr]+ $ACL_Rule = new-object System.Security.AccessControl.FileSystemAccess ...
+2025-08-12 21:43:49 [stderr]+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-08-12 21:43:49 [stderr]    + CategoryInfo          : InvalidOperation: (op_BitwiseOr:String) [], RuntimeException
+2025-08-12 21:43:49 [stderr]    + FullyQualifiedErrorId : MethodNotFound
+2025-08-12 21:43:49 [stderr] 
+2025-08-12 21:43:49 [stderr]Exception calling "SetAccessRule" with "1" argument(s): "Value cannot be null.
+2025-08-12 21:43:49 [stderr]Parameter name: rule"
+2025-08-12 21:43:49 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:132 char:1
+2025-08-12 21:43:49 [stderr]+ $ACL.SetAccessRule($ACL_Rule)
+2025-08-12 21:43:49 [stderr]+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-08-12 21:43:49 [stderr]    + CategoryInfo          : NotSpecified: (:) [], MethodInvocationException
+2025-08-12 21:43:49 [stderr]    + FullyQualifiedErrorId : ArgumentNullException
