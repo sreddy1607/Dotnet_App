@@ -1,0 +1,166 @@
+function Stop-Web-App-Pool($AppPoolName) {
+     if ((Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped") {
+         Write-Host "$AppPoolName already stopped"
+     }
+     else {
+         Write-Host "Shutting down $AppPoolName"
+         Stop-WebAppPool -Name $AppPoolName
+     }
+ 
+     do {
+         Start-Sleep -Seconds 1
+     } until ((Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped")
+ }
+ 
+ function Stop-Web-Site($WebsiteName) {
+     if ((Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped") {
+         Write-Host "$WebsiteName already stopped"
+     }
+     else {
+         Write-Host "Shutting down $WebsiteName"
+         Stop-Website -Name $WebsiteName
+     }
+ 
+     do {
+         Start-Sleep -Seconds 1
+     } until ((Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped")
+ }
+ 
+ # Ensure script runs in 64-bit mode
+ if ($PSHOME -like "*SysWOW64*") {
+     Write-Warning "Restarting script in 64-bit Windows PowerShell..."
+     & (Join-Path ($PSHOME -replace "SysWOW64", "SysNative") powershell.exe) -NoProfile -File `
+         (Join-Path $PSScriptRoot $MyInvocation.MyCommand) @args
+     Exit $LastExitCode
+ }
+ 
+ # Setup Paths & Variables
+ Import-Module -Name WebAdministration
+ $SiteName = "Apiservices"
+ $SiteFolder = 'D:\inetpub\ApiServices'
+ $LoggingDir = 'D:\IISLogs'
+ $AppPoolName = 'Apiservices'
+ $StagingDir = "D:\tar-surge-Api-staging"
+ $IISRootDir = "D:\inetpub"
+ 
+ # Ensure Required Directories Exist
+ Write-Host "Ensuring required directories exist..."
+ @("$SiteFolder", "$LoggingDir", "D:\apps\ErrorLogs") | ForEach-Object {
+     if (-Not (Test-Path -Path $_)) {
+         New-Item -ItemType "directory" -Path $_ | Out-Null
+     }
+ }
+
+# Stop Site & App Pool if they exist
+ Write-Host "Stopping '$SiteName'"
+ Stop-Web-Site("$SiteName")
+ 
+ Write-Host "Stopping Application Pool '$AppPoolName'"
+ Stop-Web-App-Pool("$AppPoolName")
+
+# Remove all sites
+
+Get-Website | ForEach-Object {
+Write-Host "Removing site: $($_.Name)"
+Remove-Website -Name $_.Name -ErrorAction SilentlyContinue
+
+}
+ 
+# Remove all app pools
+
+Get-WebAppPool | ForEach-Object {
+Write-Host "Removing app pool: $($_.Name)"
+Remove-WebAppPool -Name $_.Name -ErrorAction SilentlyContinue
+
+}
+
+# Create IIS Site (No Nested App)
+Write-Host "Creating IIS site '$SiteName' and assigning to App Pool '$AppPoolName'"
+New-WebSite -Name "$SiteName" -PhysicalPath "$SiteFolder" -ApplicationPool "$AppPoolName" -Force
+
+# Remove default wildcard binding
+Write-Host "Removing default binding on *:80"
+Remove-WebBinding -Name "$SiteName" -Protocol "http" -Port 80 -ErrorAction SilentlyContinue
+
+# Configure Site Bindings (No IP Address)
+Write-Host "Configuring web bindings for '$SiteName'"
+New-WebBinding -Name "$SiteName" -Protocol "http" -Port 80
+ 
+# Configure Logging Directory
+Write-Host "Setting logging directory for '$SiteName'"
+Set-WebConfigurationProperty "/system.applicationHost/sites/siteDefaults" -Name logfile.directory -Value $LoggingDir 
+ 
+# Create New Application Pool
+Write-Host "Creating Application Pool '$AppPoolName'"
+New-WebAppPool -Name $AppPoolName
+ 
+Write-Host "Setting $AppPoolName to No Managed Code"
+Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name managedRuntimeVersion -Value ""
+
+# === Grant App Pool permission to zConnect cert using Subject ===
+
+$appPoolIdentity = "IIS AppPool\Apiservices"
+
+# Search for certificate by subject (Common Name)
+$cert = Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object {
+    $_.Subject -like "*CN=MMIS Surge zOSConnect Test Client*"
+}
+
+if (-not $cert) {
+    Write-Error "zConnect certificate with CN 'MMIS Surge zOSConnect Test Client' not found."
+    exit 1
+}
+
+Write-Host "Found zConnect certificate: $($cert.Subject)"
+
+# Locate the private key file path
+$keyFile = Join-Path "$env:ProgramData\Microsoft\Crypto\RSA\MachineKeys" `
+    $cert.PrivateKey.CspKeyContainerInfo.UniqueKeyContainerName
+
+# Grant Read permission if not already present
+$acl = Get-Acl $keyFile
+if (-not ($acl.Access | Where-Object { $_.IdentityReference -eq $appPoolIdentity })) {
+    $rule = New-Object System.Security.AccessControl.FileSystemAccessRule($appPoolIdentity, "Read", "Allow")
+    $acl.AddAccessRule($rule)
+    Set-Acl $keyFile $acl
+    Write-Host "Read access granted to $appPoolIdentity on zConnect cert"
+} else {
+    Write-Host "$appPoolIdentity already has read access to zConnect cert"
+}
+
+
+# Disable time-based recycling (default is 1740 minutes)
+Write-Host "Disabling regular time interval recycling for $AppPoolName"
+Set-WebConfigurationProperty -Filter "/system.applicationHost/applicationPools/add[@name='$AppPoolName']/recycling/periodicRestart" 
+    -Name "time" 
+    -Value "00:00:00"
+
+# Enable 'Load User Profile'
+Write-Host "Setting 'Load User Profile' to True for $AppPoolName"
+Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.loadUserProfile -Value $true
+
+ 
+Write-Host "Pushing the index.html file out"
+Remove-Item $IISRootDir\index.html
+Copy-Item $StagingDir\serverconfig\index.html -Destination $IISRootDir
+$HOST_NAME = & hostname
+(Get-Content $IISRootDir\index.html) -replace "{server-hostname}", "$HOST_NAME" | Set-Content $IISRootDir\index.html
+
+Write-Host "Installing/Updating Datadog Configuration"
+xcopy /s/y/e $StagingDir\serverconfig\datadog\conf.d\* C:\ProgramData\Datadog\conf.d\
+
+Write-Host "`nAdding ddagentuser to C:\ProgramData\Amazon\CodeDeploy\deployment-logs so Datadog can read the CodeDeploy log file`n"
+$Folder = 'C:\ProgramData\Amazon\CodeDeploy\deployment-logs'
+$ACL = Get-Acl  $Folder
+$ACL_Rule = new-object System.Security.AccessControl.FileSystemAccessRule ('ddagentuser', "ReadAndExecute",”ContainerInherit,ObjectInherit”,”None”,”Allow”)
+$ACL.SetAccessRule($ACL_Rule)
+Set-Acl -Path $Folder -AclObject $ACL
+
+Write-Host "Restarting the Datadog agent service"
+& 'C:\Program Files\Datadog\Datadog Agent\bin\agent.exe' restart-service
+
+Write-Host "Resetting IIS to ensure everything is restarted"
+& 'C:\Windows\System32\iisreset.exe'
+
+
+Write-Host "Configuration Deploy Complete"
