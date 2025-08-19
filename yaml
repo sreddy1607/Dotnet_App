@@ -1,81 +1,35 @@
-]WARNING: Restarting script in 64-bit Windows PowerShell...
-2025-08-12 21:53:55 [stdout]Ensuring required directories exist...
-2025-08-12 21:53:55 [stdout]Stopping 'Apiservices'
-2025-08-12 21:53:55 [stdout]Shutting down Apiservices
-2025-08-12 21:53:56 [stdout]Stopping Application Pool 'Apiservices'
-2025-08-12 21:53:56 [stdout]Shutting down Apiservices
-2025-08-12 21:53:58 [stdout]Removing site: Apiservices
-2025-08-12 21:53:58 [stderr]Get-WebAppPool : The term 'Get-WebAppPool' is not recognized as the name of a cmdlet, function, script file, or 
-2025-08-12 21:53:58 [stderr]operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try 
-2025-08-12 21:53:58 [stderr]again.
-2025-08-12 21:53:58 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:71 char:1
-2025-08-12 21:53:58 [stderr]+ Get-WebAppPool | ForEach-Object {
-2025-08-12 21:53:58 [stderr]+ ~~~~~~~~~~~~~~
-2025-08-12 21:53:58 [stderr]    + CategoryInfo          : ObjectNotFound: (Get-WebAppPool:String) [], CommandNotFoundException
-2025-08-12 21:53:58 [stderr]    + FullyQualifiedErrorId : CommandNotFoundException
-2025-08-12 21:53:58 [stderr] 
-2025-08-12 21:53:58 [stdout]Creating IIS site 'Apiservices' and assigning to App Pool 'Apiservices'
-2025-08-12 21:53:59 [stdout]
-2025-08-12 21:53:59 [stdout]Name             ID   State      Physical Path                  Bindings                                               
-2025-08-12 21:53:59 [stdout]----             --   -----      -------------                  --------                                               
-2025-08-12 21:53:59 [stdout]Apiservices      1    Started    D:\inetpub\ApiServices         http *:80:                                             
-2025-08-12 21:53:59 [stdout]Removing default binding on *:80
-2025-08-12 21:53:59 [stdout]Configuring web bindings for 'Apiservices'
-2025-08-12 21:53:59 [stdout]Setting logging directory for 'Apiservices'
-2025-08-12 21:54:00 [stdout]Creating Application Pool 'Apiservices'
-2025-08-12 21:54:00 [stderr]New-WebAppPool : Destination element already exists, please use "force" parameter to override.
-2025-08-12 21:54:00 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:95 char:1
-2025-08-12 21:54:00 [stderr]+ New-WebAppPool -Name $AppPoolName
-2025-08-12 21:54:00 [stderr]+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-2025-08-12 21:54:00 [stderr]    + CategoryInfo          : InvalidArgument: (:) [New-WebAppPool], ArgumentException
-2025-08-12 21:54:00 [stderr]    + FullyQualifiedErrorId : Destination element already exists, please use "force" parameter to override.,Microsoft. 
-2025-08-12 21:54:00 [stderr]   IIs.PowerShell.Provider.NewAppPoolCommand
-2025-08-12 21:54:00 [stderr] 
-2025-08-12 21:54:00 [stdout]Setting Apiservices to No Managed Code
-2025-08-12 21:54:01 [stdout]Disabling regular time interval recycling for Apiservices
-2025-08-12 21:54:01 [stderr]Set-WebConfigurationProperty : Cannot process command because of one or more missing mandatory parameters: Name Value.
-2025-08-12 21:54:01 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:104 char:1
-2025-08-12 21:54:01 [stderr]+ Set-WebConfigurationProperty -Filter "/system.applicationHost/applica ...
-2025-08-12 21:54:01 [stderr]+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-2025-08-12 21:54:01 [stderr]    + CategoryInfo          : InvalidArgument: (:) [Set-WebConfigurationProperty], ParameterBindingException
-2025-08-12 21:54:01 [stderr]    + FullyQualifiedErrorId : MissingMandatoryParameter,Microsoft.IIs.PowerShell.Provider.SetConfigurationPropertyComm 
-2025-08-12 21:54:01 [stderr]   and
-2025-08-12 21:54:01 [stderr] 
-2025-08-12 21:54:01 [stderr]-Name : The term '-Name' is not recognized as the name of a cmdlet, function, script file, or operable program. Check 
-2025-08-12 21:54:01 [stderr]the spelling of the name, or if a path was included, verify that the path is correct and try again.
-2025-08-12 21:54:01 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:105 char:5
-2025-08-12 21:54:01 [stderr]+     -Name "time"
-2025-08-12 21:54:01 [stderr]+     ~~~~~
-2025-08-12 21:54:01 [stderr]    + CategoryInfo          : ObjectNotFound: (-Name:String) [], CommandNotFoundException
-2025-08-12 21:54:01 [stderr]    + FullyQualifiedErrorId : CommandNotFoundException
-2025-08-12 21:54:01 [stderr] 
-2025-08-12 21:54:01 [stderr]-Value : The term '-Value' is not recognized as the name of a cmdlet, function, script file, or operable program. 
-2025-08-12 21:54:01 [stderr]Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
-2025-08-12 21:54:01 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:106 char:5
-2025-08-12 21:54:01 [stderr]+     -Value "00:00:00"
-2025-08-12 21:54:01 [stderr]+     ~~~~~~
-2025-08-12 21:54:01 [stderr]    + CategoryInfo          : ObjectNotFound: (-Value:String) [], CommandNotFoundException
-2025-08-12 21:54:01 [stderr]    + FullyQualifiedErrorId : CommandNotFoundException
-2025-08-12 21:54:01 [stderr] 
-2025-08-12 21:54:01 [stdout]Setting 'Load User Profile' to True for Apiservices
-2025-08-12 21:54:02 [stdout]Pushing the index.html file out
-2025-08-12 21:54:02 [stdout]Installing/Updating Datadog Configuration
-2025-08-12 21:54:02 [stdout]D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\deploy.d\conf.yaml
-2025-08-12 21:54:02 [stdout]D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\iis.d\conf.yaml
-2025-08-12 21:54:02 [stdout]D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\surgeapi.d\conf.yaml
-2025-08-12 21:54:02 [stdout]3 File(s) copied
-2025-08-12 21:54:02 [stdout]
-2025-08-12 21:54:02 [stdout]Adding ddagentuser to C:\ProgramData\Amazon\CodeDeploy\deployment-logs so Datadog can read the CodeDeploy log file
-2025-08-12 21:54:02 [stdout]
-2025-08-12 21:54:02 [stdout]Restarting the Datadog agent service
-2025-08-12 21:54:03 [stdout]Resetting IIS to ensure everything is restarted
-2025-08-12 21:54:16 [stdout]
-2025-08-12 21:54:16 [stdout]Attempting stop...
-2025-08-12 21:54:16 [stdout]
-2025-08-12 21:54:16 [stdout]Internet services successfully stopped
-2025-08-12 21:54:16 [stdout]
-2025-08-12 21:54:16 [stdout]Attempting start...
-2025-08-12 21:54:16 [stdout]
-2025-08-12 21:54:16 [stdout]Internet services successfully restarted
-2025-08-12 21:54:16 [stdout]
-2025-08-12 21:54:16 [stdout]Configuration Deploy Complete
+ERROR: Could not do lightweight checkout, falling back to heavyweight
+java.io.FileNotFoundException: MotioCI/api/CLI/Jenkinsfile-motio-template
+	at org.jenkinsci.plugins.github_branch_source.GitHubSCMFile.content(GitHubSCMFile.java:193)
+	at jenkins.scm.api.SCMFile.contentAsString(SCMFile.java:335)
+	at org.jenkinsci.plugins.workflow.multibranch.SCMBinder.create(SCMBinder.java:108)
+	at org.jenkinsci.plugins.workflow.job.WorkflowRun.run(WorkflowRun.java:311)
+	at hudson.model.ResourceController.execute(ResourceController.java:101)
+	at hudson.model.Executor.run(Executor.java:442)
+Checking out git https://github.com/ca-mmis/combined-devops-cognos-deployments.git into /var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/branches/motioci-poctest/workspace@script/cbdc51a6b5c55421281bdd3767b68db92325e0983024656f62882c05deb00f2b to read MotioCI/api/CLI/Jenkinsfile-motio-template
+The recommended git tool is: NONE
+using credential github-key
+Cloning the remote Git repository
+Cloning with configured refspecs honoured and without tags
+Cloning repository https://github.com/ca-mmis/combined-devops-cognos-deployments.git
+ > git init /var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/branches/motioci-poctest/workspace@script/cbdc51a6b5c55421281bdd3767b68db92325e0983024656f62882c05deb00f2b # timeout=10
+Fetching upstream changes from https://github.com/ca-mmis/combined-devops-cognos-deployments.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.43.0'
+using GIT_ASKPASS to set credentials Used by Jenkins to access GitHub - Jenkins github service account
+ > git fetch --no-tags --force --progress -- https://github.com/ca-mmis/combined-devops-cognos-deployments.git +refs/heads/motioci-poctest:refs/remotes/origin/motioci-poctest # timeout=10
+ > git config remote.origin.url https://github.com/ca-mmis/combined-devops-cognos-deployments.git # timeout=10
+ > git config --add remote.origin.fetch +refs/heads/motioci-poctest:refs/remotes/origin/motioci-poctest # timeout=10
+Avoid second fetch
+Checking out Revision f2bb723b03fac83c74faeaff4d5bc0222b2bcef2 (motioci-poctest)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f f2bb723b03fac83c74faeaff4d5bc0222b2bcef2 # timeout=10
+Commit message: "Update and rename Jenkinsfile-motio-template to Jenkinsfile-motio-template.groovy"
+ > git rev-list --no-walk 5c6644695ef736e71e018d802146cec611e38c3f # timeout=10
+ERROR: /var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/branches/motioci-poctest/workspace@script/cbdc51a6b5c55421281bdd3767b68db92325e0983024656f62882c05deb00f2b/MotioCI/api/CLI/Jenkinsfile-motio-template not found
+
+GitHub has been notified of this commit’s build result
+
+[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: Cognos Jobs/Cognos_deployment_pipeline/motioci-poctest #27 did not yet start
+[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: Cognos Jobs/Cognos_deployment_pipeline/motioci-poctest #27 did not yet start
+Finished: FAILURE
