@@ -1,60 +1,23 @@
-[Pipeline] echo
-16:01:31  Branch: motioci-poctest
-[Pipeline] echo
-16:01:31  Project: Demo
-[Pipeline] echo
-16:01:31  Instances: DEV/TEST='Cognos-DEV/TEST' PROD='Cognos-PRD'
-[Pipeline] echo
-16:01:31  Source Label ID (DEV): 57
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Check Python Availability)
-[Pipeline] container
-[Pipeline] {
+16:38:29  + set -euo pipefail
+16:38:29  + cd MotioCI/api/CLI
+16:38:29  + python3 -m pip install --user -r requirements.txt
+16:38:34    WARNING: The script normalizer is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+16:38:34    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+16:38:34    WARNING: The script gitlab is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+16:38:34    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+16:38:34    WARNING: The script gql-cli is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+16:38:34    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+16:38:34  ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+16:38:34  pandas 2.2.1 requires python-dateutil>=2.8.2, but you have python-dateutil 2.8.1 which is incompatible.
+16:38:34  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
 [Pipeline] sh
-16:01:31  + echo 'Checking for Python3...'
-16:01:31  Checking for Python3...
-16:01:31  + which python3
-16:01:31  /usr/bin/python3
-16:01:31  + python3 --version
-16:01:31  Python 3.6.8
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (MotioCI Login)
-[Pipeline] withCredentials
-16:01:32  Masking supported pattern matches of $CREDENTIALS_FILE
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] sh
-16:01:32  + set -euo pipefail
-16:01:32  + cd MotioCI/api/CLI
-16:01:32  + python3 -m pip install --user -r requirements.txt
-16:01:37    WARNING: The script normalizer is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
-16:01:37    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-16:01:37    WARNING: The script gitlab is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
-16:01:37    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-16:01:37    WARNING: The script gql-cli is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
-16:01:37    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-16:01:37  ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-16:01:37  pandas 2.2.1 requires python-dateutil>=2.8.2, but you have python-dateutil 2.8.1 which is incompatible.
-16:01:37  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
-[Pipeline] sh
-16:01:38  + set -euo pipefail
-16:01:38  + cd MotioCI/api/CLI
-16:01:38  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
-16:01:38  + awk '-F: ' '/^x-auth_token:/ {print $2}'
-16:01:38  + tr -d ' \r\n'
+16:38:35  + set -euo pipefail
+16:38:35  + cd MotioCI/api/CLI
+16:38:35  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
+16:38:35  + awk '-F: ' '/^x-auth_token:/ {print $2}'
+16:38:35  + tr -d ' \r\n'
 [Pipeline] echo
-16:01:42  MotioCI login OK
+16:38:39  MotioCI login OK
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] }
@@ -70,37 +33,37 @@
 [Pipeline] script
 [Pipeline] {
 [Pipeline] sh
-16:01:43  + set -euo pipefail
-16:01:43  + cd MotioCI/api/CLI
-16:01:43  + echo 'Checking if label TEST-PROMOTED-35 already exists in DEV/TEST...'
-16:01:43  Checking if label TEST-PROMOTED-35 already exists in DEV/TEST...
-16:01:43  + grep -q TEST-PROMOTED-35
-16:01:43  ++ grep MOTIO_AUTH_TOKEN /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/motio.env
-16:01:43  ++ cut -d= -f2
-16:01:43  grep: /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/motio.env: No such file or directory
-16:01:43  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken= --instanceName=Cognos-DEV/TEST --projectName=Demo
-16:01:43  Traceback (most recent call last):
-16:01:43    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 910, in json
-16:01:43      return complexjson.loads(self.text, **kwargs)
-16:01:43    File "/usr/lib64/python3.9/json/__init__.py", line 346, in loads
-16:01:43      return _default_decoder.decode(s)
-16:01:43    File "/usr/lib64/python3.9/json/decoder.py", line 337, in decode
-16:01:43      obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-16:01:43    File "/usr/lib64/python3.9/json/decoder.py", line 355, in raw_decode
-16:01:43      raise JSONDecodeError("Expecting value", s, err.value) from None
-16:01:43  json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-16:01:43  
-16:01:43  During handling of the above exception, another exception occurred:
-16:01:43  
-16:01:43  Traceback (most recent call last):
-16:01:43    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 530, in <module>
-16:01:43      labels.get_labels_specific(args.instanceName, args.projectName)
-16:01:43    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/labels.py", line 100, in get_labels_specific
-16:01:43      label_array = response.json()["data"]["instances"]["edges"][0]["node"]["projects"]["edges"][0]["node"]["labels"][
-16:01:43    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 917, in json
-16:01:43      raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
-16:01:43  requests.exceptions.JSONDecodeError: [Errno Expecting value] : 0
-16:01:43  + true
+16:38:40  + set -euo pipefail
+16:38:40  + cd MotioCI/api/CLI
+16:38:40  + echo 'Checking if label TEST-PROMOTED-36 already exists in DEV/TEST...'
+16:38:40  Checking if label TEST-PROMOTED-36 already exists in DEV/TEST...
+16:38:40  + grep -q TEST-PROMOTED-36
+16:38:40  ++ grep MOTIO_AUTH_TOKEN /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/motio.env
+16:38:40  ++ cut -d= -f2
+16:38:40  grep: /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/motio.env: No such file or directory
+16:38:40  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken= --instanceName=Cognos-DEV/TEST --projectName=Demo
+16:38:40  Traceback (most recent call last):
+16:38:40    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 910, in json
+16:38:40      return complexjson.loads(self.text, **kwargs)
+16:38:40    File "/usr/lib64/python3.9/json/__init__.py", line 346, in loads
+16:38:40      return _default_decoder.decode(s)
+16:38:40    File "/usr/lib64/python3.9/json/decoder.py", line 337, in decode
+16:38:40      obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+16:38:40    File "/usr/lib64/python3.9/json/decoder.py", line 355, in raw_decode
+16:38:40      raise JSONDecodeError("Expecting value", s, err.value) from None
+16:38:40  json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+16:38:40  
+16:38:40  During handling of the above exception, another exception occurred:
+16:38:40  
+16:38:40  Traceback (most recent call last):
+16:38:40    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 530, in <module>
+16:38:40      labels.get_labels_specific(args.instanceName, args.projectName)
+16:38:40    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/labels.py", line 100, in get_labels_specific
+16:38:40      label_array = response.json()["data"]["instances"]["edges"][0]["node"]["projects"]["edges"][0]["node"]["labels"][
+16:38:40    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 917, in json
+16:38:40      raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+16:38:40  requests.exceptions.JSONDecodeError: [Errno Expecting value] : 0
+16:38:40  + true
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] }
@@ -110,6 +73,20 @@
 [Pipeline] stage
 [Pipeline] { (Promote DEV)
 [Pipeline] withCredentials
+16:38:41  Masking supported pattern matches of $COGNOS_USER or $COGNOS_PASS
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+16:38:41  + set -euo pipefail
+16:38:41  + cd MotioCI/api/CLI
+16:38:41  ++ grep MOTIO_AUTH_TOKEN /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/motio.env
+16:38:41  ++ cut -d= -f2
+16:38:41  grep: /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/motio.env: No such file or directory
+16:38:41  + AUTH=
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
 [Pipeline] // withCredentials
 [Pipeline] }
 [Pipeline] // stage
@@ -134,9 +111,9 @@ Stage "Promote PROD" skipped due to earlier failure(s)
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-16:01:44  Pipeline execution finished.
+16:38:41  Pipeline execution finished.
 [Pipeline] echo
-16:01:44  Pipeline failed.
+16:38:42  Pipeline failed.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -152,9 +129,9 @@ Stage "Promote PROD" skipped due to earlier failure(s)
 [Pipeline] }
 [Pipeline] // podTemplate
 [Pipeline] End of Pipeline
-ERROR: Could not find credentials entry with ID 'cognosserviceaccount'
+ERROR: script returned exit code 2
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/35/.jfrog deleted
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/36/.jfrog deleted
 Finished: FAILURE
