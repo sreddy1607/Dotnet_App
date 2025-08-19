@@ -1,35 +1,127 @@
-ERROR: Could not do lightweight checkout, falling back to heavyweight
-java.io.FileNotFoundException: MotioCI/api/CLI/Jenkinsfile-motio-template
-	at org.jenkinsci.plugins.github_branch_source.GitHubSCMFile.content(GitHubSCMFile.java:193)
-	at jenkins.scm.api.SCMFile.contentAsString(SCMFile.java:335)
-	at org.jenkinsci.plugins.workflow.multibranch.SCMBinder.create(SCMBinder.java:108)
-	at org.jenkinsci.plugins.workflow.job.WorkflowRun.run(WorkflowRun.java:311)
-	at hudson.model.ResourceController.execute(ResourceController.java:101)
-	at hudson.model.Executor.run(Executor.java:442)
-Checking out git https://github.com/ca-mmis/combined-devops-cognos-deployments.git into /var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/branches/motioci-poctest/workspace@script/cbdc51a6b5c55421281bdd3767b68db92325e0983024656f62882c05deb00f2b to read MotioCI/api/CLI/Jenkinsfile-motio-template
-The recommended git tool is: NONE
-using credential github-key
-Cloning the remote Git repository
-Cloning with configured refspecs honoured and without tags
-Cloning repository https://github.com/ca-mmis/combined-devops-cognos-deployments.git
- > git init /var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/branches/motioci-poctest/workspace@script/cbdc51a6b5c55421281bdd3767b68db92325e0983024656f62882c05deb00f2b # timeout=10
-Fetching upstream changes from https://github.com/ca-mmis/combined-devops-cognos-deployments.git
- > git --version # timeout=10
- > git --version # 'git version 2.43.0'
-using GIT_ASKPASS to set credentials Used by Jenkins to access GitHub - Jenkins github service account
- > git fetch --no-tags --force --progress -- https://github.com/ca-mmis/combined-devops-cognos-deployments.git +refs/heads/motioci-poctest:refs/remotes/origin/motioci-poctest # timeout=10
- > git config remote.origin.url https://github.com/ca-mmis/combined-devops-cognos-deployments.git # timeout=10
- > git config --add remote.origin.fetch +refs/heads/motioci-poctest:refs/remotes/origin/motioci-poctest # timeout=10
-Avoid second fetch
-Checking out Revision f2bb723b03fac83c74faeaff4d5bc0222b2bcef2 (motioci-poctest)
- > git config core.sparsecheckout # timeout=10
- > git checkout -f f2bb723b03fac83c74faeaff4d5bc0222b2bcef2 # timeout=10
-Commit message: "Update and rename Jenkinsfile-motio-template to Jenkinsfile-motio-template.groovy"
- > git rev-list --no-walk 5c6644695ef736e71e018d802146cec611e38c3f # timeout=10
-ERROR: /var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/branches/motioci-poctest/workspace@script/cbdc51a6b5c55421281bdd3767b68db92325e0983024656f62882c05deb00f2b/MotioCI/api/CLI/Jenkinsfile-motio-template not found
+[Pipeline] stage
+[Pipeline] { (MotioCI Login)
+[Pipeline] withCredentials
+15:46:17  Masking supported pattern matches of $CREDENTIALS_FILE
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
+15:46:18  + set -euo pipefail
+15:46:18  + cd MotioCI/api/CLI
+15:46:18  + python3 -m pip install --user -r requirements.txt
+15:46:23    WARNING: The script normalizer is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+15:46:23    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+15:46:23    WARNING: The script gitlab is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+15:46:23    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+15:46:23    WARNING: The script gql-cli is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+15:46:23    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+15:46:23  ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+15:46:23  pandas 2.2.1 requires python-dateutil>=2.8.2, but you have python-dateutil 2.8.1 which is incompatible.
+15:46:23  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+[Pipeline] sh
+15:46:25  + set -euo pipefail
+15:46:25  + cd MotioCI/api/CLI
+15:46:25  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
+15:46:25  + awk '-F: ' '/^x-auth_token:/ {print $2}'
+15:46:25  + tr -d ' \r\n'
+[Pipeline] echo
+15:46:30  MotioCI login OK
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Resolve Instance IDs)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
+15:46:36  + set -euo pipefail
+15:46:36  + cd MotioCI/api/CLI
+15:46:36  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov instance ls --xauthtoken=eefa75bc-d6c2-4d72-bd11-d8084778727d --json
+15:46:36  + python3 - Cognos-DEV/TEST
+15:46:36  Traceback (most recent call last):
+15:46:36    File "<stdin>", line 3, in <module>
+15:46:36    File "/usr/lib64/python3.9/json/__init__.py", line 293, in load
+15:46:36      return loads(fp.read(),
+15:46:36    File "/usr/lib64/python3.9/json/__init__.py", line 346, in loads
+15:46:36      return _default_decoder.decode(s)
+15:46:36    File "/usr/lib64/python3.9/json/decoder.py", line 337, in decode
+15:46:36      obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+15:46:36    File "/usr/lib64/python3.9/json/decoder.py", line 355, in raw_decode
+15:46:36      raise JSONDecodeError("Expecting value", s, err.value) from None
+15:46:36  json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+15:46:36  usage: ci-cli.py [-h] --server SERVER
+15:46:36                   {login,instance,project,label,labelVersion,deploy,versionedItems,logout}
+15:46:36                   ...
+15:46:36  ci-cli.py: error: unrecognized arguments: --json
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Preflight (DEV/TEST))
+Stage "Preflight (DEV/TEST)" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Promote: DEV -> TEST)
+Stage "Promote: DEV -> TEST" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Approve PROD)
+Stage "Approve PROD" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Preflight (find TEST label by name))
+Stage "Preflight (find TEST label by name)" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Promote: TEST -> PROD)
+Stage "Promote: TEST -> PROD" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+15:46:44  Pipeline execution finished.
+[Pipeline] echo
+15:46:44  Pipeline failed.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // timestamps
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] }
+[Pipeline] // podTemplate
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
 
 GitHub has been notified of this commit’s build result
 
-[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: Cognos Jobs/Cognos_deployment_pipeline/motioci-poctest #27 did not yet start
-[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: Cognos Jobs/Cognos_deployment_pipeline/motioci-poctest #27 did not yet start
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/30/.jfrog deleted
 Finished: FAILURE
