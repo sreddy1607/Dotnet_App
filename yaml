@@ -1,4 +1,148 @@
-Pipeline] // script
+ stage
+[Pipeline] { (List Namespaces (DEV))
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+18:05:14  + set -euo pipefail
+18:05:14  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+18:05:14  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+18:05:14  + cd MotioCI/api/CLI
+18:05:14  + python3 -
+18:05:14  /usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py:1061: InsecureRequestWarning: Unverified HTTPS request is being made to host 'cgrptmcip01.cloud.cammis.ca.gov'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html#ssl-warnings
+18:05:14    warnings.warn(
+18:05:14  === DEV/TEST Namespaces ===
+18:05:14  Failed to parse namespaces. Raw response:
+18:05:14  
+18:05:14  
+18:05:14  
+18:05:14  
+18:05:14  
+18:05:14  
+18:05:14  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+18:05:14  <meta http-equiv="pragma" content="no-cache"/>
+18:05:14  <meta http-equiv="cache-control" content="no-cache"/>
+18:05:14  
+18:05:14  
+18:05:14  
+18:05:14  
+18:05:14  <script type="text/javascript" src="/scripts/rclci/common/BrowserSniffer.js" language="JavaScript"></script>
+18:05:14  <script type="text/javascript" src="/scripts/rclci/common/JsUtil.js"></script>
+18:05:14  <script type="text/javascript" src="/scripts/rclci/common/CommonIncludes.js"></script>
+18:05:14  
+18:05:14  <script type="text/javascript" src="/scripts/rclci/common/DocumentLifeCycleMonitor.js" language="JavaScript"></script>
+18:05:14  <script type="text/javascript" src="/scripts/rclci/common/BrowserGeometry.js" language="JavaScript"></script>
+18:05:14  
+18:05:14  
+18:05:14  <script type="text/javascript">
+18:05:14  
+18:05:14  BASE_URL = location.protocol + '//' + window.location.host + '';
+18:05:14  
+18:05:14  launchNewWindow = function(aUrl, aName, aWidth, aHeight)
+18:05:14  {
+18:05:14     //alert("url [" + aUrl + "]\nname=[" + aName + "]\nwidth=[" + aWidth + "]\nheight = [" +aHeight  + "]");
+18:05:14     var geom = new BrowserGeometry();
+18:05:14  
+18:05:14     var width = (aWidth ? aWidth : 1024);
+18:05:14     var height = (aHeight ? aHeight : 768);
+18:05:14     var name = (aName ? aName : "_blank");
+18:05:14  
+18:05:14     var features = "width=" + width + ",height=" + height + ",top=" + geom.top + ",left=" + geom.left + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,status=yes";
+18:05:14  
+18:05:14      popup = window.open(aUrl, name, features);
+18:05:14      popup.opener = null;
+18:05:14  
+18:05:14      return popup;
+18:05:14  };
+18:05:14  
+18:05:14  
+18:05:14  launchHelpWindow = function(aHelpPageUrl)
+18:05:14  {
+18:05:14     launchNewWindow(BASE_URL + aHelpPageUrl, "_help");
+18:05:14  };
+18:05:14  
+18:05:14  function replaceAll(text, oldText, newText) {
+18:05:14      while (text.indexOf(oldText) != -1) {
+18:05:14  	text = text.replace(oldText, newText);
+18:05:14      }
+18:05:14      return text;
+18:05:14  }
+18:05:14  
+18:05:14  checkKey = function(e)
+18:05:14  {
+18:05:14     var keycode;
+18:05:14     if (window.event)
+18:05:14        keycode = window.event.keyCode;
+18:05:14     else if (e)
+18:05:14        keycode = e.which;
+18:05:14     else
+18:05:14        return true;
+18:05:14  
+18:05:14     // Enter key will submit form
+18:05:14     return keycode != 13;
+18:05:14  };
+18:05:14  
+18:05:14  </script>
+18:05:14  
+18:05:14  <style type="text/css">
+18:05:14     @import "/styles/rclci.css";
+18:05:14  </style>
+18:05:14  
+18:05:14  
+18:05:14  <link rel="stylesheet" type="text/css" href="/scripts/lib/ext/resources/css/ext-all.css"/>
+18:05:14  <link rel="stylesheet" type="text/css" href="/scripts/lib/ext/resources/css/xtheme-gray.css" />
+18:05:14  <link rel="stylesheet" type="text/css" href="/styles/versionControl/override.css"/>
+18:05:14  <script type="text/javascript" src="/scripts/lib/ext/adapter/ext/ext-base.js"></script>
+18:05:14  <script type="text/javascript" src="/scripts/lib/ext/ext-all-debug.js"></script>
+18:05:14  
+18:05:14  
+18:05:14  <script type="text/javascript">
+18:05:14     Ext.BLANK_IMAGE_URL = '/images/1x1.gif';
+18:05:14  
+18:05:14     Ext.QuickTips.init();
+18:05:14     
+18:05:14     Ext.form.TextField.override({
+18:05:14        stripCharsRe: /(^\s+|\s+$)/g,
+18:05:14        validationDelay: 10000
+18:05:14     });
+18:05:14  
+18:05:14     Ext.form.CompositeField.override({
+18:05:14         width: 250
+18:05:14     });
+18:05:14  </script>
+18:05:14  
+18:05:14  <title>404 - File Not Found</title>
+18:05:14  
+18:05:14  <script type="text/javascript">
+18:05:14     Ext.onReady(function(){
+18:05:14        Ext.Msg.alert("404", "File not found.");
+18:05:14     });
+18:05:14  </script>
+18:05:14  
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (MotioCI Login (PROD))
+[Pipeline] withCredentials
+18:05:14  Masking supported pattern matches of $PROD_CRED_FILE
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
+18:05:15  + set -euo pipefail
+18:05:15  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+18:05:15  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+18:05:15  + cd MotioCI/api/CLI
+18:05:15  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
+18:05:15  + awk '-F: ' '/^x-auth_token:/ {print $2}'
+18:05:15  + tr -d ' \r\n'
+[Pipeline] echo
+18:05:19  MotioCI PROD login OK (len=36)
+[Pipeline] }
+[Pipeline] // script
 [Pipeline] }
 [Pipeline] // container
 [Pipeline] }
@@ -6,45 +150,70 @@ Pipeline] // script
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
-[Pipeline] { (List Namespaces (DEV))
+[Pipeline] { (Preflight (DEV/TEST))
 [Pipeline] container
 [Pipeline] {
 [Pipeline] sh
-17:57:35  + set -euo pipefail
-17:57:35  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:57:35  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:57:35  + cd MotioCI/api/CLI
-17:57:35  + python3 -
-17:57:35    File "<stdin>", line 6
-17:57:35      vars = {"id": int(${DEVTEST_INSTANCE_ID})}
-17:57:35                        ^
-17:57:35  SyntaxError: invalid syntax
+18:05:20  + set -euo pipefail
+18:05:20  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+18:05:20  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+18:05:20  + cd MotioCI/api/CLI
+18:05:20  + echo 'Checking label visibility for Demo in Cognos-DEV/TEST...'
+18:05:20  Checking label visibility for Demo in Cognos-DEV/TEST...
+18:05:20  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=cd9712ae-6654-4806-b230-c3f49523fd2c --instanceName=Cognos-DEV/TEST --projectName=Demo
+18:05:20  + echo 'Ensuring target TEST label does not already exist...'
+18:05:20  Ensuring target TEST label does not already exist...
+18:05:20  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=cd9712ae-6654-4806-b230-c3f49523fd2c --instanceName=Cognos-DEV/TEST --projectName=Demo --labelName=TEST-PROMOTED-42
+18:05:20  + grep -q TEST-PROMOTED-42
 [Pipeline] }
 [Pipeline] // container
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
-[Pipeline] { (MotioCI Login (PROD))
-Stage "MotioCI Login (PROD)" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Preflight (DEV/TEST))
-Stage "Preflight (DEV/TEST)" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
 [Pipeline] { (Promote DEV to TEST)
-Stage "Promote DEV to TEST" skipped due to earlier failure(s)
-[Pipeline] getContext
+[Pipeline] withCredentials
+18:05:20  Masking supported pattern matches of $COGNOS_USER or $COGNOS_PASS
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+18:05:21  + set -euo pipefail
+18:05:21  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+18:05:21  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+18:05:21  + cd MotioCI/api/CLI
+18:05:21  + echo 'Promoting DEV -> TEST as TEST-PROMOTED-42'
+18:05:21  Promoting DEV -> TEST as TEST-PROMOTED-42
+18:05:21  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov deploy --xauthtoken=cd9712ae-6654-4806-b230-c3f49523fd2c --sourceInstanceId=3 --targetInstanceId=3 --labelId=57 --projectName=Demo --targetLabelName=TEST-PROMOTED-42 --username **** --password **** --namespaceId AzureAD
+18:05:24  Error performing the deployment:
+18:05:24    [{'message': 'failed to authenticate to instance with ID 3', 'locations': [{'line': 3, 'column': 5}], 'path': ['deploy'], 'extensions': {'code': 'DEPLOYMENT_AUTHENTICATION_FAILED', 'classification': 'DataFetchingException'}}]
+18:05:24  + echo '---- DEV->TEST deploy stderr (for diagnostics) ----'
+18:05:24  ---- DEV->TEST deploy stderr (for diagnostics) ----
+18:05:24  + cat deploy_test.err
+18:05:24  + echo ---------------------------------------------------
+18:05:24  ---------------------------------------------------
+18:05:24  + grep -qiE 'denied|forbidden|401|403|DEPLOYMENT_AUTHENTICATION_FAILED|failed to authenticate' deploy_test.err
+18:05:24  + grep -qiE 'error|exception|traceback' deploy_test.err
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // withCredentials
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Verify TEST Label Created)
-Stage "Verify TEST Label Created" skipped due to earlier failure(s)
-[Pipeline] getContext
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+18:05:25  + set -euo pipefail
+18:05:25  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+18:05:25  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+18:05:25  + cd MotioCI/api/CLI
+18:05:25  + echo 'Verifying TEST-PROMOTED-42 exists in DEV/TEST...'
+18:05:25  Verifying TEST-PROMOTED-42 exists in DEV/TEST...
+18:05:25  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=cd9712ae-6654-4806-b230-c3f49523fd2c --instanceName=Cognos-DEV/TEST --projectName=Demo --labelName=TEST-PROMOTED-42
+18:05:25  + grep -q TEST-PROMOTED-42
+[Pipeline] }
+[Pipeline] // container
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
@@ -74,9 +243,9 @@ Stage "Promote TEST to PROD" skipped due to earlier failure(s)
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-17:57:40  Pipeline execution finished.
+18:05:26  Pipeline execution finished.
 [Pipeline] echo
-17:57:40  Pipeline failed.
+18:05:26  Pipeline failed.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -96,5 +265,5 @@ ERROR: script returned exit code 1
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/40/.jfrog deleted
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/42/.jfrog deleted
 Finished: FAILURE
