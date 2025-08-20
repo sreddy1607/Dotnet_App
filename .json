@@ -1,15 +1,65 @@
-credential json (dev) - 
-[
-    {
-        "instanceId": "3",
-        "apiKey": "AWk1OUMyRkU3M0U2RUM0RUZEQUQ3MTY4ODBEN0NFNDVBRWu4kJkLtIYGd/Lpzr7rmNMqQUHn"
-    }
-]
+Hi Srinivas, please see answers known below.
+
+From: Reddy, Srinivas@DHCS <Srinivas.Reddy@dhcs.ca.gov>
+Sent: Wednesday, August 20, 2025 9:49 AM
+To: Treacy, Mark@DHCS <Mark.Treacy@dhcs.ca.gov>; Butters, Dennis@DHCS <Dennis.Butters@dhcs.ca.gov>
+Cc: Singh, Taliea@DHCS <Taliea.Singh@dhcs.ca.gov>; Kumar, Rajat@DHCS <Rajat.Kumar@dhcs.ca.gov>
+Subject: Request to Enable Service Account for Cognos Deployments via MotioCI
+
  
-(prod)
-[
-    {
-        "instanceId": "1",
-        "apiKey": "AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"
-    }
-]
+
+Hi Admin & Team,
+
+ 
+
+I am working on automating Cognos deployments through MotioCI.
+
+The MotioCI authentication (API token) is working fine, but the pipeline is failing during the deploy step with the error:
+
+ 
+
+DEPLOYMENT_AUTHENTICATION_FAILED: failed to authenticate to instance with ID [X]
+
+ 
+
+This happens when MotioCI tries to log into the target Cognos instance (DEV/TEST and PROD) using the service account.
+
+ 
+
+ 
+
+Could you please help confirm the following for the service account
+
+ CMarksSS01@intra.dhs.ca.gov:
+
+ 
+
+--Namespace ID:
+
+ 
+
+What is the exact namespaceId we should use for DEV/TEST and for PROD?
+
+ 
+
+(Is it Azure AD, AzureAD, or something else? Case and spaces matter.) Azure for both
+
+ 
+
+--Account Status:
+
+ 
+
+Ensure this service account is enabled, password is valid (not expired), and no MFA/interactive login is required. Is enabled in Azure, Do not have password for this account, MFA unknown
+
+ 
+
+Confirm it can log in directly to the Cognos portal in both environments.
+
+ 
+
+--Permissions:
+
+ 
+
+Does the service account have the required Cognos roles/permissions to perform deployments via MotioCI for project Demo? Yes, it is a Cognos Administrator
