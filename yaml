@@ -1,7 +1,4 @@
-+ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov deploy --xauthtoken=f12ac0b2-3345-448f-aab6-30302c68b029 --sourceInstanceId=3 --targetInstanceId=3 --labelId=57 --projectName=Demo --targetLabelName=TEST-PROMOTED-39 --username **** --password **** --namespaceId AzureAD
-17:46:10  Error performing the deployment:
-17:46:10    [{'message': 'failed to authenticate to instance with ID 3', 'locations': [{'line': 3, 'column': 5}], 'path': ['deploy'], 'extensions': {'code': 'DEPLOYMENT_AUTHENTICATION_FAILED', 'classification': 'DataFetchingException'}}]
-17:46:11  + grep -qiE 'denied|forbidden|401|403|error' deploy_test.err
+Pipeline] // script
 [Pipeline] }
 [Pipeline] // container
 [Pipeline] }
@@ -9,20 +6,45 @@
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
-[Pipeline] { (Verify TEST Label Created)
+[Pipeline] { (List Namespaces (DEV))
 [Pipeline] container
 [Pipeline] {
 [Pipeline] sh
-17:46:12  + set -euo pipefail
-17:46:12  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:46:12  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:46:12  + cd MotioCI/api/CLI
-17:46:12  + echo 'Verifying TEST-PROMOTED-39 exists in DEV/TEST...'
-17:46:12  Verifying TEST-PROMOTED-39 exists in DEV/TEST...
-17:46:12  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=f12ac0b2-3345-448f-aab6-30302c68b029 --instanceName=Cognos-DEV/TEST --projectName=Demo --labelName=TEST-PROMOTED-39
-17:46:12  + grep -q TEST-PROMOTED-39
+17:57:35  + set -euo pipefail
+17:57:35  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+17:57:35  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+17:57:35  + cd MotioCI/api/CLI
+17:57:35  + python3 -
+17:57:35    File "<stdin>", line 6
+17:57:35      vars = {"id": int(${DEVTEST_INSTANCE_ID})}
+17:57:35                        ^
+17:57:35  SyntaxError: invalid syntax
 [Pipeline] }
 [Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (MotioCI Login (PROD))
+Stage "MotioCI Login (PROD)" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Preflight (DEV/TEST))
+Stage "Preflight (DEV/TEST)" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Promote DEV to TEST)
+Stage "Promote DEV to TEST" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Verify TEST Label Created)
+Stage "Verify TEST Label Created" skipped due to earlier failure(s)
+[Pipeline] getContext
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
@@ -38,6 +60,12 @@ Stage "Resolve TEST Label ID" skipped due to earlier failure(s)
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
+[Pipeline] { (List Namespaces (PROD))
+Stage "List Namespaces (PROD)" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
 [Pipeline] { (Promote TEST to PROD)
 Stage "Promote TEST to PROD" skipped due to earlier failure(s)
 [Pipeline] getContext
@@ -46,9 +74,9 @@ Stage "Promote TEST to PROD" skipped due to earlier failure(s)
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-17:46:15  Pipeline execution finished.
+17:57:40  Pipeline execution finished.
 [Pipeline] echo
-17:46:15  Pipeline failed.
+17:57:40  Pipeline failed.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -68,5 +96,5 @@ ERROR: script returned exit code 1
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/39/.jfrog deleted
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/40/.jfrog deleted
 Finished: FAILURE
