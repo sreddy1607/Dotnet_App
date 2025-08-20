@@ -1,21 +1,7 @@
-Masking supported pattern matches of $PROD_CRED_FILE
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] sh
-17:34:10  + set -euo pipefail
-17:34:10  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:34:10  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:34:10  + cd MotioCI/api/CLI
-17:34:10  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
-17:34:10  + awk '-F: ' '/^x-auth_token:/ {print $2}'
-17:34:10  + tr -d ' \r\n'
-[Pipeline] echo
-17:34:14  MotioCI PROD login OK (len=36)
-[Pipeline] }
-[Pipeline] // script
++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov deploy --xauthtoken=f12ac0b2-3345-448f-aab6-30302c68b029 --sourceInstanceId=3 --targetInstanceId=3 --labelId=57 --projectName=Demo --targetLabelName=TEST-PROMOTED-39 --username **** --password **** --namespaceId AzureAD
+17:46:10  Error performing the deployment:
+17:46:10    [{'message': 'failed to authenticate to instance with ID 3', 'locations': [{'line': 3, 'column': 5}], 'path': ['deploy'], 'extensions': {'code': 'DEPLOYMENT_AUTHENTICATION_FAILED', 'classification': 'DataFetchingException'}}]
+17:46:11  + grep -qiE 'denied|forbidden|401|403|error' deploy_test.err
 [Pipeline] }
 [Pipeline] // container
 [Pipeline] }
@@ -23,76 +9,32 @@ Masking supported pattern matches of $PROD_CRED_FILE
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
-[Pipeline] { (Preflight (DEV/TEST))
+[Pipeline] { (Verify TEST Label Created)
 [Pipeline] container
 [Pipeline] {
 [Pipeline] sh
-17:34:17  + set -euo pipefail
-17:34:17  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:34:17  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:34:17  + cd MotioCI/api/CLI
-17:34:17  + echo 'Checking label visibility for Demo in Cognos-DEV/TEST...'
-17:34:17  Checking label visibility for Demo in Cognos-DEV/TEST...
-17:34:17  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=0825e948-7e25-45ce-844a-da5a7fb5484c --instanceName=Cognos-DEV/TEST --projectName=Demo
-17:34:17  + echo 'Ensuring target TEST label does not already exist...'
-17:34:17  Ensuring target TEST label does not already exist...
-17:34:17  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=0825e948-7e25-45ce-844a-da5a7fb5484c --instanceName=Cognos-DEV/TEST --projectName=Demo --labelName=TEST-PROMOTED-38
-17:34:17  + grep -q TEST-PROMOTED-38
+17:46:12  + set -euo pipefail
+17:46:12  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+17:46:12  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+17:46:12  + cd MotioCI/api/CLI
+17:46:12  + echo 'Verifying TEST-PROMOTED-39 exists in DEV/TEST...'
+17:46:12  Verifying TEST-PROMOTED-39 exists in DEV/TEST...
+17:46:12  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=f12ac0b2-3345-448f-aab6-30302c68b029 --instanceName=Cognos-DEV/TEST --projectName=Demo --labelName=TEST-PROMOTED-39
+17:46:12  + grep -q TEST-PROMOTED-39
 [Pipeline] }
 [Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Promote DEV to TEST)
-[Pipeline] withCredentials
-17:34:19  Masking supported pattern matches of $COGNOS_USER or $COGNOS_PASS
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-17:34:20  + set -euo pipefail
-17:34:20  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:34:20  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:34:20  + cd MotioCI/api/CLI
-17:34:20  + echo 'Promoting DEV -> TEST as TEST-PROMOTED-38'
-17:34:20  Promoting DEV -> TEST as TEST-PROMOTED-38
-17:34:20  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov deploy --xauthtoken=0825e948-7e25-45ce-844a-da5a7fb5484c --sourceInstanceName=Cognos-DEV/TEST --targetInstanceName=Cognos-DEV/TEST --labelId=57 --projectName=Demo --targetLabelName=TEST-PROMOTED-38 --username **** --password **** --namespaceId AzureAD
-17:34:22  Enter Source Instance Name/Id: + true
-17:34:22  + grep -qiE 'denied|forbidden|401|403' deploy_test.err
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // withCredentials
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Approval Before PROD)
-[Pipeline] input
-17:34:22  Approve promotion to PROD?
-17:34:22  Proceed or Abort
-17:36:10  Approved by Srinivas.Reddy@dhcs.ca.gov
+Stage "Approval Before PROD" skipped due to earlier failure(s)
+[Pipeline] getContext
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Resolve TEST Label ID)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-17:36:14  + set -euo pipefail
-17:36:14  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:36:14  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-17:36:14  + cd MotioCI/api/CLI
-17:36:14  + echo 'Looking up TEST label id for name: TEST-PROMOTED-38'
-17:36:14  Looking up TEST label id for name: TEST-PROMOTED-38
-17:36:14  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=0825e948-7e25-45ce-844a-da5a7fb5484c --instanceName=Cognos-DEV/TEST --projectName=Demo --labelName=TEST-PROMOTED-38
-17:36:14  + OUT='{'\''data'\'': {'\''instances'\'': {'\''edges'\'': [{'\''node'\'': {'\''projects'\'': {'\''edges'\'': [{'\''node'\'': {'\''labels'\'': {'\''edges'\'': []}}}]}}}]}}}'
-17:36:14  ++ printf %s '{'\''data'\'': {'\''instances'\'': {'\''edges'\'': [{'\''node'\'': {'\''projects'\'': {'\''edges'\'': [{'\''node'\'': {'\''labels'\'': {'\''edges'\'': []}}}]}}}]}}}'
-17:36:14  ++ grep -Eo 'id[^0-9]*[[:space:]]*([0-9]+)'
-17:36:14  ++ grep -Eo '[0-9]+'
-17:36:14  ++ head -1
-17:36:14  + TEST_LABEL_ID=
-[Pipeline] }
-[Pipeline] // container
+Stage "Resolve TEST Label ID" skipped due to earlier failure(s)
+[Pipeline] getContext
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
@@ -104,9 +46,9 @@ Stage "Promote TEST to PROD" skipped due to earlier failure(s)
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-17:36:19  Pipeline execution finished.
+17:46:15  Pipeline execution finished.
 [Pipeline] echo
-17:36:20  Pipeline failed.
+17:46:15  Pipeline failed.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -126,5 +68,5 @@ ERROR: script returned exit code 1
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/38/.jfrog deleted
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/39/.jfrog deleted
 Finished: FAILURE
