@@ -131,9 +131,7 @@ if (-not ($acl.Access | Where-Object { $_.IdentityReference -eq $appPoolIdentity
 
 # Disable time-based recycling (default is 1740 minutes)
 Write-Host "Disabling regular time interval recycling for $AppPoolName"
-Set-WebConfigurationProperty -Filter "/system.applicationHost/applicationPools/add[@name='$AppPoolName']/recycling/periodicRestart" 
-    -Name "time" 
-    -Value "00:00:00"
+Set-WebConfigurationProperty -Filter "/system.applicationHost/applicationPools/add[@name='$AppPoolName']/recycling/periodicRestart" -Name "time" -Value "00:00:00"
 
 # Enable 'Load User Profile'
 Write-Host "Setting 'Load User Profile' to True for $AppPoolName"
@@ -151,8 +149,14 @@ xcopy /s/y/e $StagingDir\serverconfig\datadog\conf.d\* C:\ProgramData\Datadog\co
 
 Write-Host "`nAdding ddagentuser to C:\ProgramData\Amazon\CodeDeploy\deployment-logs so Datadog can read the CodeDeploy log file`n"
 $Folder = 'C:\ProgramData\Amazon\CodeDeploy\deployment-logs'
-$ACL = Get-Acl  $Folder
-$ACL_Rule = new-object System.Security.AccessControl.FileSystemAccessRule ('ddagentuser', "ReadAndExecute",”ContainerInherit,ObjectInherit”,”None”,”Allow”)
+$ACL = Get-Acl $Folder
+$ACL_Rule = new-object System.Security.AccessControl.FileSystemAccessRule (
+    'ddagentuser',
+    'ReadAndExecute',
+    ([System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::Objectinherit),
+    [System.Security.AccessControl.PropagationFlags]::None,
+    [System.Security.AccessControl.AccessControlType]::Allow
+)
 $ACL.SetAccessRule($ACL_Rule)
 Set-Acl -Path $Folder -AclObject $ACL
 
