@@ -1,255 +1,124 @@
- stage
-[Pipeline] { (List Namespaces (DEV))
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-18:05:14  + set -euo pipefail
-18:05:14  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-18:05:14  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-18:05:14  + cd MotioCI/api/CLI
-18:05:14  + python3 -
-18:05:14  /usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py:1061: InsecureRequestWarning: Unverified HTTPS request is being made to host 'cgrptmcip01.cloud.cammis.ca.gov'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html#ssl-warnings
-18:05:14    warnings.warn(
-18:05:14  === DEV/TEST Namespaces ===
-18:05:14  Failed to parse namespaces. Raw response:
-18:05:14  
-18:05:14  
-18:05:14  
-18:05:14  
-18:05:14  
-18:05:14  
-18:05:14  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-18:05:14  <meta http-equiv="pragma" content="no-cache"/>
-18:05:14  <meta http-equiv="cache-control" content="no-cache"/>
-18:05:14  
-18:05:14  
-18:05:14  
-18:05:14  
-18:05:14  <script type="text/javascript" src="/scripts/rclci/common/BrowserSniffer.js" language="JavaScript"></script>
-18:05:14  <script type="text/javascript" src="/scripts/rclci/common/JsUtil.js"></script>
-18:05:14  <script type="text/javascript" src="/scripts/rclci/common/CommonIncludes.js"></script>
-18:05:14  
-18:05:14  <script type="text/javascript" src="/scripts/rclci/common/DocumentLifeCycleMonitor.js" language="JavaScript"></script>
-18:05:14  <script type="text/javascript" src="/scripts/rclci/common/BrowserGeometry.js" language="JavaScript"></script>
-18:05:14  
-18:05:14  
-18:05:14  <script type="text/javascript">
-18:05:14  
-18:05:14  BASE_URL = location.protocol + '//' + window.location.host + '';
-18:05:14  
-18:05:14  launchNewWindow = function(aUrl, aName, aWidth, aHeight)
-18:05:14  {
-18:05:14     //alert("url [" + aUrl + "]\nname=[" + aName + "]\nwidth=[" + aWidth + "]\nheight = [" +aHeight  + "]");
-18:05:14     var geom = new BrowserGeometry();
-18:05:14  
-18:05:14     var width = (aWidth ? aWidth : 1024);
-18:05:14     var height = (aHeight ? aHeight : 768);
-18:05:14     var name = (aName ? aName : "_blank");
-18:05:14  
-18:05:14     var features = "width=" + width + ",height=" + height + ",top=" + geom.top + ",left=" + geom.left + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,status=yes";
-18:05:14  
-18:05:14      popup = window.open(aUrl, name, features);
-18:05:14      popup.opener = null;
-18:05:14  
-18:05:14      return popup;
-18:05:14  };
-18:05:14  
-18:05:14  
-18:05:14  launchHelpWindow = function(aHelpPageUrl)
-18:05:14  {
-18:05:14     launchNewWindow(BASE_URL + aHelpPageUrl, "_help");
-18:05:14  };
-18:05:14  
-18:05:14  function replaceAll(text, oldText, newText) {
-18:05:14      while (text.indexOf(oldText) != -1) {
-18:05:14  	text = text.replace(oldText, newText);
-18:05:14      }
-18:05:14      return text;
-18:05:14  }
-18:05:14  
-18:05:14  checkKey = function(e)
-18:05:14  {
-18:05:14     var keycode;
-18:05:14     if (window.event)
-18:05:14        keycode = window.event.keyCode;
-18:05:14     else if (e)
-18:05:14        keycode = e.which;
-18:05:14     else
-18:05:14        return true;
-18:05:14  
-18:05:14     // Enter key will submit form
-18:05:14     return keycode != 13;
-18:05:14  };
-18:05:14  
-18:05:14  </script>
-18:05:14  
-18:05:14  <style type="text/css">
-18:05:14     @import "/styles/rclci.css";
-18:05:14  </style>
-18:05:14  
-18:05:14  
-18:05:14  <link rel="stylesheet" type="text/css" href="/scripts/lib/ext/resources/css/ext-all.css"/>
-18:05:14  <link rel="stylesheet" type="text/css" href="/scripts/lib/ext/resources/css/xtheme-gray.css" />
-18:05:14  <link rel="stylesheet" type="text/css" href="/styles/versionControl/override.css"/>
-18:05:14  <script type="text/javascript" src="/scripts/lib/ext/adapter/ext/ext-base.js"></script>
-18:05:14  <script type="text/javascript" src="/scripts/lib/ext/ext-all-debug.js"></script>
-18:05:14  
-18:05:14  
-18:05:14  <script type="text/javascript">
-18:05:14     Ext.BLANK_IMAGE_URL = '/images/1x1.gif';
-18:05:14  
-18:05:14     Ext.QuickTips.init();
-18:05:14     
-18:05:14     Ext.form.TextField.override({
-18:05:14        stripCharsRe: /(^\s+|\s+$)/g,
-18:05:14        validationDelay: 10000
-18:05:14     });
-18:05:14  
-18:05:14     Ext.form.CompositeField.override({
-18:05:14         width: 250
-18:05:14     });
-18:05:14  </script>
-18:05:14  
-18:05:14  <title>404 - File Not Found</title>
-18:05:14  
-18:05:14  <script type="text/javascript">
-18:05:14     Ext.onReady(function(){
-18:05:14        Ext.Msg.alert("404", "File not found.");
-18:05:14     });
-18:05:14  </script>
-18:05:14  
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (MotioCI Login (PROD))
-[Pipeline] withCredentials
-18:05:14  Masking supported pattern matches of $PROD_CRED_FILE
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] sh
-18:05:15  + set -euo pipefail
-18:05:15  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-18:05:15  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-18:05:15  + cd MotioCI/api/CLI
-18:05:15  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
-18:05:15  + awk '-F: ' '/^x-auth_token:/ {print $2}'
-18:05:15  + tr -d ' \r\n'
-[Pipeline] echo
-18:05:19  MotioCI PROD login OK (len=36)
++ curl -kv -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: f2951b7a-800c-4518-914c-1a22ec597677' -d '{
+10:34:58      "query": "mutation Deploy($input: DeployInput!) { deploy(input: $input) { deployment { id } } }",
+10:34:58      "variables": {
+10:34:58        "input": {
+10:34:58          "source": {
+10:34:58            "instanceId": "3",
+10:34:58            "label": "57",
+10:34:58            "projectName": "Demo"
+10:34:58          },
+10:34:58          "target": {
+10:34:58            "instanceId": "1",
+10:34:58            "targetLabelName": "PROMOTED-20250712-115",
+10:34:58            "userName": "CMarksSS01@intra.dhs.ca.gov"
+10:34:58            "password": "Service@2024DHCS"
+10:34:58            "namespaceId": "AzureAD"
+10:34:58          }
+10:34:58        }
+10:34:58      }
+10:34:58    }'
+10:34:58  Note: Unnecessary use of -X or --request, POST is already inferred.
+10:34:58    % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+10:34:58                                   Dload  Upload   Total   Spent    Left  Speed
+10:34:58  
+10:34:58    0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host cgrptmcip01.cloud.cammis.ca.gov:443 was resolved.
+10:34:58  * IPv6: (none)
+10:34:58  * IPv4: 10.188.66.20
+10:34:58  *   Trying 10.188.66.20:443...
+10:34:58  * Connected to cgrptmcip01.cloud.cammis.ca.gov (10.188.66.20) port 443
+10:34:58  * ALPN: curl offers h2,http/1.1
+10:34:58  } [5 bytes data]
+10:34:58  * TLSv1.3 (OUT), TLS handshake, Client hello (1):
+10:34:58  } [512 bytes data]
+10:34:58  
+10:34:58    0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* TLSv1.3 (IN), TLS handshake, Server hello (2):
+10:34:58  { [85 bytes data]
+10:34:58  * TLSv1.2 (IN), TLS handshake, Certificate (11):
+10:34:58  { [5610 bytes data]
+10:34:58  * TLSv1.2 (IN), TLS handshake, Server key exchange (12):
+10:34:58  { [300 bytes data]
+10:34:58  * TLSv1.2 (IN), TLS handshake, Server finished (14):
+10:34:58  { [4 bytes data]
+10:34:58  * TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+10:34:58  } [37 bytes data]
+10:34:58  * TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
+10:34:58  } [1 bytes data]
+10:34:58  * TLSv1.2 (OUT), TLS handshake, Finished (20):
+10:34:58  } [16 bytes data]
+10:34:58  * TLSv1.2 (IN), TLS handshake, Finished (20):
+10:34:58  { [16 bytes data]
+10:34:58  * SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384 / X25519 / RSASSA-PSS
+10:34:58  * ALPN: server did not agree on a protocol. Uses default.
+10:34:58  * Server certificate:
+10:34:58  *  subject: CN=CGRPTMCIP01.cloud.cammis.ca.gov
+10:34:58  *  start date: Feb 12 21:20:06 2025 GMT
+10:34:58  *  expire date: Feb 11 21:20:06 2030 GMT
+10:34:58  *  issuer: C=US; DC=gov; DC=ca; DC=cammis; DC=cloud; O=State of California Department of Health Care Services; OU=California Medicare and Medi-Cal Information Systems; CN=CLOUDCAMMIS Enterprise Certificate Authority
+10:34:58  *  SSL certificate verify result: self-signed certificate in certificate chain (19), continuing anyway.
+10:34:58  *   Certificate level 0: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+10:34:58  *   Certificate level 1: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+10:34:58  *   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+10:34:58  * using HTTP/1.x
+10:34:58  } [5 bytes data]
+10:34:58  > POST /api/graphql HTTP/1.1
+10:34:58  > Host: cgrptmcip01.cloud.cammis.ca.gov
+10:34:58  > User-Agent: curl/8.5.0
+10:34:58  > Accept: */*
+10:34:58  > Content-Type: application/json
+10:34:58  > x-auth-token: f2951b7a-800c-4518-914c-1a22ec597677
+10:34:58  > Content-Length: 515
+10:34:58  > 
+10:34:58  } [515 bytes data]
+10:34:58  < HTTP/1.1 303 
+10:34:58  < Vary: Origin
+10:34:58  < Vary: Access-Control-Request-Method
+10:34:58  < Vary: Access-Control-Request-Headers
+10:34:58  < Strict-Transport-Security: max-age=31536000;includeSubDomains
+10:34:58  < X-Frame-Options: DENY
+10:34:58  < X-Content-Type-Options: nosniff
+10:34:58  < Content-Security-Policy: frame-ancestors 'self'
+10:34:58  < X-XSS-Protection: 1; mode=block
+10:34:58  < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+10:34:58  < Pragma: no-cache
+10:34:58  < Expires: 0
+10:34:58  < Location: 
+10:34:58  < Content-Length: 0
+10:34:58  < Date: Fri, 22 Aug 2025 17:34:58 GMT
+10:34:58  < 
+10:34:58  
+10:34:58  100   515    0     0  100   515      0   4452 --:--:-- --:--:-- --:--:--  4439
+10:34:58  * Connection #0 to host cgrptmcip01.cloud.cammis.ca.gov left intact
+10:34:58  + echo ''
+10:34:58  
+10:34:58  + echo 'SUCCESS! Deploy command accepted all parameters!'
+10:34:58  SUCCESS! Deploy command accepted all parameters!
+10:34:58  + echo 'Only SSL certificate verification is blocking us now'
+10:34:58  Only SSL certificate verification is blocking us now
+10:34:58  + echo 'Testing multiple SSL bypass methods:'
+10:34:58  Testing multiple SSL bypass methods:
+10:34:58  + echo ''
+10:34:58  
+10:34:58  + echo ''
+10:34:58  
+10:34:58  + echo 'Verification: Checking PROD Demo project after promotion:'
+10:34:58  Verification: Checking PROD Demo project after promotion:
+10:34:58  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=f2951b7a-800c-4518-914c-1a22ec597677 --instanceName=Cognos-PRD --projectName=Demo
+10:34:59  {'node': {'name': 'Pre-Promotion Label for motioci-poc-101', 'id': 58, 'description': '', 'labelType': 'PRE_DEPLOYMENT'}}
+10:34:59  {'node': {'name': 'motioci-poc-101', 'id': 59, 'description': None, 'labelType': 'POST_DEPLOYMENT'}}
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] }
 [Pipeline] // container
 [Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Preflight (DEV/TEST))
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-18:05:20  + set -euo pipefail
-18:05:20  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-18:05:20  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-18:05:20  + cd MotioCI/api/CLI
-18:05:20  + echo 'Checking label visibility for Demo in Cognos-DEV/TEST...'
-18:05:20  Checking label visibility for Demo in Cognos-DEV/TEST...
-18:05:20  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=cd9712ae-6654-4806-b230-c3f49523fd2c --instanceName=Cognos-DEV/TEST --projectName=Demo
-18:05:20  + echo 'Ensuring target TEST label does not already exist...'
-18:05:20  Ensuring target TEST label does not already exist...
-18:05:20  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=cd9712ae-6654-4806-b230-c3f49523fd2c --instanceName=Cognos-DEV/TEST --projectName=Demo --labelName=TEST-PROMOTED-42
-18:05:20  + grep -q TEST-PROMOTED-42
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Promote DEV to TEST)
-[Pipeline] withCredentials
-18:05:20  Masking supported pattern matches of $COGNOS_USER or $COGNOS_PASS
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-18:05:21  + set -euo pipefail
-18:05:21  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-18:05:21  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-18:05:21  + cd MotioCI/api/CLI
-18:05:21  + echo 'Promoting DEV -> TEST as TEST-PROMOTED-42'
-18:05:21  Promoting DEV -> TEST as TEST-PROMOTED-42
-18:05:21  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov deploy --xauthtoken=cd9712ae-6654-4806-b230-c3f49523fd2c --sourceInstanceId=3 --targetInstanceId=3 --labelId=57 --projectName=Demo --targetLabelName=TEST-PROMOTED-42 --username **** --password **** --namespaceId AzureAD
-18:05:24  Error performing the deployment:
-18:05:24    [{'message': 'failed to authenticate to instance with ID 3', 'locations': [{'line': 3, 'column': 5}], 'path': ['deploy'], 'extensions': {'code': 'DEPLOYMENT_AUTHENTICATION_FAILED', 'classification': 'DataFetchingException'}}]
-18:05:24  + echo '---- DEV->TEST deploy stderr (for diagnostics) ----'
-18:05:24  ---- DEV->TEST deploy stderr (for diagnostics) ----
-18:05:24  + cat deploy_test.err
-18:05:24  + echo ---------------------------------------------------
-18:05:24  ---------------------------------------------------
-18:05:24  + grep -qiE 'denied|forbidden|401|403|DEPLOYMENT_AUTHENTICATION_FAILED|failed to authenticate' deploy_test.err
-18:05:24  + grep -qiE 'error|exception|traceback' deploy_test.err
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Verify TEST Label Created)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-18:05:25  + set -euo pipefail
-18:05:25  + export PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-18:05:25  + PATH=/home/jenkins/agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-18:05:25  + cd MotioCI/api/CLI
-18:05:25  + echo 'Verifying TEST-PROMOTED-42 exists in DEV/TEST...'
-18:05:25  Verifying TEST-PROMOTED-42 exists in DEV/TEST...
-18:05:25  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=cd9712ae-6654-4806-b230-c3f49523fd2c --instanceName=Cognos-DEV/TEST --projectName=Demo --labelName=TEST-PROMOTED-42
-18:05:25  + grep -q TEST-PROMOTED-42
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Approval Before PROD)
-Stage "Approval Before PROD" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Resolve TEST Label ID)
-Stage "Resolve TEST Label ID" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (List Namespaces (PROD))
-Stage "List Namespaces (PROD)" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Promote TEST to PROD)
-Stage "Promote TEST to PROD" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-18:05:26  Pipeline execution finished.
+10:34:59  Pipeline execution finished.
 [Pipeline] echo
-18:05:26  Pipeline failed.
+10:34:59  MotioCI pipeline completed successfully.
 [Pipeline] }
 [Pipeline] // stage
-[Pipeline] }
-[Pipeline] // timeout
 [Pipeline] }
 [Pipeline] // timestamps
 [Pipeline] }
@@ -261,9 +130,8 @@ Stage "Promote TEST to PROD" skipped due to earlier failure(s)
 [Pipeline] }
 [Pipeline] // podTemplate
 [Pipeline] End of Pipeline
-ERROR: script returned exit code 1
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/42/.jfrog deleted
-Finished: FAILURE
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/62/.jfrog deleted
+Finished: SUCCESS
