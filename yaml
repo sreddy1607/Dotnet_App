@@ -1,18 +1,142 @@
- + set -e
-12:23:51  + cd MotioCI/api/CLI
-12:23:51  + python3 -m pip install --user -r requirements.txt
-12:23:51  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
-12:23:51  ++ tail -n1
-12:23:51  ++ tr -d '\r'
-12:23:52  Traceback (most recent call last):
-12:23:52    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 52, in <module>
-12:23:52      def load_credentials_from_json(file_path: str = "credentials.json") -> Optional[str]:
-12:23:52  NameError: name 'Optional' is not defined
-12:23:52  + TOKEN=
-12:23:52  + '[' -z '' ']'
-12:23:52  + echo 'ERROR: Empty MotioCI token.'
-12:23:52  ERROR: Empty MotioCI token.
-12:23:52  + exit 1
+[Pipeline] echo
+12:38:57  Branch: motioci-poctest
+[Pipeline] echo
+12:38:57  Initializing Motio pipeline...
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Check Python Availability)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+12:38:58  + set -e
+12:38:58  + echo 'Checking for Python3...'
+12:38:58  Checking for Python3...
+12:38:58  + which python3
+12:38:58  /usr/bin/python3
+12:38:58  + python3 --version
+12:38:58  Python 3.6.8
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Install CLI deps)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+12:38:58  + set -e
+12:38:58  + cd MotioCI/api/CLI
+12:38:58  + python3 -m pip install --user -r requirements.txt
+12:38:59  Collecting gql>=3.0.0
+12:38:59    Downloading gql-4.0.0-py3-none-any.whl (89 kB)
+12:38:59  Collecting python-dateutil==2.8.1
+12:38:59    Downloading python_dateutil-2.8.1-py2.py3-none-any.whl (227 kB)
+12:38:59  Collecting python-gitlab~=2.9.0
+12:38:59    Downloading python_gitlab-2.9.0-py3-none-any.whl (108 kB)
+12:38:59  Collecting requests~=2.27.1
+12:38:59    Downloading requests-2.27.1-py2.py3-none-any.whl (63 kB)
+12:38:59  Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.9/site-packages (from python-dateutil==2.8.1->-r requirements.txt (line 2)) (1.16.0)
+12:38:59  Collecting backoff<3.0,>=1.11.1
+12:38:59    Downloading backoff-2.2.1-py3-none-any.whl (15 kB)
+12:38:59  Collecting graphql-core<3.3,>=3.2
+12:38:59    Downloading graphql_core-3.2.6-py3-none-any.whl (203 kB)
+12:39:00  Collecting yarl<2.0,>=1.6
+12:39:00    Downloading yarl-1.20.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (327 kB)
+12:39:00  Collecting anyio<5,>=3.0
+12:39:00    Downloading anyio-4.10.0-py3-none-any.whl (107 kB)
+12:39:00  Collecting requests-toolbelt>=0.9.1
+12:39:00    Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+12:39:00  Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.9/site-packages (from requests~=2.27.1->-r requirements.txt (line 4)) (1.26.18)
+12:39:00  Collecting certifi>=2017.4.17
+12:39:00    Downloading certifi-2025.8.3-py3-none-any.whl (161 kB)
+12:39:01  Collecting charset-normalizer~=2.0.0
+12:39:01    Downloading charset_normalizer-2.0.12-py3-none-any.whl (39 kB)
+12:39:01  Collecting idna<4,>=2.5
+12:39:01    Downloading idna-3.10-py3-none-any.whl (70 kB)
+12:39:01  Collecting exceptiongroup>=1.0.2
+12:39:01    Downloading exceptiongroup-1.3.0-py3-none-any.whl (16 kB)
+12:39:01  Requirement already satisfied: typing_extensions>=4.5 in /usr/local/lib/python3.9/site-packages (from anyio<5,>=3.0->gql>=3.0.0->-r requirements.txt (line 1)) (4.10.0)
+12:39:01  Collecting sniffio>=1.1
+12:39:01    Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+12:39:02  Collecting multidict>=4.0
+12:39:02    Downloading multidict-6.6.4-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (239 kB)
+12:39:02  Collecting propcache>=0.2.1
+12:39:02    Downloading propcache-0.3.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (200 kB)
+12:39:03  Installing collected packages: idna, charset-normalizer, certifi, sniffio, requests, propcache, multidict, exceptiongroup, yarl, requests-toolbelt, graphql-core, backoff, anyio, python-gitlab, python-dateutil, gql
+12:39:03    WARNING: The script normalizer is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+12:39:03    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+12:39:03    WARNING: The script gitlab is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+12:39:03    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+12:39:03    WARNING: The script gql-cli is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+12:39:03    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+12:39:03  ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+12:39:03  pandas 2.2.1 requires python-dateutil>=2.8.2, but you have python-dateutil 2.8.1 which is incompatible.
+12:39:03  Successfully installed anyio-4.10.0 backoff-2.2.1 certifi-2025.8.3 charset-normalizer-2.0.12 exceptiongroup-1.3.0 gql-4.0.0 graphql-core-3.2.6 idna-3.10 multidict-6.6.4 propcache-0.3.2 python-dateutil-2.8.1 python-gitlab-2.9.0 requests-2.27.1 requests-toolbelt-1.0.0 sniffio-1.3.1 yarl-1.20.1
+12:39:03  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+12:39:04  + echo 'Dependencies installed.'
+12:39:04  Dependencies installed.
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (MotioCI Login)
+[Pipeline] withCredentials
+12:39:04  Masking supported pattern matches of $CREDENTIALS_FILE
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+12:39:04  + set -e
+12:39:04  + cd MotioCI/api/CLI
+12:39:04  + python3 -m pip install --user -r requirements.txt
+12:39:05  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
+12:39:05  ++ tail -n1
+12:39:05  ++ tr -d '\r'
+12:39:08  + TOKEN=4ff319a9-49cc-45dd-b622-17d9cbcc573d
+12:39:08  + '[' -z 4ff319a9-49cc-45dd-b622-17d9cbcc573d ']'
+12:39:08  + echo TOKEN=4ff319a9-49cc-45dd-b622-17d9cbcc573d
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] script
+[Pipeline] {
+[Pipeline] readFile
+[Pipeline] echo
+12:39:08  MotioCI login completed - token captured.
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy)
+[Pipeline] withCredentials
+12:39:09  Masking supported pattern matches of $COG_USER or $COG_PASS
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+12:39:09  + set -euo pipefail
+12:39:09  + cd MotioCI/api/CLI
+12:39:09  + echo 'Sanity: list projects on Cognos-PRD...'
+12:39:09  Sanity: list projects on Cognos-PRD...
+12:39:09  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=4ff319a9-49cc-45dd-b622-17d9cbcc573d --instanceName=Cognos-PRD
+12:39:09  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
+12:39:09  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
+12:39:09  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
+12:39:09  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive deploy --xauthtoken=4ff319a9-49cc-45dd-b622-17d9cbcc573d --sourceInstanceId=3 --targetInstanceId=1 --labelId=57 --projectName=Demo --targetLabelName=PROMOTED-20250712-115 --username=**** --password=**** --namespaceId=AzureAD
+12:39:13  Error performing the deployment:
+12:39:13    [{'message': 'Access is denied', 'locations': [{'line': 3, 'column': 5}], 'path': ['deploy'], 'extensions': {'code': 'ACCESS_DENIED', 'isLicenseValid': True, 'classification': 'DataFetchingException'}}]
+12:39:13  + echo 'Verification: labels after deployment'
+12:39:13  Verification: labels after deployment
+12:39:13  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=4ff319a9-49cc-45dd-b622-17d9cbcc573d --instanceName=Cognos-PRD --projectName=Demo
+12:39:13  + tee verify_labels.json
+12:39:13  {'node': {'name': 'Pre-Promotion Label for motioci-poc-101', 'id': 58, 'description': '', 'labelType': 'PRE_DEPLOYMENT'}}
+12:39:13  {'node': {'name': 'motioci-poc-101', 'id': 59, 'description': None, 'labelType': 'POST_DEPLOYMENT'}}
 [Pipeline] }
 [Pipeline] // container
 [Pipeline] }
@@ -20,17 +144,11 @@
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
-[Pipeline] { (Deploy)
-Stage "Deploy" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-12:23:52  Pipeline execution finished.
+12:39:13  Pipeline execution finished.
 [Pipeline] echo
-12:23:52  MotioCI pipeline failed.
+12:39:13  MotioCI pipeline completed successfully.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -44,9 +162,8 @@ Stage "Deploy" skipped due to earlier failure(s)
 [Pipeline] }
 [Pipeline] // podTemplate
 [Pipeline] End of Pipeline
-ERROR: script returned exit code 1
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/79/.jfrog deleted
-Finished: FAILURE
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/83/.jfrog deleted
+Finished: SUCCESS
