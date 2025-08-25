@@ -1,123 +1,84 @@
-[Pipeline] { (MotioCI Login)
-[Pipeline] withCredentials
-10:54:17  Masking supported pattern matches of $CREDENTIALS_FILE
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] sh
-10:54:18  + set -e
-10:54:18  + cd MotioCI/api/CLI
-10:54:18  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
-10:54:18  + TOKEN='Successfully loaded credentials from ****
-10:54:18  == DEBUG: Attempting login with masked credentials ==
-10:54:18  [{"instanceId": "1", "apiKey": "********"}]
-10:54:18  == DEBUG: Sending masked credentials ==
-10:54:18  [
-10:54:18    {
-10:54:18      "instanceId": "1",
-10:54:18      "apiKey": "********"
-10:54:18    }
-10:54:18  ]
-10:54:18  Error making request: HTTPSConnectionPool(host='\''cgrptmcip01.cloud.cammis.ca.gov'\'', port=443): Max retries exceeded with url: /api/login (Caused by NewConnectionError('\''<urllib3.connection.HTTPSConnection object at 0x7fe483de0d00>: Failed to establish a new connection: [Errno 111] Connection refused'\''))
-10:54:18  Invalid parameters. Login cancelled!'
-10:54:18  + echo 'Successfully loaded credentials from ****
-10:54:18  == DEBUG: Attempting login with masked credentials ==
-10:54:18  [{"instanceId": "1", "apiKey": "********"}]
-10:54:18  == DEBUG: Sending masked credentials ==
-10:54:18  [
-10:54:18    {
-10:54:18      "instanceId": "1",
-10:54:18      "apiKey": "********"
-10:54:18    }
-10:54:18  ]
-10:54:18  Error making request: HTTPSConnectionPool(host='\''cgrptmcip01.cloud.cammis.ca.gov'\'', port=443): Max retries exceeded with url: /api/login (Caused by NewConnectionError('\''<urllib3.connection.HTTPSConnection object at 0x7fe483de0d00>: Failed to establish a new connection: [Errno 111] Connection refused'\''))
-10:54:18  Invalid parameters. Login cancelled!'
-[Pipeline] echo
-10:54:18  MotioCI login completed - token captured.
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Deploy)
-[Pipeline] withCredentials
-10:54:18  Masking supported pattern matches of $COG_USER or $COG_PASS
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-10:54:19  + set -euo pipefail
-10:54:19  + cd MotioCI/api/CLI
-10:54:19  + echo 'Sanity: list projects on Cognos-PRD...'
-10:54:19  Sanity: list projects on Cognos-PRD...
-10:54:19  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls '--xauthtoken=Successfully loaded credentials from /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest@tmp/secretFiles/5a394173-c740-40c7-a942-8f7c6337adaf/credential.json
-10:54:19  == DEBUG: Attempting login with masked credentials ==
-10:54:19  [{"instanceId": "1", "apiKey": "********"}]
-10:54:19  == DEBUG: Sending masked credentials ==
-10:54:19  [
-10:54:19    {
-10:54:19      "instanceId": "1",
-10:54:19      "apiKey": "********"
-10:54:19    }
-10:54:19  ]
-10:54:19  Error making request: HTTPSConnectionPool(host='\''cgrptmcip01.cloud.cammis.ca.gov'\'', port=443): Max retries exceeded with url: /api/login (Caused by NewConnectionError('\''<urllib3.connection.HTTPSConnection object at 0x7fe483de0d00>: Failed to establish a new connection: [Errno 111] Connection refused'\''))
-10:54:19  Invalid parameters. Login cancelled!' --instanceName=Cognos-PRD
-10:54:19  Traceback (most recent call last):
-10:54:19    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 529, in <module>
-10:54:19      projects.get_projects_specific(args.instanceName)
-10:54:19    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/projects.py", line 21, in get_projects_specific
-10:54:19      response = requests.post(constants.GRAPH_URL, headers={'x-auth-token': constants.X_AUTH_TOKEN},
-10:54:19    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 25, in patched_post
-10:54:19      return original_post(*args, **kwargs)
-10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/api.py", line 117, in post
-10:54:19      return request('post', url, data=data, json=json, **kwargs)
-10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/api.py", line 61, in request
-10:54:19      return session.request(method=method, url=url, **kwargs)
-10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/sessions.py", line 515, in request
-10:54:19      prep = self.prepare_request(req)
-10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/sessions.py", line 443, in prepare_request
-10:54:19      p.prepare(
-10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 319, in prepare
-10:54:19      self.prepare_headers(headers)
-10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 453, in prepare_headers
-10:54:19      check_header_validity(header)
-10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/utils.py", line 1025, in check_header_validity
-10:54:19      raise InvalidHeader("Invalid return character or leading space in header: %s" % name)
-10:54:19  requests.exceptions.InvalidHeader: Invalid return character or leading space in header: x-auth-token
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Declarative: Post Actions)
-[Pipeline] echo
-10:54:19  Pipeline execution finished.
-[Pipeline] echo
-10:54:19  MotioCI pipeline failed.
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // timestamps
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] }
-[Pipeline] // podTemplate
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
+#!/usr/bin/env python3
+import json
+import requests
+import os
+DEBUG = os.environ.get("DEBUG") == "1"
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-GitHub has been notified of this commit’s build result
+# Disable SSL warnings since we're using -k (insecure) flag equivalent
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/71/.jfrog deleted
-Finished: FAILURE
+def mask_sensitive_data(data):
+    """Mask sensitive data for logging purposes"""
+    if isinstance(data, list):
+        return [mask_sensitive_data(item) for item in data]
+    elif isinstance(data, dict):
+        masked = {}
+        for key, value in data.items():
+            if key.lower() in ['apikey', 'password', 'token', 'secret', 'key']:
+                masked[key] = '*' * 8  # Mask sensitive fields
+            else:
+                masked[key] = value
+        return masked
+    return data
+
+def login_init(credentials):
+    """Make the login API request and return the x-auth-token"""
+    url = "https://cgrptmcip01.cloud.cammis.ca.gov/api/login"
+
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    # Parse the credentials string to get the actual data
+    try:
+        # If credentials is a string, parse it
+        if isinstance(credentials, str):
+            payload = json.loads(credentials)
+        else:
+            payload = credentials
+            
+        # Ensure payload is a list 
+        if not isinstance(payload, list):
+            payload = [payload]
+            
+    except json.JSONDecodeError as e:
+        print(f"Error parsing credentials: {e}")
+        return None
+
+    # Log masked credentials for debugging 
+if DEBUG:  
+    print("== DEBUG: Sending masked credentials ==")
+    masked_payload = mask_sensitive_data(payload)
+    print(json.dumps(masked_payload, indent=2))
+
+    try:
+        response = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+            verify=False,
+            allow_redirects=True
+        )       
+
+        # Extract and return the auth token
+        if response.status_code == 200:
+            auth_token = response.headers.get('x-auth-token')
+            print(f"Login successful! Status Code: {response.status_code}")
+            if auth_token:
+                # Show full auth token 
+                print(f"Auth Token: {auth_token}")
+                return auth_token
+            else:
+            if DEBUG:   
+                print("No x-auth-token found in response headers", file=sys.stderr)
+                return None
+        else:
+        if DEBUG:
+            print(f"Login failed. Status Code: {response.status_code}", file=sys.stderr)
+            print("Response headers available for debugging", file=sys.stderr)
+            return None
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+        return None
