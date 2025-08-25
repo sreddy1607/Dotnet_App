@@ -1,42 +1,41 @@
-[Pipeline] stage
 [Pipeline] { (MotioCI Login)
 [Pipeline] withCredentials
-10:52:39  Masking supported pattern matches of $CREDENTIALS_FILE
+10:54:17  Masking supported pattern matches of $CREDENTIALS_FILE
 [Pipeline] {
 [Pipeline] container
 [Pipeline] {
 [Pipeline] script
 [Pipeline] {
 [Pipeline] sh
-10:52:40  + set -e
-10:52:40  + cd MotioCI/api/CLI
-10:52:40  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
-10:52:40  + TOKEN='Successfully loaded credentials from ****
-10:52:40  == DEBUG: Attempting login with masked credentials ==
-10:52:40  [{"instanceId": "1", "apiKey": "********"}]
-10:52:40  == DEBUG: Sending masked credentials ==
-10:52:40  [
-10:52:40    {
-10:52:40      "instanceId": "1",
-10:52:40      "apiKey": "********"
-10:52:40    }
-10:52:40  ]
-10:52:40  Error making request: HTTPSConnectionPool(host='\''cgrptmcip01.cloud.cammis.ca.gov'\'', port=443): Max retries exceeded with url: /api/login (Caused by NewConnectionError('\''<urllib3.connection.HTTPSConnection object at 0x7f743de2bd00>: Failed to establish a new connection: [Errno 111] Connection refused'\''))
-10:52:40  Invalid parameters. Login cancelled!'
-10:52:40  + echo 'Successfully loaded credentials from ****
-10:52:40  == DEBUG: Attempting login with masked credentials ==
-10:52:40  [{"instanceId": "1", "apiKey": "********"}]
-10:52:40  == DEBUG: Sending masked credentials ==
-10:52:40  [
-10:52:40    {
-10:52:40      "instanceId": "1",
-10:52:40      "apiKey": "********"
-10:52:40    }
-10:52:40  ]
-10:52:40  Error making request: HTTPSConnectionPool(host='\''cgrptmcip01.cloud.cammis.ca.gov'\'', port=443): Max retries exceeded with url: /api/login (Caused by NewConnectionError('\''<urllib3.connection.HTTPSConnection object at 0x7f743de2bd00>: Failed to establish a new connection: [Errno 111] Connection refused'\''))
-10:52:40  Invalid parameters. Login cancelled!'
+10:54:18  + set -e
+10:54:18  + cd MotioCI/api/CLI
+10:54:18  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
+10:54:18  + TOKEN='Successfully loaded credentials from ****
+10:54:18  == DEBUG: Attempting login with masked credentials ==
+10:54:18  [{"instanceId": "1", "apiKey": "********"}]
+10:54:18  == DEBUG: Sending masked credentials ==
+10:54:18  [
+10:54:18    {
+10:54:18      "instanceId": "1",
+10:54:18      "apiKey": "********"
+10:54:18    }
+10:54:18  ]
+10:54:18  Error making request: HTTPSConnectionPool(host='\''cgrptmcip01.cloud.cammis.ca.gov'\'', port=443): Max retries exceeded with url: /api/login (Caused by NewConnectionError('\''<urllib3.connection.HTTPSConnection object at 0x7fe483de0d00>: Failed to establish a new connection: [Errno 111] Connection refused'\''))
+10:54:18  Invalid parameters. Login cancelled!'
+10:54:18  + echo 'Successfully loaded credentials from ****
+10:54:18  == DEBUG: Attempting login with masked credentials ==
+10:54:18  [{"instanceId": "1", "apiKey": "********"}]
+10:54:18  == DEBUG: Sending masked credentials ==
+10:54:18  [
+10:54:18    {
+10:54:18      "instanceId": "1",
+10:54:18      "apiKey": "********"
+10:54:18    }
+10:54:18  ]
+10:54:18  Error making request: HTTPSConnectionPool(host='\''cgrptmcip01.cloud.cammis.ca.gov'\'', port=443): Max retries exceeded with url: /api/login (Caused by NewConnectionError('\''<urllib3.connection.HTTPSConnection object at 0x7fe483de0d00>: Failed to establish a new connection: [Errno 111] Connection refused'\''))
+10:54:18  Invalid parameters. Login cancelled!'
 [Pipeline] echo
-10:52:40  MotioCI login completed - token captured.
+10:54:18  MotioCI login completed - token captured.
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] }
@@ -48,15 +47,61 @@
 [Pipeline] stage
 [Pipeline] { (Deploy)
 [Pipeline] withCredentials
+10:54:18  Masking supported pattern matches of $COG_USER or $COG_PASS
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+10:54:19  + set -euo pipefail
+10:54:19  + cd MotioCI/api/CLI
+10:54:19  + echo 'Sanity: list projects on Cognos-PRD...'
+10:54:19  Sanity: list projects on Cognos-PRD...
+10:54:19  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls '--xauthtoken=Successfully loaded credentials from /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest@tmp/secretFiles/5a394173-c740-40c7-a942-8f7c6337adaf/credential.json
+10:54:19  == DEBUG: Attempting login with masked credentials ==
+10:54:19  [{"instanceId": "1", "apiKey": "********"}]
+10:54:19  == DEBUG: Sending masked credentials ==
+10:54:19  [
+10:54:19    {
+10:54:19      "instanceId": "1",
+10:54:19      "apiKey": "********"
+10:54:19    }
+10:54:19  ]
+10:54:19  Error making request: HTTPSConnectionPool(host='\''cgrptmcip01.cloud.cammis.ca.gov'\'', port=443): Max retries exceeded with url: /api/login (Caused by NewConnectionError('\''<urllib3.connection.HTTPSConnection object at 0x7fe483de0d00>: Failed to establish a new connection: [Errno 111] Connection refused'\''))
+10:54:19  Invalid parameters. Login cancelled!' --instanceName=Cognos-PRD
+10:54:19  Traceback (most recent call last):
+10:54:19    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 529, in <module>
+10:54:19      projects.get_projects_specific(args.instanceName)
+10:54:19    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/projects.py", line 21, in get_projects_specific
+10:54:19      response = requests.post(constants.GRAPH_URL, headers={'x-auth-token': constants.X_AUTH_TOKEN},
+10:54:19    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 25, in patched_post
+10:54:19      return original_post(*args, **kwargs)
+10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/api.py", line 117, in post
+10:54:19      return request('post', url, data=data, json=json, **kwargs)
+10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/api.py", line 61, in request
+10:54:19      return session.request(method=method, url=url, **kwargs)
+10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/sessions.py", line 515, in request
+10:54:19      prep = self.prepare_request(req)
+10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/sessions.py", line 443, in prepare_request
+10:54:19      p.prepare(
+10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 319, in prepare
+10:54:19      self.prepare_headers(headers)
+10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 453, in prepare_headers
+10:54:19      check_header_validity(header)
+10:54:19    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/utils.py", line 1025, in check_header_validity
+10:54:19      raise InvalidHeader("Invalid return character or leading space in header: %s" % name)
+10:54:19  requests.exceptions.InvalidHeader: Invalid return character or leading space in header: x-auth-token
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
 [Pipeline] // withCredentials
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-10:52:40  Pipeline execution finished.
+10:54:19  Pipeline execution finished.
 [Pipeline] echo
-10:52:40  MotioCI pipeline failed.
+10:54:19  MotioCI pipeline failed.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -70,9 +115,9 @@
 [Pipeline] }
 [Pipeline] // podTemplate
 [Pipeline] End of Pipeline
-ERROR: Could not find credentials entry with ID 'cognos-prod-service-user'
+ERROR: script returned exit code 1
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/70/.jfrog deleted
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/71/.jfrog deleted
 Finished: FAILURE
