@@ -1,28 +1,31 @@
-
+12:16:53  Dependencies installed.
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (MotioCI Login)
 [Pipeline] withCredentials
-11:42:25  Masking supported pattern matches of $CREDENTIALS_FILE
+12:16:53  Masking supported pattern matches of $CREDENTIALS_FILE
 [Pipeline] {
 [Pipeline] container
 [Pipeline] {
-[Pipeline] script
-[Pipeline] {
 [Pipeline] sh
-11:42:26  + set -e
-11:42:26  + cd MotioCI/api/CLI
-11:42:26  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
-11:42:31  + TOKEN='Successfully loaded credentials from ****
-11:42:31  65d7ecdc-43ce-400b-bf11-a56844cab947'
-11:42:31  + '[' -z 'Successfully loaded credentials from ****
-11:42:31  65d7ecdc-43ce-400b-bf11-a56844cab947]'
-11:42:31  /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest@tmp/durable-3d28376a/script.sh.copy: line 6: [: missing `]'
-11:42:31  + echo 'Successfully loaded credentials from ****
-11:42:31  65d7ecdc-43ce-400b-bf11-a56844cab947'
-[Pipeline] echo
-11:42:31  MotioCI login completed - token captured.
-[Pipeline] }
-[Pipeline] // script
+12:16:53  + set -e
+12:16:53  + cd MotioCI/api/CLI
+12:16:53  + python3 -m pip install --user -r requirements.txt
+12:16:54  ++ tail -n1
+12:16:54  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
+12:16:54  ++ tr -d '\r'
+12:16:54  Traceback (most recent call last):
+12:16:54    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 52, in <module>
+12:16:54      def load_credentials_from_json(file_path: str = "credentials.json") -> str | None:
+12:16:54  TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
+12:16:54  + TOKEN=
+12:16:54  + '[' -z '' ']'
+12:16:54  + echo 'ERROR: Empty MotioCI token.'
+12:16:54  ERROR: Empty MotioCI token.
+12:16:54  + exit 1
 [Pipeline] }
 [Pipeline] // container
 [Pipeline] }
@@ -31,52 +34,16 @@
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Deploy)
-[Pipeline] withCredentials
-11:42:31  Masking supported pattern matches of $COG_USER or $COG_PASS
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-11:42:32  + set -euo pipefail
-11:42:32  + cd MotioCI/api/CLI
-11:42:32  + echo 'Sanity: list projects on Cognos-PRD...'
-11:42:32  Sanity: list projects on Cognos-PRD...
-11:42:32  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls '--xauthtoken=Successfully loaded credentials from /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest@tmp/secretFiles/d06f15c7-8a16-4443-9b1f-2a49498fd465/credential.json
-11:42:32  65d7ecdc-43ce-400b-bf11-a56844cab947' --instanceName=Cognos-PRD
-11:42:32  Traceback (most recent call last):
-11:42:32    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 524, in <module>
-11:42:32      projects.get_projects_specific(args.instanceName)
-11:42:32    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/projects.py", line 21, in get_projects_specific
-11:42:32      response = requests.post(constants.GRAPH_URL, headers={'x-auth-token': constants.X_AUTH_TOKEN},
-11:42:32    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 26, in patched_post
-11:42:32      return original_post(*args, **kwargs)
-11:42:32    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/api.py", line 117, in post
-11:42:32      return request('post', url, data=data, json=json, **kwargs)
-11:42:32    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/api.py", line 61, in request
-11:42:32      return session.request(method=method, url=url, **kwargs)
-11:42:32    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/sessions.py", line 515, in request
-11:42:32      prep = self.prepare_request(req)
-11:42:32    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/sessions.py", line 443, in prepare_request
-11:42:32      p.prepare(
-11:42:32    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 319, in prepare
-11:42:32      self.prepare_headers(headers)
-11:42:32    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 453, in prepare_headers
-11:42:32      check_header_validity(header)
-11:42:32    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/utils.py", line 1025, in check_header_validity
-11:42:32      raise InvalidHeader("Invalid return character or leading space in header: %s" % name)
-11:42:32  requests.exceptions.InvalidHeader: Invalid return character or leading space in header: x-auth-token
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // withCredentials
+Stage "Deploy" skipped due to earlier failure(s)
+[Pipeline] getContext
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-11:42:32  Pipeline execution finished.
+12:16:54  Pipeline execution finished.
 [Pipeline] echo
-11:42:32  MotioCI pipeline failed.
+12:16:54  MotioCI pipeline failed.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -94,5 +61,5 @@ ERROR: script returned exit code 1
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/74/.jfrog deleted
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/78/.jfrog deleted
 Finished: FAILURE
