@@ -1,18 +1,1 @@
-Hi Srinivas, please see the following information from Cognos (ref Exporting tenant content to a deployment archive - IBM Documentation):
-
- 
-
-Setting the Encryption Password
-
-During the export process, in the Deployment Wizard (whether for tenant content or general content):
-You'll reach a step labeled "Specify a deployment archive".
-Under the Encryption section, click "Set the encryption password".
-Enter and confirm your desired password.
-Click OK to apply it
-This password will be required later when importing the deployment archive into another Cognos environment.
-Important Notes:
-There is no default encryption password. You must manually set one during the export process.
-If you forget the password, the encrypted archive cannot be imported, so be sure to store it securely.
- 
-
-Does this help?  If not, please schedule a meeting at 3 so we can walk through the process to research further and/or open a case with SaaS if necessary.
+https://www.ibm.com/docs/en/cognos-analytics/11.2.x?topic=deployment-exporting-tenant-content-archive
