@@ -1,104 +1,38 @@
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (MotioCI Login)
-[Pipeline] withCredentials
-13:01:49  Masking supported pattern matches of $CREDENTIALS_FILE
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-13:01:49  + set -e
-13:01:49  + cd MotioCI/api/CLI
-13:01:49  + python3 -m pip install --user -r requirements.txt
-13:01:50  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
-13:01:50  ++ tail -n1
-13:01:50  ++ tr -d '\r'
-13:01:54  + TOKEN=24207109-1dae-4466-b56c-4ca918c2ef44
-13:01:54  + '[' -z 24207109-1dae-4466-b56c-4ca918c2ef44 ']'
-13:01:54  + echo TOKEN=24207109-1dae-4466-b56c-4ca918c2ef44
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] script
-[Pipeline] {
-[Pipeline] readFile
-[Pipeline] echo
-13:01:54  MotioCI login completed - token captured.
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Debug Namespaces)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-13:01:55  + echo 'Checking available namespaces for PRD instance...'
-13:01:55  Checking available namespaces for PRD instance...
-13:01:55  + curl -sk -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: 24207109-1dae-4466-b56c-4ca918c2ef44' -d '{
-13:01:55              "query":"query($id:Int!){ instance(id:$id){ namespaces { id name } } }",
-13:01:55              "variables":{"id":1}
-13:01:55            }'
-13:01:55  + jq .
-13:01:55  {
-13:01:55    "errors": [
-13:01:55      {
-13:01:55        "message": "Validation error of type VariableTypeMismatch: Variable type 'Int!' doesn't match expected type 'Long!' @ 'instance'",
-13:01:55        "locations": [
-13:01:55          {
-13:01:55            "line": 1,
-13:01:55            "column": 30
-13:01:55          }
-13:01:55        ],
-13:01:55        "extensions": {
-13:01:55          "classification": "ValidationError"
-13:01:55        }
-13:01:55      }
-13:01:55    ]
-13:01:55  }
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Deploy)
-[Pipeline] withCredentials
-13:01:55  Masking supported pattern matches of $COG_USER or $COG_PASS
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-13:01:55  + set -euo pipefail
-13:01:55  + cd MotioCI/api/CLI
-13:01:55  + echo 'Sanity: list projects on Cognos-PRD...'
-13:01:55  Sanity: list projects on Cognos-PRD...
-13:01:55  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=24207109-1dae-4466-b56c-4ca918c2ef44 --instanceName=Cognos-PRD
-13:01:56  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
-13:01:56  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
-13:01:56  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
-13:01:56  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive deploy --xauthtoken=24207109-1dae-4466-b56c-4ca918c2ef44 --sourceInstanceId=3 --targetInstanceId=1 --labelId=57 --projectName=Demo --targetLabelName=PROMOTED-20250712-115 --username=**** --password=**** --namespaceId=AzureAD
-13:01:58  Error performing the deployment:
-13:01:58    [{'message': 'Access is denied', 'locations': [{'line': 3, 'column': 5}], 'path': ['deploy'], 'extensions': {'code': 'ACCESS_DENIED', 'isLicenseValid': True, 'classification': 'DataFetchingException'}}]
-13:01:58  + echo 'Verification: labels after deployment'
-13:01:58  Verification: labels after deployment
-13:01:58  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=24207109-1dae-4466-b56c-4ca918c2ef44 --instanceName=Cognos-PRD --projectName=Demo
-13:01:58  + tee verify_labels.json
-13:01:59  {'node': {'name': 'Pre-Promotion Label for motioci-poc-101', 'id': 58, 'description': '', 'labelType': 'PRE_DEPLOYMENT'}}
-13:01:59  {'node': {'name': 'motioci-poc-101', 'id': 59, 'description': None, 'labelType': 'POST_DEPLOYMENT'}}
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Declarative: Post Actions)
-[Pipeline] echo
-13:01:59  Pipeline execution finished.
-[Pipeline] echo
-13:01:59  MotioCI pipeline completed successfully.
-[Pipeline] }
+ // Temporarily commented out to avoid creating labels during testing
+    
+    stage('MotioCI Versioning') {
+      steps {
+        container('python') {
+          script {
+            echo "Creating MotioCI version for branch: ${env.GIT_BRANCH}"
+            sh '''
+              cd MotioCI/api/CLI
+              
+              # Create version based on branch and build number
+              VERSION_NAME="${BRANCH_NAME}-${BUILD_NUMBER}"
+              echo "Creating version: $VERSION_NAME"
+              
+              # Execute versioning command using auth token from login stage
+              if [ -n "${MOTIO_AUTH_TOKEN}" ]; then
+                echo "Using authentication token from login stage"
+                
+                # Create label in Demo project 
+                python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" label create --xauthtoken="${MOTIO_AUTH_TOKEN}" --instanceName="Cognos-DEV/TEST" --projectName="Demo" --name="$VERSION_NAME" --versionedItemIds="[]"
+                
+                echo "MotioCI label $VERSION_NAME created successfully in Demo project"
+                
+                # Capture the label ID for promotion
+                echo "Getting label ID for newly created label..."
+                LABEL_LIST=$(python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" label ls --xauthtoken="${MOTIO_AUTH_TOKEN}" --instanceName="Cognos-DEV/TEST" --projectName="Demo")
+                echo "Current labels in Demo project:"
+                echo "$LABEL_LIST"
+              else
+                echo "ERROR: No authentication token available from login stage"
+                exit 1
+              fi
+            '''
+          }
+        }
+      }
+    }
+    
