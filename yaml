@@ -1,31 +1,18 @@
-12:16:53  Dependencies installed.
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (MotioCI Login)
-[Pipeline] withCredentials
-12:16:53  Masking supported pattern matches of $CREDENTIALS_FILE
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-12:16:53  + set -e
-12:16:53  + cd MotioCI/api/CLI
-12:16:53  + python3 -m pip install --user -r requirements.txt
-12:16:54  ++ tail -n1
-12:16:54  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
-12:16:54  ++ tr -d '\r'
-12:16:54  Traceback (most recent call last):
-12:16:54    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 52, in <module>
-12:16:54      def load_credentials_from_json(file_path: str = "credentials.json") -> str | None:
-12:16:54  TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
-12:16:54  + TOKEN=
-12:16:54  + '[' -z '' ']'
-12:16:54  + echo 'ERROR: Empty MotioCI token.'
-12:16:54  ERROR: Empty MotioCI token.
-12:16:54  + exit 1
+ + set -e
+12:23:51  + cd MotioCI/api/CLI
+12:23:51  + python3 -m pip install --user -r requirements.txt
+12:23:51  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
+12:23:51  ++ tail -n1
+12:23:51  ++ tr -d '\r'
+12:23:52  Traceback (most recent call last):
+12:23:52    File "/home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest/MotioCI/api/CLI/ci-cli.py", line 52, in <module>
+12:23:52      def load_credentials_from_json(file_path: str = "credentials.json") -> Optional[str]:
+12:23:52  NameError: name 'Optional' is not defined
+12:23:52  + TOKEN=
+12:23:52  + '[' -z '' ']'
+12:23:52  + echo 'ERROR: Empty MotioCI token.'
+12:23:52  ERROR: Empty MotioCI token.
+12:23:52  + exit 1
 [Pipeline] }
 [Pipeline] // container
 [Pipeline] }
@@ -41,9 +28,9 @@ Stage "Deploy" skipped due to earlier failure(s)
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-12:16:54  Pipeline execution finished.
+12:23:52  Pipeline execution finished.
 [Pipeline] echo
-12:16:54  MotioCI pipeline failed.
+12:23:52  MotioCI pipeline failed.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -61,5 +48,5 @@ ERROR: script returned exit code 1
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/78/.jfrog deleted
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/79/.jfrog deleted
 Finished: FAILURE
