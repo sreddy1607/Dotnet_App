@@ -1,121 +1,7 @@
-13:27:16  Branch: motioci-poctest
-[Pipeline] echo
-13:27:16  Initializing Motio pipeline...
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Check Python Availability)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-13:27:17  + echo 'Checking for Python3...'
-13:27:17  Checking for Python3...
-13:27:17  + which python3
-13:27:17  /usr/bin/python3
-13:27:17  + python3 --version
-13:27:17  Python 3.6.8
-13:27:17  + curl -k -v -X POST https://dhcsdevtestcog.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d '{
-13:27:17    "parameters": [
-13:27:17      {
-13:27:17        "name": "CAMNamespace",
-13:27:17        "value": "AzureAD"
-13:27:17      },
-13:27:17      {
-13:27:17        "name": "CAMUsername",
-13:27:17        "value": "CMarksSS01@intra.dhs.ca.gov"
-13:27:17      },
-13:27:17      {
-13:27:17        "name": "CAMPassword",
-13:27:17        "value": "Service@2024DHCS"
-13:27:17      }
-13:27:17    ]
-13:27:17  }' -i
-13:27:17  Note: Unnecessary use of -X or --request, POST is already inferred.
-13:27:17    % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-13:27:17                                   Dload  Upload   Total   Spent    Left  Speed
-13:27:17  
-13:27:17    0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 104.18.8.164...
-13:27:17  * TCP_NODELAY set
-13:27:17  * Connected to dhcsdevtestcog.ca.analytics.ibm.com (104.18.8.164) port 443 (#0)
-13:27:17  * ALPN, offering h2
-13:27:17  * ALPN, offering http/1.1
-13:27:17  * successfully set certificate verify locations:
-13:27:17  *   CAfile: /etc/pki/tls/certs/ca-bundle.crt
-13:27:17    CApath: none
-13:27:17  } [5 bytes data]
-13:27:17  * TLSv1.3 (OUT), TLS handshake, Client hello (1):
-13:27:17  } [512 bytes data]
-13:27:17  * TLSv1.3 (IN), TLS handshake, Server hello (2):
-13:27:17  { [104 bytes data]
-13:27:17  * TLSv1.2 (IN), TLS handshake, Certificate (11):
-13:27:17  { [4707 bytes data]
-13:27:17  * TLSv1.2 (IN), TLS handshake, Server key exchange (12):
-13:27:17  { [300 bytes data]
-13:27:17  * TLSv1.2 (IN), TLS handshake, Server finished (14):
-13:27:17  { [4 bytes data]
-13:27:17  * TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
-13:27:17  } [37 bytes data]
-13:27:17  * TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
-13:27:17  } [1 bytes data]
-13:27:17  * TLSv1.2 (OUT), TLS handshake, Finished (20):
-13:27:17  } [16 bytes data]
-13:27:17  * TLSv1.2 (IN), TLS handshake, Finished (20):
-13:27:17  { [16 bytes data]
-13:27:17  * SSL connection using TLSv1.2 / ECDHE-RSA-CHACHA20-POLY1305
-13:27:17  * ALPN, server accepted to use h2
-13:27:17  * Server certificate:
-13:27:17  *  subject: C=US; ST=New York; L=Armonk; O=International Business Machines Corporation; CN=*.planning-analytics.ibmcloud.com
-13:27:17  *  start date: Mar  5 00:00:00 2025 GMT
-13:27:17  *  expire date: Mar  4 23:59:59 2026 GMT
-13:27:17  *  issuer: C=US; O=DigiCert Inc; CN=DigiCert Global G2 TLS RSA SHA256 2020 CA1
-13:27:17  *  SSL certificate verify ok.
-13:27:17  * Using HTTP2, server supports multi-use
-13:27:17  * Connection state changed (HTTP/2 confirmed)
-13:27:17  * Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
-13:27:17  } [5 bytes data]
-13:27:17  * Using Stream ID: 1 (easy handle 0x55cfd994c910)
-13:27:17  } [5 bytes data]
-13:27:17  > POST /api/v1/session HTTP/2
-13:27:17  > Host: dhcsdevtestcog.ca.analytics.ibm.com
-13:27:17  > User-Agent: curl/7.61.1
-13:27:17  > Accept: */*
-13:27:17  > Content-Type: application/json
-13:27:17  > Content-Length: 255
-13:27:17  > 
-13:27:17  { [5 bytes data]
-13:27:17  * Connection state changed (MAX_CONCURRENT_STREAMS == 100)!
-13:27:17  } [5 bytes data]
-13:27:17  * We are completely uploaded and fine
-13:27:17  { [5 bytes data]
-13:27:17  < HTTP/2 401 
-13:27:17  < date: Fri, 22 Aug 2025 20:27:17 GMT
-13:27:17  < content-type: application/json
-13:27:17  < cache-control: no-cache,no-store
-13:27:17  < content-language: en-US
-13:27:17  < x-robots-tag: noindex
-13:27:17  < strict-transport-security: max-age=31536000; includeSubDomains
-13:27:17  < cf-cache-status: DYNAMIC
-13:27:17  < server: cloudflare
-13:27:17  < cf-ray: 97351c282b55d82e-PDX
-13:27:17  < 
-13:27:17  { [5 bytes data]
-13:27:17  
-13:27:17  100   293    0    38  100   255    200   1342 --:--:-- --:--:-- --:--:--  1542
-13:27:17  * Connection #0 to host dhcsdevtestcog.ca.analytics.ibm.com left intact
-13:27:17  HTTP/2 401 
-13:27:17  date: Fri, 22 Aug 2025 20:27:17 GMT
-13:27:17  content-type: application/json
-13:27:17  cache-control: no-cache,no-store
-13:27:17  content-language: en-US
-13:27:17  x-robots-tag: noindex
-13:27:17  strict-transport-security: max-age=31536000; includeSubDomains
-13:27:17  cf-cache-status: DYNAMIC
-13:27:17  server: cloudflare
-13:27:17  cf-ray: 97351c282b55d82e-PDX
-13:27:17  
-13:27:17  {"message":"Authentication required."}
+10:45:57  Successfully installed anyio-4.10.0 backoff-2.2.1 certifi-2025.8.3 charset-normalizer-2.0.12 exceptiongroup-1.3.0 gql-4.0.0 graphql-core-3.2.6 idna-3.10 multidict-6.6.4 propcache-0.3.2 python-dateutil-2.8.1 python-gitlab-2.9.0 requests-2.27.1 requests-toolbelt-1.0.0 sniffio-1.3.1 yarl-1.20.1
+10:45:57  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+10:45:57  + echo 'Dependencies installed.'
+10:45:57  Dependencies installed.
 [Pipeline] }
 [Pipeline] // container
 [Pipeline] }
@@ -123,75 +9,21 @@
 [Pipeline] stage
 [Pipeline] { (MotioCI Login)
 [Pipeline] withCredentials
-13:27:17  Masking supported pattern matches of $CREDENTIALS_FILE
+10:45:57  Masking supported pattern matches of $CREDENTIALS_FILE
 [Pipeline] {
 [Pipeline] container
 [Pipeline] {
 [Pipeline] script
 [Pipeline] {
-[Pipeline] echo
-13:27:17  Installing MotioCI CLI dependencies
 [Pipeline] sh
-13:27:18  + cd MotioCI/api/CLI
-13:27:18  + python3 -m pip install --user -r requirements.txt
-13:27:18  Collecting gql>=3.0.0
-13:27:18    Downloading gql-4.0.0-py3-none-any.whl (89 kB)
-13:27:18  Collecting python-dateutil==2.8.1
-13:27:18    Downloading python_dateutil-2.8.1-py2.py3-none-any.whl (227 kB)
-13:27:18  Collecting python-gitlab~=2.9.0
-13:27:18    Downloading python_gitlab-2.9.0-py3-none-any.whl (108 kB)
-13:27:18  Collecting requests~=2.27.1
-13:27:18    Downloading requests-2.27.1-py2.py3-none-any.whl (63 kB)
-13:27:18  Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.9/site-packages (from python-dateutil==2.8.1->-r requirements.txt (line 2)) (1.16.0)
-13:27:20  Collecting yarl<2.0,>=1.6
-13:27:20    Downloading yarl-1.20.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (327 kB)
-13:27:20  Collecting anyio<5,>=3.0
-13:27:20    Downloading anyio-4.10.0-py3-none-any.whl (107 kB)
-13:27:20  Collecting backoff<3.0,>=1.11.1
-13:27:20    Downloading backoff-2.2.1-py3-none-any.whl (15 kB)
-13:27:20  Collecting graphql-core<3.3,>=3.2
-13:27:20    Downloading graphql_core-3.2.6-py3-none-any.whl (203 kB)
-13:27:20  Collecting requests-toolbelt>=0.9.1
-13:27:20    Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
-13:27:20  Collecting idna<4,>=2.5
-13:27:20    Downloading idna-3.10-py3-none-any.whl (70 kB)
-13:27:20  Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.9/site-packages (from requests~=2.27.1->-r requirements.txt (line 4)) (1.26.18)
-13:27:20  Collecting charset-normalizer~=2.0.0
-13:27:20    Downloading charset_normalizer-2.0.12-py3-none-any.whl (39 kB)
-13:27:20  Collecting certifi>=2017.4.17
-13:27:20    Downloading certifi-2025.8.3-py3-none-any.whl (161 kB)
-13:27:20  Collecting exceptiongroup>=1.0.2
-13:27:20    Downloading exceptiongroup-1.3.0-py3-none-any.whl (16 kB)
-13:27:20  Requirement already satisfied: typing_extensions>=4.5 in /usr/local/lib/python3.9/site-packages (from anyio<5,>=3.0->gql>=3.0.0->-r requirements.txt (line 1)) (4.10.0)
-13:27:20  Collecting sniffio>=1.1
-13:27:20    Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
-13:27:21  Collecting propcache>=0.2.1
-13:27:21    Downloading propcache-0.3.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (200 kB)
-13:27:22  Collecting multidict>=4.0
-13:27:22    Downloading multidict-6.6.4-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (239 kB)
-13:27:22  Installing collected packages: idna, charset-normalizer, certifi, sniffio, requests, propcache, multidict, exceptiongroup, yarl, requests-toolbelt, graphql-core, backoff, anyio, python-gitlab, python-dateutil, gql
-13:27:22    WARNING: The script normalizer is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
-13:27:22    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-13:27:22    WARNING: The script gitlab is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
-13:27:22    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-13:27:22    WARNING: The script gql-cli is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
-13:27:22    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-13:27:23  ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-13:27:23  pandas 2.2.1 requires python-dateutil>=2.8.2, but you have python-dateutil 2.8.1 which is incompatible.
-13:27:23  Successfully installed anyio-4.10.0 backoff-2.2.1 certifi-2025.8.3 charset-normalizer-2.0.12 exceptiongroup-1.3.0 gql-4.0.0 graphql-core-3.2.6 idna-3.10 multidict-6.6.4 propcache-0.3.2 python-dateutil-2.8.1 python-gitlab-2.9.0 requests-2.27.1 requests-toolbelt-1.0.0 sniffio-1.3.1 yarl-1.20.1
-13:27:23  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
-13:27:23  + echo 'Successfully installed packages'
-13:27:23  Successfully installed packages
-[Pipeline] echo
-13:27:23  Logging into MotioCI with stored credentials file
-[Pipeline] sh
-13:27:23  + cd MotioCI/api/CLI
-13:27:23  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
-13:27:23  + grep 'Auth Token:'
-13:27:23  + cut -d: -f2
-13:27:23  + tr -d ' '
-[Pipeline] echo
-13:27:27  MotioCI login completed - Token captured: 790f1f26-6b44-4954-b6b7-0992e2234615
+10:45:58  + set -e
+10:45:58  + cd MotioCI/api/CLI
+10:45:58  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
+10:45:58  usage: ci-cli.py [-h] --server SERVER
+10:45:58                   {login,instance,project,label,labelVersion,deploy,versionedItems,logout}
+10:45:58                   ...
+10:45:58  ci-cli.py: error: unrecognized arguments: --non-interactive
+10:45:58  + TOKEN=
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] }
@@ -202,146 +34,16 @@
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Deploy)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] echo
-13:27:27  Testing MotioCI Promotion
-[Pipeline] sh
-13:27:27  + cd MotioCI/api/CLI
-13:27:27  + export PYTHONHTTPSVERIFY=0
-13:27:27  + PYTHONHTTPSVERIFY=0
-13:27:27  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=790f1f26-6b44-4954-b6b7-0992e2234615 --instanceName=Cognos-PRD
-13:27:27  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
-13:27:27  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
-13:27:27  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
-13:27:28  + echo 'Test 4: Testing deploy command without username/password (maybe it will work?):'
-13:27:28  Test 4: Testing deploy command without username/password (maybe it will work?):
-13:27:28  + curl -kv -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: 790f1f26-6b44-4954-b6b7-0992e2234615' -d '{
-13:27:28                "query": "mutation Deploy($input: DeployInput!) { deploy(input: $input) { deployment { id status } } }",
-13:27:28                  "variables": {
-13:27:28                       "input": {
-13:27:28                       "source": {
-13:27:28                       "instanceId": "3",
-13:27:28                        "label": "57",
-13:27:28                         "projectName": "Demo"
-13:27:28                               },
-13:27:28                        "target": {
-13:27:28                        "instanceId": "1",
-13:27:28                       "targetLabelName": "PROMOTED-20250712-115",
-13:27:28                       "userName": "CMarksSS01@intra.dhs.ca.gov",
-13:27:28                        "password": "Service@2024DHCS",
-13:27:28                        "namespaceId": "AzureAD"
-13:27:28        }
-13:27:28      }
-13:27:28    }
-13:27:28  }'
-13:27:28  Note: Unnecessary use of -X or --request, POST is already inferred.
-13:27:28    % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-13:27:28                                   Dload  Upload   Total   Spent    Left  Speed
-13:27:28  
-13:27:28    0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host cgrptmcip01.cloud.cammis.ca.gov:443 was resolved.
-13:27:28  * IPv6: (none)
-13:27:28  * IPv4: 10.188.66.20
-13:27:28  *   Trying 10.188.66.20:443...
-13:27:28  * Connected to cgrptmcip01.cloud.cammis.ca.gov (10.188.66.20) port 443
-13:27:28  * ALPN: curl offers h2,http/1.1
-13:27:28  } [5 bytes data]
-13:27:28  * TLSv1.3 (OUT), TLS handshake, Client hello (1):
-13:27:28  } [512 bytes data]
-13:27:28  * TLSv1.3 (IN), TLS handshake, Server hello (2):
-13:27:28  { [85 bytes data]
-13:27:28  * TLSv1.2 (IN), TLS handshake, Certificate (11):
-13:27:28  { [5610 bytes data]
-13:27:28  * TLSv1.2 (IN), TLS handshake, Server key exchange (12):
-13:27:28  { [300 bytes data]
-13:27:28  * TLSv1.2 (IN), TLS handshake, Server finished (14):
-13:27:28  { [4 bytes data]
-13:27:28  * TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
-13:27:28  } [37 bytes data]
-13:27:28  * TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
-13:27:28  } [1 bytes data]
-13:27:28  * TLSv1.2 (OUT), TLS handshake, Finished (20):
-13:27:28  } [16 bytes data]
-13:27:28  * TLSv1.2 (IN), TLS handshake, Finished (20):
-13:27:28  { [16 bytes data]
-13:27:28  * SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384 / X25519 / RSASSA-PSS
-13:27:28  * ALPN: server did not agree on a protocol. Uses default.
-13:27:28  * Server certificate:
-13:27:28  *  subject: CN=CGRPTMCIP01.cloud.cammis.ca.gov
-13:27:28  *  start date: Feb 12 21:20:06 2025 GMT
-13:27:28  *  expire date: Feb 11 21:20:06 2030 GMT
-13:27:28  *  issuer: C=US; DC=gov; DC=ca; DC=cammis; DC=cloud; O=State of California Department of Health Care Services; OU=California Medicare and Medi-Cal Information Systems; CN=CLOUDCAMMIS Enterprise Certificate Authority
-13:27:28  *  SSL certificate verify result: self-signed certificate in certificate chain (19), continuing anyway.
-13:27:28  *   Certificate level 0: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
-13:27:28  *   Certificate level 1: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
-13:27:28  *   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
-13:27:28  * using HTTP/1.x
-13:27:28  } [5 bytes data]
-13:27:28  > POST /api/graphql HTTP/1.1
-13:27:28  > Host: cgrptmcip01.cloud.cammis.ca.gov
-13:27:28  > User-Agent: curl/8.5.0
-13:27:28  > Accept: */*
-13:27:28  > Content-Type: application/json
-13:27:28  > x-auth-token: 790f1f26-6b44-4954-b6b7-0992e2234615
-13:27:28  > Content-Length: 695
-13:27:28  > 
-13:27:28  } [695 bytes data]
-13:27:28  < HTTP/1.1 200 
-13:27:28  < Vary: Origin
-13:27:28  < Vary: Access-Control-Request-Method
-13:27:28  < Vary: Access-Control-Request-Headers
-13:27:28  < Strict-Transport-Security: max-age=31536000;includeSubDomains
-13:27:28  < X-Frame-Options: DENY
-13:27:28  < X-Content-Type-Options: nosniff
-13:27:28  < Content-Security-Policy: frame-ancestors 'self'
-13:27:28  < X-XSS-Protection: 1; mode=block
-13:27:28  < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-13:27:28  < Pragma: no-cache
-13:27:28  < Expires: 0
-13:27:28  < Content-Type: application/json
-13:27:28  < Transfer-Encoding: chunked
-13:27:28  < Date: Fri, 22 Aug 2025 20:27:28 GMT
-13:27:28  < 
-13:27:28  { [396 bytes data]
-13:27:28  
-13:27:28  100  1091    0   396  100   695   3311   5812 --:--:-- --:--:-- --:--:--  9168
-13:27:28  * Connection #0 to host cgrptmcip01.cloud.cammis.ca.gov left intact
-13:27:28  {"errors":[{"message":"Validation error of type UnknownType: Unknown type DeployInput","locations":[{"line":1,"column":25}],"extensions":{"classification":"ValidationError"}},{"message":"Validation error of type FieldUndefined: Field 'status' in type 'Deployment' is undefined @ 'deploy/deployment/status'","locations":[{"line":1,"column":81}],"extensions":{"classification":"ValidationError"}}]}+ echo ''
-13:27:28  
-13:27:28  + echo 'SUCCESS! Deploy command accepted all parameters!'
-13:27:28  SUCCESS! Deploy command accepted all parameters!
-13:27:28  + echo 'Only SSL certificate verification is blocking us now'
-13:27:28  Only SSL certificate verification is blocking us now
-13:27:28  + echo 'Testing multiple SSL bypass methods:'
-13:27:28  Testing multiple SSL bypass methods:
-13:27:28  + echo ''
-13:27:28  
-13:27:28  + echo ''
-13:27:28  
-13:27:28  + echo 'Verification: Checking PROD Demo project after promotion:'
-13:27:28  Verification: Checking PROD Demo project after promotion:
-13:27:28  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=790f1f26-6b44-4954-b6b7-0992e2234615 --instanceName=Cognos-PRD --projectName=Demo
-13:27:28  + tee verify_labels.json
-13:27:28  {'node': {'name': 'Pre-Promotion Label for motioci-poc-101', 'id': 58, 'description': '', 'labelType': 'PRE_DEPLOYMENT'}}
-13:27:28  {'node': {'name': 'motioci-poc-101', 'id': 59, 'description': None, 'labelType': 'POST_DEPLOYMENT'}}
-13:27:28  + grep -q '"name": "PROMOTED-20250712-115"' verify_labels.json
-13:27:28  + echo 'Deployment label not found in PRD/Demo'
-13:27:28  Deployment label not found in PRD/Demo
-13:27:28  + exit 1
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // container
+Stage "Deploy" skipped due to earlier failure(s)
+[Pipeline] getContext
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-13:27:28  Pipeline execution finished.
+10:45:58  Pipeline execution finished.
 [Pipeline] echo
-13:27:28  MotioCI pipeline failed.
+10:45:58  MotioCI pipeline failed.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -355,9 +57,9 @@
 [Pipeline] }
 [Pipeline] // podTemplate
 [Pipeline] End of Pipeline
-ERROR: script returned exit code 1
+ERROR: script returned exit code 2
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/67/.jfrog deleted
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/69/.jfrog deleted
 Finished: FAILURE
