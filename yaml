@@ -1,29 +1,42 @@
-10:45:57  Successfully installed anyio-4.10.0 backoff-2.2.1 certifi-2025.8.3 charset-normalizer-2.0.12 exceptiongroup-1.3.0 gql-4.0.0 graphql-core-3.2.6 idna-3.10 multidict-6.6.4 propcache-0.3.2 python-dateutil-2.8.1 python-gitlab-2.9.0 requests-2.27.1 requests-toolbelt-1.0.0 sniffio-1.3.1 yarl-1.20.1
-10:45:57  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
-10:45:57  + echo 'Dependencies installed.'
-10:45:57  Dependencies installed.
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (MotioCI Login)
 [Pipeline] withCredentials
-10:45:57  Masking supported pattern matches of $CREDENTIALS_FILE
+10:52:39  Masking supported pattern matches of $CREDENTIALS_FILE
 [Pipeline] {
 [Pipeline] container
 [Pipeline] {
 [Pipeline] script
 [Pipeline] {
 [Pipeline] sh
-10:45:58  + set -e
-10:45:58  + cd MotioCI/api/CLI
-10:45:58  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
-10:45:58  usage: ci-cli.py [-h] --server SERVER
-10:45:58                   {login,instance,project,label,labelVersion,deploy,versionedItems,logout}
-10:45:58                   ...
-10:45:58  ci-cli.py: error: unrecognized arguments: --non-interactive
-10:45:58  + TOKEN=
+10:52:40  + set -e
+10:52:40  + cd MotioCI/api/CLI
+10:52:40  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
+10:52:40  + TOKEN='Successfully loaded credentials from ****
+10:52:40  == DEBUG: Attempting login with masked credentials ==
+10:52:40  [{"instanceId": "1", "apiKey": "********"}]
+10:52:40  == DEBUG: Sending masked credentials ==
+10:52:40  [
+10:52:40    {
+10:52:40      "instanceId": "1",
+10:52:40      "apiKey": "********"
+10:52:40    }
+10:52:40  ]
+10:52:40  Error making request: HTTPSConnectionPool(host='\''cgrptmcip01.cloud.cammis.ca.gov'\'', port=443): Max retries exceeded with url: /api/login (Caused by NewConnectionError('\''<urllib3.connection.HTTPSConnection object at 0x7f743de2bd00>: Failed to establish a new connection: [Errno 111] Connection refused'\''))
+10:52:40  Invalid parameters. Login cancelled!'
+10:52:40  + echo 'Successfully loaded credentials from ****
+10:52:40  == DEBUG: Attempting login with masked credentials ==
+10:52:40  [{"instanceId": "1", "apiKey": "********"}]
+10:52:40  == DEBUG: Sending masked credentials ==
+10:52:40  [
+10:52:40    {
+10:52:40      "instanceId": "1",
+10:52:40      "apiKey": "********"
+10:52:40    }
+10:52:40  ]
+10:52:40  Error making request: HTTPSConnectionPool(host='\''cgrptmcip01.cloud.cammis.ca.gov'\'', port=443): Max retries exceeded with url: /api/login (Caused by NewConnectionError('\''<urllib3.connection.HTTPSConnection object at 0x7f743de2bd00>: Failed to establish a new connection: [Errno 111] Connection refused'\''))
+10:52:40  Invalid parameters. Login cancelled!'
+[Pipeline] echo
+10:52:40  MotioCI login completed - token captured.
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] }
@@ -34,16 +47,16 @@
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Deploy)
-Stage "Deploy" skipped due to earlier failure(s)
-[Pipeline] getContext
+[Pipeline] withCredentials
+[Pipeline] // withCredentials
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-10:45:58  Pipeline execution finished.
+10:52:40  Pipeline execution finished.
 [Pipeline] echo
-10:45:58  MotioCI pipeline failed.
+10:52:40  MotioCI pipeline failed.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -57,9 +70,9 @@ Stage "Deploy" skipped due to earlier failure(s)
 [Pipeline] }
 [Pipeline] // podTemplate
 [Pipeline] End of Pipeline
-ERROR: script returned exit code 2
+ERROR: Could not find credentials entry with ID 'cognos-prod-service-user'
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/69/.jfrog deleted
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/70/.jfrog deleted
 Finished: FAILURE
