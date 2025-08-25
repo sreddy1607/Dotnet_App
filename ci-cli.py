@@ -15,6 +15,7 @@ import queries
 import os
 import urllib3
 import ssl
+import sys
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Monkey patch requests to disable SSL verification globally
@@ -69,22 +70,23 @@ def load_credentials_from_json(file_path="credentials.json"):
         return credentials_json
         
     except json.JSONDecodeError as e:
-        print(f"ERROR: Invalid JSON format in credentials file - {e}")
+        print(f"ERROR: Invalid JSON format in credentials file - {e}", file=sys.stderr)
         return None
     except Exception as e:
-        print(f"ERROR: Failed to load credentials file - {e}")
+        print(f"ERROR: Failed to load credentials file - {e}", file=sys.stderr)
         return None
 
 
-# Method for parsing command line parameters
 def parse_args():
     # Format for command line: subject verb flags
-    # Options for first positional argument: login, label, labelVersion, project, versionedItems, instance, logout
-    # Options for second positional argument: based on subject. Ex. label allows ls or create. instance allows only ls.
+    # Options for first positional argument: login, instance, project, label, label version, versioned items, and logout
     parent_parser = argparse.ArgumentParser(
         description="description: sample Python CLI to perform queries using the GraphiQL API.")
     parent_parser.add_argument('--server', type=str, required=True,
                                help="provide link to GraphiQL API for the commands to run")
+    # NEW: Accept --non-interactive so Jenkins doesn't break
+    parent_parser.add_argument('--non-interactive', action='store_true',
+                               help="Run in CI-safe mode: disable interactive prompts and fail instead.")
     subject_parser = parent_parser.add_subparsers(dest="subject",
                                                   description='''subjects description: The available subjects are stated below. To find out what actions can be performed on a subject, run python ci-cli.py [subject] -h. To run commands, the xauthtoken and server flags are required.''')
 
@@ -306,6 +308,37 @@ def get_available_namespaces(target_instance_id, isVersioned):
 
     # Get target authentication method
 
+def complete_standard_auth(namespaces, args):
+    # Build list of valid namespace ids reported by the target instance
+    valid_namespaces = [ns['id'] for ns in namespaces]
+
+    # Password
+    if args.password is None:
+        print("Username Entered: ", args.username)
+        password = input("Enter Password: ")
+    else:
+        password = args.password
+
+    # Namespace selection (order: CLI flag -> env var -> 'azure' if present -> prompt)
+    namespace_id_input = args.namespaceId or os.environ.get("NAMESPACE_ID")
+    if not namespace_id_input and "azure" in valid_namespaces:
+        namespace_id_input = "azure"
+
+    # Validate or prompt until valid
+    while not namespace_id_input or namespace_id_input not in valid_namespaces:
+        print("Invalid or missing namespaceId. Available namespaces:", valid_namespaces)
+        namespace_id_input = input("Enter namespaceId (or 'q' to quit): ")
+        if namespace_id_input == "q":
+            break
+
+    authentication = {
+        'password': {
+            'namespaceId': namespace_id_input,
+            'username': args.username,
+            'password': password
+        }
+    }
+    return authentication
 
 def get_authentication(target_instance_id, is_versioned, args):
     if args.camPassportId is not None:
@@ -314,31 +347,9 @@ def get_authentication(target_instance_id, is_versioned, args):
         valid_namespaces = get_available_namespaces(target_instance_id, is_versioned)
         authentication = complete_standard_auth(valid_namespaces, args)
     else:
-        print(
-            "Error. Missing deployment credentials. Enter either camPassportId for portal auth or username for standard auth");
+        print("Error. Missing deployment credentials. Enter either camPassportId for portal auth or username for standard auth")
         return
     return authentication
-
-
-def complete_standard_auth(namespaces, args):
-    valid_namespaces = []
-    for namespace in namespaces:
-        valid_namespaces.append(namespace['id'])
-    if args.password is None:
-        print("Username Entered: ", args.username)
-        password = input("Enter Password: ")
-    else:
-        password = args.password
-    if args.namespaceId is None:
-        namespace_id_input = input("Enter namespaceId: ")
-        while namespace_id_input not in valid_namespaces and namespace_id_input != "q":
-            print("Invalid namespace. Available namespaces: ", valid_namespaces)
-            namespace_id_input = input("Enter namespaceName (enter q to quit): ")
-    else:
-        namespace_id_input = args.namespaceId
-    authentication = {'password': {'namespaceId': namespace_id_input, 'username': args.username, 'password': password}}
-    return authentication
-
 
 # Loop for instances' id, name, or valid user input. Validates user input on possible options in CI
 def find_instance_id(instance_id, instance_name, input_string):
@@ -483,30 +494,24 @@ constants.LOGOUT_URL = constants.CI_URL + constants.LOGOUT_URL
 constants.GRAPH_URL = constants.CI_URL + constants.GRAPH_URL
 
 if args.subject == "login":
-    # Priority order: 1. credentials parameter, 2. credentialsFile parameter, 3. user input
+    # Priority order: 1. --credentials, 2. --credentialsFile, 3. interactive
     if args.credentials is not None:
         credentials_to_use = args.credentials
     else:
         credentials_to_use = load_credentials_from_json(args.credentialsFile)
-        
         if credentials_to_use is None:
-            print("Falling back to manual credential input...")
-            credentials_to_use = loginInput.get_login_from_user()
-    
-    # SECURE: Only log masked credentials
-    print("== DEBUG: Attempting login with masked credentials ==")
-    print(mask_credentials_for_logging(credentials_to_use))
-    
-    # Attempt login
-    auth_token = login.login_init(credentials_to_use)
-    if auth_token is None:
-        print("Invalid parameters. Login cancelled!")
-    else:
-        # SECURE: Don't log actual credentials, but DO show full auth token
-        print("Login successful!")
-        # Show full auth token - it's needed for subsequent operations
-        print("x-auth_token: ", auth_token)
+            # In CI, this should fail fast; interactively you could fall back
+            print("ERROR: No credentials provided and credentialsFile not found/invalid.", file=sys.stderr)
+            sys.exit(1)
 
+    token = login.login_init(credentials_to_use)
+    if not token:
+        print("ERROR: Login failed (no token returned).", file=sys.stderr)
+        sys.exit(1)
+
+    # IMPORTANT: print ONLY the token to stdout (no extra text)
+    print(token)
+    sys.exit(0)
 else:
     constants.X_AUTH_TOKEN = args.xauthtoken
 
