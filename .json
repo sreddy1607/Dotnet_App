@@ -1,65 +1,100 @@
-Hi Srinivas, please see answers known below.
+ + TOKEN=f47c6d23-f063-4099-a05a-eafa76876440
+13:07:03  + '[' -z f47c6d23-f063-4099-a05a-eafa76876440 ']'
+13:07:03  + echo TOKEN=f47c6d23-f063-4099-a05a-eafa76876440
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] script
+[Pipeline] {
+[Pipeline] readFile
+[Pipeline] echo
+13:07:03  MotioCI login completed - token captured.
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Debug Namespaces)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+13:07:04  + echo 'Checking available namespaces for PRD instance...'
+13:07:04  Checking available namespaces for PRD instance...
+13:07:04  + curl -sk -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: f47c6d23-f063-4099-a05a-eafa76876440' -d '{
+13:07:04              "query":"query($id:Int!){ instance(id:$id){ namespaces { id name } } }",
+13:07:04              "variables":{"id":1}
+13:07:04            }'
+13:07:04  + jq .
+13:07:04  {
+13:07:04    "errors": [
+13:07:04      {
+13:07:04        "message": "Validation error of type VariableTypeMismatch: Variable type 'Int!' doesn't match expected type 'Long!' @ 'instance'",
+13:07:04        "locations": [
+13:07:04          {
+13:07:04            "line": 1,
+13:07:04            "column": 30
+13:07:04          }
+13:07:04        ],
+13:07:04        "extensions": {
+13:07:04          "classification": "ValidationError"
+13:07:04        }
+13:07:04      }
+13:07:04    ]
+13:07:04  }
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy)
+[Pipeline] withCredentials
+13:07:04  Masking supported pattern matches of $COG_USER or $COG_PASS
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+13:07:04  + set -euo pipefail
+13:07:04  + cd MotioCI/api/CLI
+13:07:04  + echo 'Sanity: list projects on Cognos-PRD...'
+13:07:04  Sanity: list projects on Cognos-PRD...
+13:07:04  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=f47c6d23-f063-4099-a05a-eafa76876440 --instanceName=Cognos-PRD
+13:07:05  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
+13:07:05  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
+13:07:05  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
+13:07:05  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive deploy --xauthtoken=f47c6d23-f063-4099-a05a-eafa76876440 --sourceInstanceId=3 --targetInstanceId=1 --labelId=57 --projectName=Demo --targetLabelName=PROMOTED-20250712-115 --username=**** --password=**** --namespaceId=AzureAD
+13:07:07  Error performing the deployment:
+13:07:07    [{'message': 'Access is denied', 'locations': [{'line': 3, 'column': 5}], 'path': ['deploy'], 'extensions': {'code': 'ACCESS_DENIED', 'isLicenseValid': True, 'classification': 'DataFetchingException'}}]
+13:07:07  + echo 'Verification: labels after deployment'
+13:07:07  Verification: labels after deployment
+13:07:07  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=f47c6d23-f063-4099-a05a-eafa76876440 --instanceName=Cognos-PRD --projectName=Demo
+13:07:07  + tee verify_labels.json
+13:07:07  {'node': {'name': 'Pre-Promotion Label for motioci-poc-101', 'id': 58, 'description': '', 'labelType': 'PRE_DEPLOYMENT'}}
+13:07:07  {'node': {'name': 'motioci-poc-101', 'id': 59, 'description': None, 'labelType': 'POST_DEPLOYMENT'}}
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+13:07:07  Pipeline execution finished.
+[Pipeline] echo
+13:07:07  MotioCI pipeline completed successfully.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timestamps
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] }
+[Pipeline] // podTemplate
+[Pipeline] End of Pipeline
 
-From: Reddy, Srinivas@DHCS <Srinivas.Reddy@dhcs.ca.gov>
-Sent: Wednesday, August 20, 2025 9:49 AM
-To: Treacy, Mark@DHCS <Mark.Treacy@dhcs.ca.gov>; Butters, Dennis@DHCS <Dennis.Butters@dhcs.ca.gov>
-Cc: Singh, Taliea@DHCS <Taliea.Singh@dhcs.ca.gov>; Kumar, Rajat@DHCS <Rajat.Kumar@dhcs.ca.gov>
-Subject: Request to Enable Service Account for Cognos Deployments via MotioCI
-
- 
-
-Hi Admin & Team,
-
- 
-
-I am working on automating Cognos deployments through MotioCI.
-
-The MotioCI authentication (API token) is working fine, but the pipeline is failing during the deploy step with the error:
-
- 
-
-DEPLOYMENT_AUTHENTICATION_FAILED: failed to authenticate to instance with ID [X]
-
- 
-
-This happens when MotioCI tries to log into the target Cognos instance (DEV/TEST and PROD) using the service account.
-
- 
-
- 
-
-Could you please help confirm the following for the service account
-
- CMarksSS01@intra.dhs.ca.gov:
-
- 
-
---Namespace ID:
-
- 
-
-What is the exact namespaceId we should use for DEV/TEST and for PROD?
-
- 
-
-(Is it Azure AD, AzureAD, or something else? Case and spaces matter.) Azure for both
-
- 
-
---Account Status:
-
- 
-
-Ensure this service account is enabled, password is valid (not expired), and no MFA/interactive login is required. Is enabled in Azure, Do not have password for this account, MFA unknown
-
- 
-
-Confirm it can log in directly to the Cognos portal in both environments.
-
- 
-
---Permissions:
-
- 
-
-Does the service account have the required Cognos roles/permissions to perform deployments via MotioCI for project Demo? Yes, it is a Cognos Administrator
+GitHub has been notified of this commit’s build result
