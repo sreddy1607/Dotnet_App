@@ -1,1 +1,5 @@
-https://www.ibm.com/docs/en/cognos-analytics/11.2.x?topic=deployment-exporting-tenant-content-archive
+logs:
+   - type: file
+     path: "D:\\apps\\ErrorLogs\\surgeapi.txt"
+     service: "surgeapi"
+     source: "TAR-SURGE-APP"
