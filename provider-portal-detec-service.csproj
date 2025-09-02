@@ -1,2 +1,12 @@
-D:\inetpub\ApiServices\surgelogs
-
+step([$class: 'AWSCodeDeployPublisher',
+                  applicationName: "rais-eis-${env_deploy_env}",
+                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                  credentials: 'awsAccessKey',
+                  deploymentConfig: "rais-eis-${env_deploy_env}-config",
+                  deploymentGroupAppspec: false,
+                  deploymentGroupName: "rais-eis-${env_deploy_env}-INPLACE-deployment-group",
+                  deploymentMethod: 'deploy',
+                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                  region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
+                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
