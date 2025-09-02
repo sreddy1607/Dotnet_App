@@ -1,5 +1,85 @@
-logs:
-   - type: file
-     path: "D:\\apps\\ErrorLogs\\surgeapi.txt"
-     service: "surgeapi"
-     source: "TAR-SURGE-APP"
+[Pipeline] stage
+[Pipeline] { (Deploy)
+[Pipeline] lock
+11:52:36  Trying to acquire lock on [Resource: codedeploy-ec2-lock]
+11:52:36  Resource [codedeploy-ec2-lock] did not exist. Created.
+11:52:36  Lock acquired on [Resource: codedeploy-ec2-lock]
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
+11:52:37  Deploy Using AWS CodeDeploy
+[Pipeline] withCredentials
+11:52:37  Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
+[Pipeline] {
+[Pipeline] step
+11:52:37  Warning: A secret was passed to "step" using Groovy String interpolation, which is insecure.
+11:52:37  		 Affected argument(s) used the following variable(s): [AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY]
+11:52:37  		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
+11:52:37  Zipping files into /tmp/#80-129988586448907144.zip
+11:52:40  Uploading zip to s3://dhcs-codedeploy-app/#80-129988586448907144.zip
+11:52:40  Registering revision for application 'tar-surge-app-DEV'
+11:52:40  Creating deployment with revision at {RevisionType: S3,S3Location: {Bucket: dhcs-codedeploy-app,Key: #80-129988586448907144.zip,BundleType: zip,ETag: 419888102c5dcfa54f22546f4ddc7aec},}
+11:52:41  Monitoring deployment with ID d-PY50SXT1E...
+11:52:41  Deployment status: Created; instances: null
+11:52:56  Deployment status: Created; instances: null
+11:53:11  Deployment status: InProgress; instances: {Pending: 1,InProgress: 0,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:53:26  Deployment status: InProgress; instances: {Pending: 1,InProgress: 0,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:53:41  Deployment status: InProgress; instances: {Pending: 1,InProgress: 0,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:53:56  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:54:11  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:54:27  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:54:42  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:54:57  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:55:12  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:55:27  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:55:42  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:55:57  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:56:12  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:56:27  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:56:42  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:56:58  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:57:13  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:57:28  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:57:43  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:57:58  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+11:58:13  Deployment status: Failed; instances: {Pending: 0,InProgress: 0,Succeeded: 0,Failed: 1,Skipped: 0,Ready: 0}
+11:58:13  Deployment did not succeed. Final status: Failed
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+11:58:13  Lock released on resource [Resource: codedeploy-ec2-lock]
+[Pipeline] // lock
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+11:58:13  Build Process complete.
+[Pipeline] echo
+11:58:13  Build encountered failures .
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // timestamps
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] }
+[Pipeline] // podTemplate
+[Pipeline] End of Pipeline
+ERROR: null
+
+GitHub has been notified of this commit’s build result
+
+/var/lib/jenkins/jobs/TAR-Jobs/jobs/SURGE/jobs/SURGE BATCH APPLICATION/workspace/master@tmp/jfrog/80/.jfrog deleted
+Finished: FAILURE
