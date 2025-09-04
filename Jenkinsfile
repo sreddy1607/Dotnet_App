@@ -1,14 +1,4 @@
-/*
-=======================================================================================
-This file is being updated constantly by the DevOps team to introduce new enhancements
-based on the template.  If you have suggestions for improvement,
-please contact the DevOps team so that we can incorporate the changes into the
-template.  In the meantime, if you have made changes here or don't want this file to be
-updated, please indicate so at the beginning of this file.
-=======================================================================================
-*/
-
-//variables from ibm template
+// Jenkinsfile (hardened & non-interactive)
 def branch = env.BRANCH_NAME ?: "DEV"
 def namespace = env.NAMESPACE  ?: "dev"
 def cloudName = env.CLOUD_NAME == "openshift" ? "openshift" : "kubernetes"
@@ -20,88 +10,106 @@ pipeline {
   agent {
     kubernetes {
       yaml """
-        apiVersion: v1
-        kind: Pod
-        spec:
-          serviceAccountName: jenkins
-          volumes:
-            - name: dockersock
-              hostPath:
-                path: /var/run/docker.sock
-            - emptyDir: {}
-              name: varlibcontainers
-            - name: jenkins-trusted-ca-bundle
-              configMap:
-                name: jenkins-trusted-ca-bundle
-                defaultMode: 420
-                optional: true
-          containers:
-            - name: jnlp
-              securityContext:
-                privileged: true
-              envFrom:
-                - configMapRef:
-                    name: jenkins-agent-env
-                    optional: true
-              env:
-                - name: GIT_SSL_CAINFO
-                  value: "/etc/pki/tls/certs/ca-bundle.crt"
-              volumeMounts:
-                - name: jenkins-trusted-ca-bundle
-                  mountPath: /etc/pki/tls/certs
-            - name: node
-              image: registry.access.redhat.com/ubi8/nodejs-16:latest
-              tty: true
-              command: ["/bin/bash"]
-              securityContext:
-                privileged: true
-              workingDir: ${workingDir}
-              securityContext:
-                privileged: true
-              envFrom:
-                - configMapRef:
-                    name: jenkins-agent-env
-                    optional: true
-              env:
-                - name: HOME
-                  value: ${workingDir}
-                - name: BRANCH
-                  value: ${branch}
-                - name: GIT_SSL_CAINFO
-                  value: "/etc/pki/tls/certs/ca-bundle.crt"
-              volumeMounts:
-                - name: jenkins-trusted-ca-bundle
-                  mountPath: /etc/pki/tls/certs
-            - name: python
-              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.2.0
-              tty: true
-              command: ["/bin/bash"]
-              securityContext:
-                privileged: true
-              workingDir: ${workingDir}
-              securityContext:
-                privileged: true
-              envFrom:
-                - configMapRef:
-                    name: jenkins-agent-env
-                    optional: true
-              env:
-                - name: HOME
-                  value: ${workingDir}
-                - name: BRANCH
-                  value: ${branch}
-                - name: GIT_SSL_CAINFO
-                  value: "/etc/pki/tls/certs/ca-bundle.crt"
-              volumeMounts:
-                - name: jenkins-trusted-ca-bundle
-                  mountPath: /etc/pki/tls/certs
-      """
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  volumes:
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - emptyDir: {}
+      name: varlibcontainers
+    - name: jenkins-trusted-ca-bundle
+      configMap:
+        name: jenkins-trusted-ca-bundle
+        defaultMode: 420
+        optional: true
+  containers:
+    - name: jnlp
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+    - name: node
+      image: registry.access.redhat.com/ubi8/nodejs-16:latest
+      tty: true
+      command: ["/bin/bash"]
+      securityContext:
+        privileged: true
+      workingDir: ${workingDir}
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: ${workingDir}
+        - name: BRANCH
+          value: ${branch}
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+    - name: python
+      image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.2.0
+      tty: true
+      command: ["/bin/bash"]
+      securityContext:
+        privileged: true
+      workingDir: ${workingDir}
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: ${workingDir}
+        - name: BRANCH
+          value: ${branch}
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+        # Make requests trust the mounted CA bundle (no -k)
+        - name: REQUESTS_CA_BUNDLE
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+        - name: SSL_CERT_FILE
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+        # Non-interactive mode signal for the CLI
+        - name: CI
+          value: "1"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+"""
     }
   }
-  environment  {
+
+  environment {
     GIT_BRANCH = "${BRANCH_NAME}"
+    MOTIO_SERVER = "https://cgrptmcip01.cloud.cammis.ca.gov"
+
+    // Source/Target config
+    SRC_INSTANCE_NAME = "Cognos-DEV/TEST"
+    SRC_INSTANCE_ID   = "3"
+    TGT_INSTANCE_NAME = "Cognos-PRD"
+    TGT_INSTANCE_ID   = "1"
+    PROJECT_NAME      = "Demo"
+    SOURCE_LABEL_ID   = "57"
+    TARGET_LABEL_NAME = "PROMOTED-20250712-115"
+
+    
+    NAMESPACE_ID      = "AzureAD"
   }
-                  
+
   options {
     disableConcurrentBuilds()
     timestamps()
@@ -118,123 +126,116 @@ pipeline {
     }
 
     stage('Check Python Availability') {
-      steps { 
+      steps {
         container('node') {
           sh '''
+            set -e
             echo "Checking for Python3..."
-            which python3 || echo "Python3 is NOT installed"
-            python3 --version ||echo "Unable to get Python version"
+            which python3 || true
+            python3 --version || true
           '''
         }
       }
     }
 
-    stage('MotioCI Login') {
-      steps {
-        withCredentials([
-          file(credentialsId: 'prod-credentials-json', variable: 'CREDENTIALS_FILE')
-        ]) {
-          container('python') {
-            script {
-              echo "Installing MotioCI CLI dependencies"
-              sh '''
-                cd MotioCI/api/CLI
-                python3 -m pip install --user -r requirements.txt
-                echo "Successfully installed packages"
-              '''
-              
-              echo "Logging into MotioCI with stored credentials file"
-              env.MOTIO_AUTH_TOKEN = sh(
-                script: '''
-                  cd MotioCI/api/CLI
-                  # Login and capture only the token line, then extract just the token
-                  python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" login --credentialsFile "$CREDENTIALS_FILE" | grep "Auth Token:" | cut -d: -f2 | tr -d ' '
-                ''',
-                returnStdout: true
-              ).trim()
-              echo "MotioCI login completed - Token captured: ${env.MOTIO_AUTH_TOKEN}"
-            }
-          }
-        }
-      }
-    }
-
-    // Temporarily commented out to avoid creating labels during testing
-    /*
-    stage('MotioCI Versioning') {
+    stage('Install CLI deps') {
       steps {
         container('python') {
-          script {
-            echo "Creating MotioCI version for branch: ${env.GIT_BRANCH}"
-            sh '''
-              cd MotioCI/api/CLI
-              
-              # Create version based on branch and build number
-              VERSION_NAME="${BRANCH_NAME}-${BUILD_NUMBER}"
-              echo "Creating version: $VERSION_NAME"
-              
-              # Execute versioning command using auth token from login stage
-              if [ -n "${MOTIO_AUTH_TOKEN}" ]; then
-                echo "Using authentication token from login stage"
-                
-                # Create label in Demo project 
-                python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" label create --xauthtoken="${MOTIO_AUTH_TOKEN}" --instanceName="Cognos-DEV/TEST" --projectName="Demo" --name="$VERSION_NAME" --versionedItemIds="[]"
-                
-                echo "MotioCI label $VERSION_NAME created successfully in Demo project"
-                
-                # Capture the label ID for promotion
-                echo "Getting label ID for newly created label..."
-                LABEL_LIST=$(python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" label ls --xauthtoken="${MOTIO_AUTH_TOKEN}" --instanceName="Cognos-DEV/TEST" --projectName="Demo")
-                echo "Current labels in Demo project:"
-                echo "$LABEL_LIST"
-              else
-                echo "ERROR: No authentication token available from login stage"
-                exit 1
-              fi
-            '''
-          }
+          sh '''
+            set -e
+            cd MotioCI/api/CLI
+            python3 -m pip install --user -r requirements.txt
+            echo "Dependencies installed."
+          '''
         }
       }
     }
-    */
 
-    stage('Deploy') {
-      steps {
-        container('python') {
-          script {
-            echo "Testing MotioCI Promotion"
-            sh '''
-              cd MotioCI/api/CLI
-              # Disable SSL verification for this session
-              export PYTHONHTTPSVERIFY=0
+stage('MotioCI Login') {
+  steps {
+    withCredentials([file(credentialsId: 'prod-credentials-json', variable: 'CREDENTIALS_FILE')]) {
+      container('python') {
+        sh '''
+          set -e
+          cd MotioCI/api/CLI
+          python3 -m pip install --user -r requirements.txt >/dev/null 2>&1 || true
 
-              # Test if you can access PROD projects specifically
-              python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" project ls --xauthtoken="${MOTIO_AUTH_TOKEN}" --instanceName="Cognos-PRD"
-              echo "Test 4: Testing deploy command without username/password (maybe it will work?):"
-              python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" deploy \
-                --xauthtoken="2319e4b2-b37e-4195-83f1-616b97d566cb" \
-                --sourceInstanceId="3" \
-                --targetInstanceId="1" \
-                --labelId="57" \
-                --projectName="Demo" \
-                --targetLabelName="PROMOTED-20250712-115" \
-                --camPassportId="MTsxMDE6NmQxNzBlODYtMTJhZS0yMjgxLWY0ZjktMmZmMDgxMjIwNzY2OjI3NTU2MjA2NjQ7MDszOzA7" \
-                --namespaceId="AzureAD"
-              
-              echo ""
-              echo "SUCCESS! Deploy command accepted all parameters!"
-              echo "Only SSL certificate verification is blocking us now"
-              echo "Testing multiple SSL bypass methods:"
-              echo ""
-              
-              echo ""
-              echo "Verification: Checking PROD Demo project after promotion:"
-              python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" label ls --xauthtoken="${MOTIO_AUTH_TOKEN}" --instanceName="Cognos-PRD" --projectName="Demo" || echo "Failed to list PROD labels after promotion"
-            '''
-          }
+          # Capture ONLY the token (our ci-cli.py now prints just the token on success)
+          TOKEN=$(python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" \
+                    --non-interactive login --credentialsFile "$CREDENTIALS_FILE" \
+                    | tail -n1 | tr -d '\\r')
+
+          if [ -z "$TOKEN" ]; then
+            echo "ERROR: Empty MotioCI token." >&2
+            exit 1
+          fi
+
+          # Export for later stages
+          echo "TOKEN=$TOKEN" > ../motio_env
+        '''
+      }
+      script {
+        def envFile = readFile('MotioCI/api/motio_env').trim()
+        for (pair in envFile.split("\n")) {
+          def (k,v) = pair.split("=", 2)
+          env[k] = v
         }
+        echo "MotioCI login completed - token captured."
       }
     }
+  }
+}
+
+stage('Debug Namespaces') {
+  steps {
+    container('python') {
+      sh '''
+        echo "Checking available namespaces for PRD instance..."
+        curl -sk -X POST "https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql" \
+          -H "Content-Type: application/json" \
+          -H "x-auth-token: ${TOKEN}" \
+          -d '{
+            "query":"query($id: Long!){ instance(id:$id){ namespaces { id name } } }",
+            "variables":{"id":1}
+          }' | jq .
+      '''
+    }
+  }
+}
+
+stage('Deploy') {
+  steps {
+    withCredentials([usernamePassword(credentialsId: 'Cognosserviceaccount', usernameVariable: 'COG_USER', passwordVariable: 'COG_PASS')]) {
+      container('python') {
+        sh '''
+          set -euo pipefail
+          cd MotioCI/api/CLI
+
+          echo "Sanity: list projects on Cognos-PRD..."
+          python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" \
+            project ls --xauthtoken="${TOKEN}" --instanceName="Cognos-PRD"
+
+          # Do the deployment (adjust ids/names as needed)
+          python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" \
+            --non-interactive deploy \
+            --xauthtoken="${TOKEN}" \
+            --sourceInstanceId=3 \
+            --targetInstanceId=1 \
+            --labelId=57 \
+            --projectName="Demo" \
+            --targetLabelName="PROMOTED-20250712-115" \
+            --camPassportId="MTsxMDE6NmQxNzBlODYtMTJhZS0yMjgxLWY0ZjktMmZmMDgxMjIwNzY2OjI3NTU2MjA2NjQ7MDszOzA7" \
+            --namespaceId="AzureAD"
+
+          echo "Verification: labels after deployment"
+          python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" \
+            label ls --xauthtoken="${TOKEN}" --instanceName="Cognos-PRD" --projectName="Demo" \
+            | tee verify_labels.json
+        '''
+      }
+    }
+  }
+}
   }
 
   post {
