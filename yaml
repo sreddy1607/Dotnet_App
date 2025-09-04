@@ -1,75 +1,377 @@
+Obtained MotioCI/api/CLI/Jenkinsfile-motio-template from af88e0cf1cb2ca40f06113c98dfab4948e023648
+[Pipeline] Start of Pipeline
+Did you forget the `def` keyword? WorkflowScript seems to be setting a field named APP_NAME (to a value of type String) which could lead to memory leaks or other issues.
+[Pipeline] podTemplate
+[Pipeline] {
+[Pipeline] node
+Created Pod: kubernetes jenkins-builder/cognos-jobs-cognos-deployment-pipeline-motioci-poctest-95-cxxjw
+[PodInfo] jenkins-builder/cognos-jobs-cognos-deployment-pipeline-motioci-poctest-95-cxxjw
+	Container [jnlp] waiting [ContainerCreating] No message
+	Container [node] waiting [ContainerCreating] No message
+	Container [python] waiting [ContainerCreating] No message
+	Pod [Pending][ContainersNotReady] containers with unready status: [jnlp node python]
+[PodInfo] jenkins-builder/cognos-jobs-cognos-deployment-pipeline-motioci-poctest-95-cxxjw
+	Container [jnlp] waiting [ContainerCreating] No message
+	Container [node] waiting [ContainerCreating] No message
+	Container [python] waiting [ContainerCreating] No message
+	Pod [Pending][ContainersNotReady] containers with unready status: [jnlp node python]
+Agent cognos-jobs-cognos-deployment-pipeline-motioci-poctest-95-cxxjw is provisioned from template Cognos_Jobs_Cognos_deployment_pipeline_motioci-poctest_95-2rx04-47n4w
+---
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  annotations:
+    kubernetes.jenkins.io/last-refresh: "1757001062529"
+    buildUrl: "http://jenkins.jenkins-builder.svc.cluster.local:80/job/Cognos%20Jobs/job/Cognos_deployment_pipeline/job/motioci-poctest/95/"
+    runUrl: "job/Cognos%20Jobs/job/Cognos_deployment_pipeline/job/motioci-poctest/95/"
+  labels:
+    jenkins: "slave"
+    jenkins/label-digest: "6b2ece1fd62829bf5da3b5b9f033245eb09dc032"
+    jenkins/label: "xJobs_Cognos_deployment_pipeline_motioci-poctest_95-2rx04"
+    kubernetes.jenkins.io/controller: "http___jenkins_jenkins-builder_svc_cluster_local_80x"
+  name: "cognos-jobs-cognos-deployment-pipeline-motioci-poctest-95-cxxjw"
+  namespace: "jenkins-builder"
+spec:
+  containers:
+  - env:
+    - name: "GIT_SSL_CAINFO"
+      value: "/etc/pki/tls/certs/ca-bundle.crt"
+    - name: "JENKINS_SECRET"
+      value: "********"
+    - name: "JENKINS_TUNNEL"
+      value: "jenkins-jnlp.jenkins-builder.svc.cluster.local:50000"
+    - name: "JENKINS_AGENT_NAME"
+      value: "cognos-jobs-cognos-deployment-pipeline-motioci-poctest-95-cxxjw"
+    - name: "REMOTING_OPTS"
+      value: "-noReconnectAfter 1d"
+    - name: "JENKINS_NAME"
+      value: "cognos-jobs-cognos-deployment-pipeline-motioci-poctest-95-cxxjw"
+    - name: "JENKINS_AGENT_WORKDIR"
+      value: "/home/jenkins/agent"
+    - name: "JENKINS_URL"
+      value: "http://jenkins.jenkins-builder.svc.cluster.local:80/"
+    envFrom:
+    - configMapRef:
+        name: "jenkins-agent-env"
+        optional: true
+    image: "jenkins/inbound-agent:3309.v27b_9314fd1a_4-1"
+    name: "jnlp"
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: "/etc/pki/tls/certs"
+      name: "jenkins-trusted-ca-bundle"
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+  - command:
+    - "/bin/bash"
+    env:
+    - name: "HOME"
+      value: "/home/jenkins/agent"
+    - name: "BRANCH"
+      value: "motioci-poctest"
+    - name: "GIT_SSL_CAINFO"
+      value: "/etc/pki/tls/certs/ca-bundle.crt"
+    envFrom:
+    - configMapRef:
+        name: "jenkins-agent-env"
+        optional: true
+    image: "registry.access.redhat.com/ubi8/nodejs-16:latest"
+    name: "node"
+    securityContext:
+      privileged: true
+    tty: true
+    volumeMounts:
+    - mountPath: "/etc/pki/tls/certs"
+      name: "jenkins-trusted-ca-bundle"
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+    workingDir: "/home/jenkins/agent"
+  - command:
+    - "/bin/bash"
+    env:
+    - name: "HOME"
+      value: "/home/jenkins/agent"
+    - name: "BRANCH"
+      value: "motioci-poctest"
+    - name: "GIT_SSL_CAINFO"
+      value: "/etc/pki/tls/certs/ca-bundle.crt"
+    - name: "REQUESTS_CA_BUNDLE"
+      value: "/etc/pki/tls/certs/ca-bundle.crt"
+    - name: "SSL_CERT_FILE"
+      value: "/etc/pki/tls/certs/ca-bundle.crt"
+    - name: "CI"
+      value: "1"
+    envFrom:
+    - configMapRef:
+        name: "jenkins-agent-env"
+        optional: true
+    image: "136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.2.0"
+    name: "python"
+    securityContext:
+      privileged: true
+    tty: true
+    volumeMounts:
+    - mountPath: "/etc/pki/tls/certs"
+      name: "jenkins-trusted-ca-bundle"
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+    workingDir: "/home/jenkins/agent"
+  nodeSelector:
+    kubernetes.io/os: "linux"
+  restartPolicy: "Never"
+  serviceAccountName: "jenkins"
+  volumes:
+  - hostPath:
+      path: "/var/run/docker.sock"
+    name: "dockersock"
+  - configMap:
+      defaultMode: 420
+      name: "jenkins-trusted-ca-bundle"
+      optional: true
+    name: "jenkins-trusted-ca-bundle"
+  - emptyDir: {}
+    name: "varlibcontainers"
+  - emptyDir:
+      medium: ""
+    name: "workspace-volume"
+
+Running on cognos-jobs-cognos-deployment-pipeline-motioci-poctest-95-cxxjw in /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest
+[Pipeline] {
 [Pipeline] stage
-[Pipeline] { (Deploy)
-[Pipeline] lock
-11:52:36  Trying to acquire lock on [Resource: codedeploy-ec2-lock]
-11:52:36  Resource [codedeploy-ec2-lock] did not exist. Created.
-11:52:36  Lock acquired on [Resource: codedeploy-ec2-lock]
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+The recommended git tool is: NONE
+using credential github-key
+Cloning the remote Git repository
+Cloning with configured refspecs honoured and without tags
+Cloning repository https://github.com/ca-mmis/combined-devops-cognos-deployments.git
+ > git init /home/jenkins/agent/workspace/loyment_pipeline_motioci-poctest # timeout=10
+Fetching upstream changes from https://github.com/ca-mmis/combined-devops-cognos-deployments.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.39.5'
+using GIT_ASKPASS to set credentials Used by Jenkins to access GitHub - Jenkins github service account
+ > git fetch --no-tags --force --progress -- https://github.com/ca-mmis/combined-devops-cognos-deployments.git +refs/heads/motioci-poctest:refs/remotes/origin/motioci-poctest # timeout=10
+ > git config remote.origin.url https://github.com/ca-mmis/combined-devops-cognos-deployments.git # timeout=10
+ > git config --add remote.origin.fetch +refs/heads/motioci-poctest:refs/remotes/origin/motioci-poctest # timeout=10
+Avoid second fetch
+Checking out Revision ecc7ab84076de8a5fe68424412a1d56d02466e0d (motioci-poctest)
+Commit message: "Update Jenkinsfile-motio-template"
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f ecc7ab84076de8a5fe68424412a1d56d02466e0d # timeout=10
+ > git rev-list --no-walk af88e0cf1cb2ca40f06113c98dfab4948e023648 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
 [Pipeline] {
-[Pipeline] container
+[Pipeline] withEnv
 [Pipeline] {
+[Pipeline] timestamps
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (initialize)
 [Pipeline] script
 [Pipeline] {
-[Pipeline] sh
-11:52:37  Deploy Using AWS CodeDeploy
-[Pipeline] withCredentials
-11:52:37  Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
-[Pipeline] {
-[Pipeline] step
-11:52:37  Warning: A secret was passed to "step" using Groovy String interpolation, which is insecure.
-11:52:37  		 Affected argument(s) used the following variable(s): [AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY]
-11:52:37  		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
-11:52:37  Zipping files into /tmp/#80-129988586448907144.zip
-11:52:40  Uploading zip to s3://dhcs-codedeploy-app/#80-129988586448907144.zip
-11:52:40  Registering revision for application 'tar-surge-app-DEV'
-11:52:40  Creating deployment with revision at {RevisionType: S3,S3Location: {Bucket: dhcs-codedeploy-app,Key: #80-129988586448907144.zip,BundleType: zip,ETag: 419888102c5dcfa54f22546f4ddc7aec},}
-11:52:41  Monitoring deployment with ID d-PY50SXT1E...
-11:52:41  Deployment status: Created; instances: null
-11:52:56  Deployment status: Created; instances: null
-11:53:11  Deployment status: InProgress; instances: {Pending: 1,InProgress: 0,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:53:26  Deployment status: InProgress; instances: {Pending: 1,InProgress: 0,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:53:41  Deployment status: InProgress; instances: {Pending: 1,InProgress: 0,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:53:56  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:54:11  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:54:27  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:54:42  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:54:57  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:55:12  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:55:27  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:55:42  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:55:57  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:56:12  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:56:27  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:56:42  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:56:58  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:57:13  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:57:28  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:57:43  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:57:58  Deployment status: InProgress; instances: {Pending: 0,InProgress: 1,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
-11:58:13  Deployment status: Failed; instances: {Pending: 0,InProgress: 0,Succeeded: 0,Failed: 1,Skipped: 0,Ready: 0}
-11:58:13  Deployment did not succeed. Final status: Failed
-[Pipeline] }
-[Pipeline] // withCredentials
+[Pipeline] echo
+08:51:12  Branch: motioci-poctest
+[Pipeline] echo
+08:51:13  Initializing Motio pipeline...
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Check Python Availability)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+08:51:13  + set -e
+08:51:13  + echo 'Checking for Python3...'
+08:51:13  Checking for Python3...
+08:51:13  + which python3
+08:51:13  /usr/bin/python3
+08:51:13  + python3 --version
+08:51:13  Python 3.6.8
+[Pipeline] }
 [Pipeline] // container
 [Pipeline] }
-11:58:13  Lock released on resource [Resource: codedeploy-ec2-lock]
-[Pipeline] // lock
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Install CLI deps)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+08:51:14  + set -e
+08:51:14  + cd MotioCI/api/CLI
+08:51:14  + python3 -m pip install --user -r requirements.txt
+08:51:15  Collecting gql>=3.0.0
+08:51:15    Downloading gql-4.0.0-py3-none-any.whl (89 kB)
+08:51:15  Collecting python-dateutil==2.8.1
+08:51:15    Downloading python_dateutil-2.8.1-py2.py3-none-any.whl (227 kB)
+08:51:15  Collecting python-gitlab~=2.9.0
+08:51:15    Downloading python_gitlab-2.9.0-py3-none-any.whl (108 kB)
+08:51:15  Collecting requests~=2.27.1
+08:51:15    Downloading requests-2.27.1-py2.py3-none-any.whl (63 kB)
+08:51:15  Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.9/site-packages (from python-dateutil==2.8.1->-r requirements.txt (line 2)) (1.16.0)
+08:51:16  Collecting yarl<2.0,>=1.6
+08:51:16    Downloading yarl-1.20.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (327 kB)
+08:51:17  Collecting graphql-core<3.3,>=3.2
+08:51:17    Downloading graphql_core-3.2.6-py3-none-any.whl (203 kB)
+08:51:17  Collecting backoff<3.0,>=1.11.1
+08:51:17    Downloading backoff-2.2.1-py3-none-any.whl (15 kB)
+08:51:17  Collecting anyio<5,>=3.0
+08:51:17    Downloading anyio-4.10.0-py3-none-any.whl (107 kB)
+08:51:17  Collecting requests-toolbelt>=0.9.1
+08:51:17    Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+08:51:17  Collecting charset-normalizer~=2.0.0
+08:51:17    Downloading charset_normalizer-2.0.12-py3-none-any.whl (39 kB)
+08:51:17  Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.9/site-packages (from requests~=2.27.1->-r requirements.txt (line 4)) (1.26.18)
+08:51:17  Collecting certifi>=2017.4.17
+08:51:17    Downloading certifi-2025.8.3-py3-none-any.whl (161 kB)
+08:51:17  Collecting idna<4,>=2.5
+08:51:17    Downloading idna-3.10-py3-none-any.whl (70 kB)
+08:51:17  Collecting exceptiongroup>=1.0.2
+08:51:17    Downloading exceptiongroup-1.3.0-py3-none-any.whl (16 kB)
+08:51:17  Requirement already satisfied: typing_extensions>=4.5 in /usr/local/lib/python3.9/site-packages (from anyio<5,>=3.0->gql>=3.0.0->-r requirements.txt (line 1)) (4.10.0)
+08:51:17  Collecting sniffio>=1.1
+08:51:17    Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+08:51:17  Collecting propcache>=0.2.1
+08:51:18    Downloading propcache-0.3.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (200 kB)
+08:51:19  Collecting multidict>=4.0
+08:51:19    Downloading multidict-6.6.4-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (239 kB)
+08:51:19  Installing collected packages: idna, charset-normalizer, certifi, sniffio, requests, propcache, multidict, exceptiongroup, yarl, requests-toolbelt, graphql-core, backoff, anyio, python-gitlab, python-dateutil, gql
+08:51:19    WARNING: The script normalizer is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+08:51:19    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+08:51:20    WARNING: The script gitlab is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+08:51:20    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+08:51:20    WARNING: The script gql-cli is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
+08:51:20    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+08:51:20  ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+08:51:20  pandas 2.2.1 requires python-dateutil>=2.8.2, but you have python-dateutil 2.8.1 which is incompatible.
+08:51:20  Successfully installed anyio-4.10.0 backoff-2.2.1 certifi-2025.8.3 charset-normalizer-2.0.12 exceptiongroup-1.3.0 gql-4.0.0 graphql-core-3.2.6 idna-3.10 multidict-6.6.4 propcache-0.3.2 python-dateutil-2.8.1 python-gitlab-2.9.0 requests-2.27.1 requests-toolbelt-1.0.0 sniffio-1.3.1 yarl-1.20.1
+08:51:20  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+08:51:20  + echo 'Dependencies installed.'
+08:51:20  Dependencies installed.
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (MotioCI Login)
+[Pipeline] withCredentials
+08:51:20  Masking supported pattern matches of $CREDENTIALS_FILE
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+08:51:21  + set -e
+08:51:21  + cd MotioCI/api/CLI
+08:51:21  + python3 -m pip install --user -r requirements.txt
+08:51:21  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --credentialsFile ****
+08:51:21  ++ tail -n1
+08:51:21  ++ tr -d '\r'
+08:51:25  + TOKEN=87fb8cdd-b75e-443a-b6fb-a16a78f4d827
+08:51:25  + '[' -z 87fb8cdd-b75e-443a-b6fb-a16a78f4d827 ']'
+08:51:25  + echo TOKEN=87fb8cdd-b75e-443a-b6fb-a16a78f4d827
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] script
+[Pipeline] {
+[Pipeline] readFile
+[Pipeline] echo
+08:51:26  MotioCI login completed - token captured.
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Debug Namespaces)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+08:51:26  + echo 'Checking available namespaces for PRD instance...'
+08:51:26  Checking available namespaces for PRD instance...
+08:51:26  + curl -sk -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: 87fb8cdd-b75e-443a-b6fb-a16a78f4d827' -d '{
+08:51:26              "query":"query($id: Long!){ instance(id:$id){ namespaces { id name } } }",
+08:51:26              "variables":{"id":1}
+08:51:26            }'
+08:51:26  + jq .
+08:51:27  {
+08:51:27    "data": {
+08:51:27      "instance": {
+08:51:27        "namespaces": [
+08:51:27          {
+08:51:27            "id": "BAOps",
+08:51:27            "name": "BAOps"
+08:51:27          },
+08:51:27          {
+08:51:27            "id": "LDAP",
+08:51:27            "name": "LDAP"
+08:51:27          },
+08:51:27          {
+08:51:27            "id": "AzureAD",
+08:51:27            "name": "Azure"
+08:51:27          }
+08:51:27        ]
+08:51:27      }
+08:51:27    }
+08:51:27  }
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy)
+[Pipeline] withCredentials
+08:51:27  Masking supported pattern matches of $COG_USER or $COG_PASS
+[Pipeline] {
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+08:51:28  + set -euo pipefail
+08:51:28  + cd MotioCI/api/CLI
+08:51:28  + echo 'Sanity: list projects on Cognos-PRD...'
+08:51:28  Sanity: list projects on Cognos-PRD...
+08:51:28  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=87fb8cdd-b75e-443a-b6fb-a16a78f4d827 --instanceName=Cognos-PRD
+08:51:28  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
+08:51:28  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
+08:51:28  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
+08:51:28  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive deploy --xauthtoken=87fb8cdd-b75e-443a-b6fb-a16a78f4d827 --sourceInstanceId=3 --targetInstanceId=1 --labelId=57 --projectName=Demo --targetLabelName=PROMOTED-20250712-115 --camPassportId=MTsxMDE6NmQxNzBlODYtMTJhZS0yMjgxLWY0ZjktMmZmMDgxMjIwNzY2OjI3NTU2MjA2NjQ7MDszOzA7 --namespaceId=AzureAD
+08:51:30  Error performing the deployment:
+08:51:30    [{'message': 'Access is denied', 'locations': [{'line': 3, 'column': 5}], 'path': ['deploy'], 'extensions': {'code': 'ACCESS_DENIED', 'isLicenseValid': True, 'classification': 'DataFetchingException'}}]
+08:51:30  + echo 'Verification: labels after deployment'
+08:51:30  Verification: labels after deployment
+08:51:30  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=87fb8cdd-b75e-443a-b6fb-a16a78f4d827 --instanceName=Cognos-PRD --projectName=Demo
+08:51:30  + tee verify_labels.json
+08:51:30  {'node': {'name': 'Pre-Promotion Label for motioci-poc-101', 'id': 58, 'description': '', 'labelType': 'PRE_DEPLOYMENT'}}
+08:51:30  {'node': {'name': 'motioci-poc-101', 'id': 59, 'description': None, 'labelType': 'POST_DEPLOYMENT'}}
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // withCredentials
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-11:58:13  Build Process complete.
+08:51:30  Pipeline execution finished.
 [Pipeline] echo
-11:58:13  Build encountered failures .
+08:51:30  MotioCI pipeline completed successfully.
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
-[Pipeline] // timeout
-[Pipeline] }
 [Pipeline] // timestamps
+[Pipeline] }
+[Pipeline] // withEnv
 [Pipeline] }
 [Pipeline] // withEnv
 [Pipeline] }
@@ -77,9 +379,8 @@
 [Pipeline] }
 [Pipeline] // podTemplate
 [Pipeline] End of Pipeline
-ERROR: null
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/TAR-Jobs/jobs/SURGE/jobs/SURGE BATCH APPLICATION/workspace/master@tmp/jfrog/80/.jfrog deleted
-Finished: FAILURE
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/95/.jfrog deleted
+Finished: SUCCESS
