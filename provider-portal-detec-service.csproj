@@ -1,12 +1,12 @@
-step([$class: 'AWSCodeDeployPublisher',
-                  applicationName: "rais-eis-${env_deploy_env}",
-                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
-                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
-                  credentials: 'awsAccessKey',
-                  deploymentConfig: "rais-eis-${env_deploy_env}-config",
-                  deploymentGroupAppspec: false,
-                  deploymentGroupName: "rais-eis-${env_deploy_env}-INPLACE-deployment-group",
-                  deploymentMethod: 'deploy',
-                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
-                  region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
-                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+09:21:14  Running pre-flight checks...
+[Pipeline] sh
+09:21:14  + BASE=https://dhcsprodcog.ca.analytics.ibm.com/api/v1
+09:21:14  + APIKEY=AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r
+09:21:14  + curl -sS --fail-with-body -X PUT https://dhcsprodcog.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d '{"parameters":[{"name":"CAMAPILoginKey","value":"AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"}]}' -c cookies.txt -b cookies.txt -D headers.txt -o session.json
+09:23:36  curl: (60) SSL: no alternative certificate subject name matches target host name 'dhcsprodcog.ca.analytics.ibm.com'
+09:23:36  More details here: https://curl.se/docs/sslcerts.html
+09:23:36  
+09:23:36  curl failed to verify the legitimacy of the server and therefore could not
+09:23:36  establish a secure connection to it. To learn more about this situation and
+09:23:36  how to fix it, please visit the web page mentioned above.
+[Pipeline] }
