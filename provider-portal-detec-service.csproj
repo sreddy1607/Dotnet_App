@@ -1,33 +1,38 @@
- stage
+[Pipeline] // stage
+[Pipeline] stage
 [Pipeline] { (Pre-deploy health checks (Cognos REST + MotioCI))
 [Pipeline] container
 [Pipeline] {
 [Pipeline] sh
-11:17:30  + set -eu
-11:17:30  + '[' -f MotioCI/api/motio_env ']'
-11:17:30  + . MotioCI/api/motio_env
-11:17:30  ++ COGNOS_SESSION_KEY='CAM MTsxMDE6YTExYjBmZWMtZTJjMy1mODFmLWE3MTQtZThiYzg3OGVkNTcyOjA5NTQ4ODMzOTY7MDszOzA7'
-11:17:30  ++ COGNOS_XSRF=
-11:17:30  ++ COGNOS_AUTH_VALUE='CAM MTsxMDE6YTExYjBmZWMtZTJjMy1mODFmLWE3MTQtZThiYzg3OGVkNTcyOjA5NTQ4ODMzOTY7MDszOzA7'
-11:17:30  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/api/v1
-11:17:30  + echo '1) Cognos REST check: /extensions with session_key'
-11:17:30  1) Cognos REST check: /extensions with session_key
-11:17:30  + set -- -H 'IBM-BA-Authorization: CAM MTsxMDE6YTExYjBmZWMtZTJjMy1mODFmLWE3MTQtZThiYzg3OGVkNTcyOjA5NTQ4ODMzOTY7MDszOzA7' -H 'Accept: application/json'
-11:17:30  + '[' -n '' ']'
-11:17:30  + curl -sS --fail-with-body https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/extensions -H 'IBM-BA-Authorization: CAM MTsxMDE6YTExYjBmZWMtZTJjMy1mODFmLWE3MTQtZThiYzg3OGVkNTcyOjA5NTQ4ODMzOTY7MDszOzA7' -H 'Accept: application/json' -c cookies.txt -b cookies.txt -D headers.txt -o extensions.json
-11:17:31  ++ python3 -
-11:17:31  + EXT_OK=1
-11:17:31  + '[' 1 -ne 1 ']'
-11:17:31  + echo 'Cognos REST OK.'
-11:17:31  Cognos REST OK.
-11:17:31  + echo '2) MotioCI project presence on PRD'
-11:17:31  2) MotioCI project presence on PRD
-11:17:31  + cd MotioCI/api/CLI
-11:17:31  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=76d802d7-4c61-475e-956c-f90e54b43737 --instanceName=Cognos-PRD
-11:17:31  ++ python3 -
-11:17:31  + PROJ_OK=0
-11:17:31  + '[' 0 -ne 1 ']'
-11:17:31  + echo 'ERROR: Project '\''Demo'\'' not found on Cognos-PRD via MotioCI.'
-11:17:31  ERROR: Project 'Demo' not found on Cognos-PRD via MotioCI.
-11:17:31  + exit 1
+11:21:06  + set -eu
+11:21:06  + '[' -f MotioCI/api/motio_env ']'
+11:21:06  + . MotioCI/api/motio_env
+11:21:06  ++ COGNOS_SESSION_KEY='CAM MTsxMDE6Yjg5ODMyZTYtZGZiMy1iZWFhLTQ5YjItZDM4MTM5ZTU5MzY4OjA0NzU4MjM0NTQ7MDszOzA7'
+11:21:06  ++ COGNOS_XSRF=
+11:21:06  ++ COGNOS_AUTH_VALUE='CAM MTsxMDE6Yjg5ODMyZTYtZGZiMy1iZWFhLTQ5YjItZDM4MTM5ZTU5MzY4OjA0NzU4MjM0NTQ7MDszOzA7'
+11:21:06  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/api/v1
+11:21:06  + echo '1) Cognos REST check: /extensions with session_key'
+11:21:06  1) Cognos REST check: /extensions with session_key
+11:21:06  + set -- -H 'IBM-BA-Authorization: CAM MTsxMDE6Yjg5ODMyZTYtZGZiMy1iZWFhLTQ5YjItZDM4MTM5ZTU5MzY4OjA0NzU4MjM0NTQ7MDszOzA7' -H 'Accept: application/json'
+11:21:06  + '[' -n '' ']'
+11:21:06  + curl -sS --fail-with-body https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/extensions -H 'IBM-BA-Authorization: CAM MTsxMDE6Yjg5ODMyZTYtZGZiMy1iZWFhLTQ5YjItZDM4MTM5ZTU5MzY4OjA0NzU4MjM0NTQ7MDszOzA7' -H 'Accept: application/json' -c cookies.txt -b cookies.txt -D headers.txt -o extensions.json
+11:21:07  + python3 -
+11:21:07  Cognos REST OK.
+11:21:07  + echo '2) MotioCI project presence on PRD'
+11:21:07  2) MotioCI project presence on PRD
+11:21:07  + cd MotioCI/api/CLI
+11:21:07  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=211c7a9a-76a3-460e-b240-c01b6d2be3e1 --instanceName=Cognos-PRD
+11:21:07  + tee projects_prd.txt
+11:21:07  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
+11:21:07  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
+11:21:07  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
+11:21:07  + grep -i -F -q Demo projects_prd.txt
+11:21:07  + echo 'MotioCI project OK.'
+11:21:07  MotioCI project OK.
+11:21:07  + cd -
+11:21:07  + echo '3) MotioCI namespace check on PRD (expects '\''AzureAD'\'')'
+11:21:07  3) MotioCI namespace check on PRD (expects 'AzureAD')
+11:21:07  + curl -sS --fail-with-body -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: 211c7a9a-76a3-460e-b240-c01b6d2be3e1' -d '{"query":"query($id: Long!){ instance(id:$id){ namespaces { id name } } }", "variables":{"id":1}}'
+11:21:07  + python3 -
+11:21:07  ERROR: Namespace 'AzureAD' not found on PRD (MotioCI GraphQL).
 [Pipeline] }
