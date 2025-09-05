@@ -1,8 +1,15 @@
-11:57:42  + set -eu
-11:57:42  + cd MotioCI/api/CLI
-11:57:42  + echo '1) Verify DEV/TEST instance & project via GraphQL (robust)'
-11:57:42  1) Verify DEV/TEST instance & project via GraphQL (robust)
-11:57:42  + cat
-11:57:42  /home/jenkins/agent/workspace/s_deployment_pipeline_newtesting@tmp/durable-e8f0efc4/script.sh.copy: line 8: id: unbound variable
+[Pipeline] stage
+[Pipeline] { (Source checks (DEV/TEST))
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+12:07:08  + set -eu
+12:07:08  + cd MotioCI/api/CLI
+12:07:08  + SRC_ID=3
+12:07:08  + echo '1) Verify DEV/TEST instance & project via GraphQL (robust)'
+12:07:08  1) Verify DEV/TEST instance & project via GraphQL (robust)
+12:07:08  + cat
+12:07:08  + curl -sS --fail-with-body -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: 20a620-6e13-46de-823c-e33c6c01c647' -d @../src_projects.gql.json -D ../src_projects.headers.txt -o ../src_projects.json
+12:07:08  curl: (22) The requested URL returned error: 401
 [Pipeline] }
 [Pipeline] // container
