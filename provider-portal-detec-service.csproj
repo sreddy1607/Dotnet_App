@@ -1,12 +1,8 @@
-09:21:14  Running pre-flight checks...
+09:41:35  Running pre-flight checks...
 [Pipeline] sh
-09:21:14  + BASE=https://dhcsprodcog.ca.analytics.ibm.com/api/v1
-09:21:14  + APIKEY=AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r
-09:21:14  + curl -sS --fail-with-body -X PUT https://dhcsprodcog.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d '{"parameters":[{"name":"CAMAPILoginKey","value":"AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"}]}' -c cookies.txt -b cookies.txt -D headers.txt -o session.json
-09:23:36  curl: (60) SSL: no alternative certificate subject name matches target host name 'dhcsprodcog.ca.analytics.ibm.com'
-09:23:36  More details here: https://curl.se/docs/sslcerts.html
-09:23:36  
-09:23:36  curl failed to verify the legitimacy of the server and therefore could not
-09:23:36  establish a secure connection to it. To learn more about this situation and
-09:23:36  how to fix it, please visit the web page mentioned above.
+09:41:36  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/api/v1
+09:41:36  + APIKEY=AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r
+09:41:36  + curl -sS --fail-with-body -X PUT https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d '{"parameters":[{"name":"CAMAPILoginKey","value":"AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"}]}' -c cookies.txt -b cookies.txt -D headers.txt -o session.json
+09:41:37  + python3 -
+09:41:37  CAM MTsxMDE6ZjlkZWM2OTgtYjZmYy0xZWEzLTM4NjEtY2QxZGM1OWY2ZWNjOjAwODk5MTE0NTE7MDszOzA7
 [Pipeline] }
