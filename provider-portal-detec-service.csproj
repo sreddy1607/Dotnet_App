@@ -1,11 +1,17 @@
-10:22:09  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
-10:22:09  + cd -
-10:22:09  + echo 'Starting Cognos API session (PRD)...'
-10:22:09  Starting Cognos API session (PRD)...
-10:22:09  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/api/v1
-10:22:09  + rm -f login.json session.json session.redacted.json headers.txt cookies.txt extensions.json
-10:22:09  + mkdir -p MotioCI/api
-10:22:09  + cat
-10:22:09  + curl --fail-with-body -sS -X PUT https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d @login.json -c cookies.txt -b cookies.txt -D headers.txt -o session.json
-10:22:09  /home/jenkins/agent/workspace/s_deployment_pipeline_newtesting@tmp/durable-4fe5a0b6/script.sh.copy: line 78: warning: here-document at line 24 delimited by end-of-file (wanted `PY')
-10:22:09  /home/jenkins/agent/workspace/s_deployment_pipeline_newtesting@tmp/durable-4fe5a0b6/script.sh.copy: line 79: unexpected EOF while looking for matching `)'
+10:26:59  + cd -
+10:26:59  + echo 'Starting Cognos API session (PRD)...'
+10:26:59  Starting Cognos API session (PRD)...
+10:26:59  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/api/v1
+10:26:59  + rm -f login.json session.json session.redacted.json headers.txt cookies.txt extensions.json
+10:26:59  + mkdir -p MotioCI/api
+10:27:00  + cat
+10:27:00  + curl --fail-with-body -sS -X PUT https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d @login.json -c cookies.txt -b cookies.txt -D headers.txt -o session.json
+10:27:00  ++ python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))'
+10:27:00  + SESSION_KEY='CAM MTsxMDE6N2U5OWNkOWEtMTUzOS02MDk1LTkwNWMtODlkMjM5NTJmMDBkOjA2Nzc4NzI0MDk7MDszOzA7'
+10:27:00  + '[' -z 'CAM MTsxMDE6N2U5OWNkOWEtMTUzOS02MDk1LTkwNWMtODlkMjM5NTJmMDBkOjA2Nzc4NzI0MDk7MDszOzA7' ']'
+10:27:00  + curl --fail-with-body -sS https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/session -c cookies.txt -b cookies.txt -D headers.txt -o /dev/null
+10:27:00  curl: (22) The requested URL returned error: 403
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // container
