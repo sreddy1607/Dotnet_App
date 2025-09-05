@@ -1,77 +1,30 @@
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Get CAM Passport (service account))
-[Pipeline] withCredentials
-09:27:59  Masking supported pattern matches of $COG_USER or $COG_PASS
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-09:28:00  + set -euo pipefail
-09:28:00  ++ cat
-09:28:00  + LOGIN_PAYLOAD='{
-09:28:00    "parameters": {
-09:28:00      "CAMNamespace": "AzureAD",
-09:28:00      "CAMUsername": "****",
-09:28:00      "CAMPassword": "****"
-09:28:00    }
-09:28:00  }'
-09:28:00  ++ curl --fail-with-body -sS -X POST https://dhcsdevtestcog.ca.analytics.ibm.com/bi/v1/disp -H 'Content-Type: application/json' --cacert /etc/pki/tls/certs/ca-bundle.crt -d '{
-09:28:00    "parameters": {
-09:28:00      "CAMNamespace": "AzureAD",
-09:28:00      "CAMUsername": "****",
-09:28:00      "CAMPassword": "****"
-09:28:00    }
-09:28:00  }'
-09:28:00  ++ python3 -c 'import sys, json; print(json.load(sys.stdin).get('\''camPassportId'\'','\'''\''))'
-09:28:00  Traceback (most recent call last):
-09:28:00    File "<string>", line 1, in <module>
-09:28:00    File "/usr/lib64/python3.9/json/__init__.py", line 293, in load
-09:28:00      return loads(fp.read(),
-09:28:00    File "/usr/lib64/python3.9/json/__init__.py", line 346, in loads
-09:28:00      return _default_decoder.decode(s)
-09:28:00    File "/usr/lib64/python3.9/json/decoder.py", line 337, in decode
-09:28:00      obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-09:28:00    File "/usr/lib64/python3.9/json/decoder.py", line 355, in raw_decode
-09:28:00      raise JSONDecodeError("Expecting value", s, err.value) from None
-09:28:00  json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-09:28:00  + CAM=
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Deploy (DEV/TEST → PRD))
-Stage "Deploy (DEV/TEST → PRD)" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Declarative: Post Actions)
-[Pipeline] archiveArtifacts
-09:28:00  Archiving artifacts
-[Pipeline] echo
-09:28:01  Pipeline execution finished.
-[Pipeline] echo
-09:28:01  MotioCI pipeline failed.
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // timestamps
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] }
-[Pipeline] // podTemplate
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
+Hi team down this is the response,
 
-GitHub has been notified of this commit’s build result
+I'm Tristan at IBM Cognos support and I'll answer the questions
 
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/motioci-poctest@tmp/jfrog/99/.jfrog deleted
-Finished: FAILURE
+1) API base host & routing for REST:
+Your base host should be similar to below for test. Based on your testing this is already correct.
+https://dhcsdevtestcog.ca.analytics.ibm.com/api/v1/<endpoint>
+
+2) Auth flow via /api/v1/session
+AzureAD is only supported if password grant is allowed on the AzureAD side (your Azure admin will need to confirm. otherwise an API key must be used. Example Below
+https://www.ibm.com/docs/en/cognos-analytics/12.0.x?topic=api-getting-started-rest
+  "parameters": [
+    {
+         "name" : "CAMAPILoginKey",
+         "value" :"<yourapikey>"
+     }
+]
+ }
+
+3) XSRF requirement & header:
+This is required once the header is set all follow up requests must contain the X-XSRF-Token header.
+
+4 & 5) Token to carry downstream (session_key vs. cookie):
+You should receive a session_key after authenticating with your API key I would verify that's the case before continuing once we have the response we can determine what you have configured.
+
+6) I'll provide this tomorrow though likely it's easiest to do this sort of thing with postman or a similar utility.
+
+7) Session timeout is 3600 seconds (an hour) by default but I'll have SRE pull down what the value is set to in DHCS Dev and Prod and update you with the response. If this needs to be modified let us know and it can be done.
+
+I'll spin-up an API example at my start of day tomorrow and provide that for point 6
