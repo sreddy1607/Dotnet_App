@@ -23,7 +23,29 @@ This is required once the header is set all follow up requests must contain the 
 4 & 5) Token to carry downstream (session_key vs. cookie):
 You should receive a session_key after authenticating with your API key I would verify that's the case before continuing once we have the response we can determine what you have configured.
 
-6) I'll provide this tomorrow though likely it's easiest to do this sort of thing with postman or a similar utility.
+6) For 6 this is putting the api key session using a get request to make sure the session is valid (and get the XSRF value) then with the XSRF value header set returning the extensions in an environment.
+
+ 
+
+curl --location --request PUT 'http://casupportdev.ca.analytics.ibm.com/api/v1/session' \
+--header 'Content-Type: application/json' \
+--data '{
+  "parameters": [
+    {
+         "name" : "CAMAPILoginKey",
+         "value" :"<myapikey>"
+     }
+]
+}'
+ 
+
+curl --location 'http://casupportdev.ca.analytics.ibm.com/api/v1/session' \
+--header 'Cookie: XSRF-TOKEN=<XSRF-TOKEN Value>'
+ 
+curl --location 'http://casupportdev.ca.analytics.ibm.com/api/v1/extensions' \
+--header 'X-XSRF-TOKEN: <XSRF-TOKEN Value>' \
+--header 'Cookie: XSRF-TOKEN=<XSRF-TOKEN Value>'
+ 
 
 7) Session timeout is 3600 seconds (an hour) by default but I'll have SRE pull down what the value is set to in DHCS Dev and Prod and update you with the response. If this needs to be modified let us know and it can be done.
 
