@@ -1,37 +1,8 @@
-[Pipeline] stage
-[Pipeline] { (Source checks (DEV/TEST))
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-11:51:06  + set -eu
-11:51:06  + cd MotioCI/api/CLI
-11:51:06  + echo '1) List projects on Cognos-DEV/TEST (expect '\''Demo'\'')'
-11:51:06  1) List projects on Cognos-DEV/TEST (expect 'Demo')
-11:51:06  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=9134a1-470a-407d-ba3c-d9ec9f1072c7 --instanceName=Cognos-DEV/TEST
-11:51:06  + tee projects_src.txt
-11:51:06  Traceback (most recent call last):
-11:51:06    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 910, in json
-11:51:06      return complexjson.loads(self.text, **kwargs)
-11:51:06    File "/usr/lib64/python3.9/json/__init__.py", line 346, in loads
-11:51:06      return _default_decoder.decode(s)
-11:51:06    File "/usr/lib64/python3.9/json/decoder.py", line 337, in decode
-11:51:06      obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-11:51:06    File "/usr/lib64/python3.9/json/decoder.py", line 355, in raw_decode
-11:51:06      raise JSONDecodeError("Expecting value", s, err.value) from None
-11:51:06  json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-11:51:06  
-11:51:06  During handling of the above exception, another exception occurred:
-11:51:06  
-11:51:06  Traceback (most recent call last):
-11:51:06    File "/home/jenkins/agent/workspace/s_deployment_pipeline_newtesting/MotioCI/api/CLI/ci-cli.py", line 468, in <module>
-11:51:06      projects.get_projects_specific(args.instanceName)
-11:51:06    File "/home/jenkins/agent/workspace/s_deployment_pipeline_newtesting/MotioCI/api/CLI/projects.py", line 23, in get_projects_specific
-11:51:06      project_list = response.json()["data"]["instances"]["edges"][0]["node"]["projects"]["edges"]
-11:51:06    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 917, in json
-11:51:06      raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
-11:51:06  requests.exceptions.JSONDecodeError: [Errno Expecting value] : 0
-11:51:06  + grep -i -F -q Demo projects_src.txt
-11:51:06  + echo 'ERROR: Project '\''Demo'\'' not found on Cognos-DEV/TEST via MotioCI.'
-11:51:06  ERROR: Project 'Demo' not found on Cognos-DEV/TEST via MotioCI.
-11:51:06  + sed -n 1,200p projects_src.txt
-11:51:06  + exit 1
+11:57:42  + set -eu
+11:57:42  + cd MotioCI/api/CLI
+11:57:42  + echo '1) Verify DEV/TEST instance & project via GraphQL (robust)'
+11:57:42  1) Verify DEV/TEST instance & project via GraphQL (robust)
+11:57:42  + cat
+11:57:42  /home/jenkins/agent/workspace/s_deployment_pipeline_newtesting@tmp/durable-e8f0efc4/script.sh.copy: line 8: id: unbound variable
+[Pipeline] }
+[Pipeline] // container
