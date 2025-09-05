@@ -1,47 +1,14 @@
- + cd -
-10:40:17  + echo 'Starting Cognos API session (PRD)...'
-10:40:17  Starting Cognos API session (PRD)...
-10:40:17  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/api/v1
-10:40:17  + rm -f login.json session.json session.redacted.json headers.txt cookies.txt extensions.json
-10:40:17  + mkdir -p MotioCI/api
-10:40:17  + cat
-10:40:17  + curl --fail-with-body -sS -X PUT https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d @login.json -c cookies.txt -b cookies.txt -D headers.txt -o session.json
-10:40:17  ++ python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))'
-10:40:17  + SESSION_KEY='CAM MTsxMDE6ZTBiNGMyMDYtYTI1ZS1jZTg0LTU1Y2MtMWVlMDU1YTBkMGQxOjI5ODA0MDQ1MTM7MDszOzA7'
-10:40:17  + '[' -z 'CAM MTsxMDE6ZTBiNGMyMDYtYTI1ZS1jZTg0LTU1Y2MtMWVlMDU1YTBkMGQxOjI5ODA0MDQ1MTM7MDszOzA7' ']'
-10:40:17  + case "$SESSION_KEY" in
-10:40:17  + AUTH_VALUE='CAM MTsxMDE6ZTBiNGMyMDYtYTI1ZS1jZTg0LTU1Y2MtMWVlMDU1YTBkMGQxOjI5ODA0MDQ1MTM7MDszOzA7'
-10:40:17  + curl --fail-with-body -sS https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/session -H 'IBM-BA-Authorization: CAM MTsxMDE6ZTBiNGMyMDYtYTI1ZS1jZTg0LTU1Y2MtMWVlMDU1YTBkMGQxOjI5ODA0MDQ1MTM7MDszOzA7' -H 'Accept: application/json' -c cookies.txt -b cookies.txt -D headers.txt -o /dev/null
-10:40:17  ++ awk '$1 ~ /^#HttpOnly_/ {sub("^#HttpOnly_", "", $1)} $6=="XSRF-TOKEN" {print $7}' cookies.txt
-10:40:17  ++ tail -n1
-10:40:17  + XSRF=
-10:40:17  + '[' -z '' ']'
-10:40:17  ++ awk 'BEGIN{IGNORECASE=1} /^Set-Cookie:/ && $0 ~ /XSRF-TOKEN/ {match($0,/XSRF-TOKEN=([^;]+)/,m); if (m[1]) print m[1] }' headers.txt
-10:40:17  ++ tail -n1
-10:40:17  + XSRF=
-10:40:17  + set -- -H 'IBM-BA-Authorization: CAM MTsxMDE6ZTBiNGMyMDYtYTI1ZS1jZTg0LTU1Y2MtMWVlMDU1YTBkMGQxOjI5ODA0MDQ1MTM7MDszOzA7'
-10:40:17  + '[' -n '' ']'
-10:40:17  + curl --fail-with-body -sS https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/extensions -H 'IBM-BA-Authorization: CAM MTsxMDE6ZTBiNGMyMDYtYTI1ZS1jZTg0LTU1Y2MtMWVlMDU1YTBkMGQxOjI5ODA0MDQ1MTM7MDszOzA7' -c cookies.txt -b cookies.txt -D headers.txt -o extensions.json
-10:40:18  + echo 'Cognos API session verified.'
-10:40:18  Cognos API session verified.
-10:40:18  + printf 'COGNOS_SESSION_KEY=%s
-10:40:18  ' 'CAM MTsxMDE6ZTBiNGMyMDYtYTI1ZS1jZTg0LTU1Y2MtMWVlMDU1YTBkMGQxOjI5ODA0MDQ1MTM7MDszOzA7'
-10:40:18  + printf 'COGNOS_XSRF=%s
-10:40:18  ' ''
-10:40:18  + printf 'COGNOS_AUTH_VALUE=%s
-10:40:18  ' 'CAM MTsxMDE6ZTBiNGMyMDYtYTI1ZS1jZTg0LTU1Y2MtMWVlMDU1YTBkMGQxOjI5ODA0MDQ1MTM7MDszOzA7'
-10:40:18  + python3 -c 'import json; j=json.load(open("session.json")); j["session_key"]="***redacted***" if "session_key" in j else None; open("session.redacted.json","w").write(json.dumps(j,indent=2))'
-[Pipeline] }
-[Pipeline] // withCredentials
+[Pipeline] stage
+[Pipeline] { (Pre-deploy health checks (Cognos REST + MotioCI))
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+10:54:27  + set -eu
+10:54:27  + '[' -f MotioCI/api/motio_env ']'
+10:54:27  + . MotioCI/api/motio_env
+10:54:27  ++ COGNOS_SESSION_KEY=CAM
+10:54:27  ++ MTsxMDE6NDAwNDUzZjItMDA1ZS00MzZjLWFkNzEtYWE1OTg3ZDliZGEzOjM0OTM0NjY1OTg7MDszOzA7
+10:54:27  MotioCI/api/motio_env: line 1: MTsxMDE6NDAwNDUzZjItMDA1ZS00MzZjLWFkNzEtYWE1OTg3ZDliZGEzOjM0OTM0NjY1OTg7MDszOzA7: command not found
 [Pipeline] }
 [Pipeline] // container
-[Pipeline] script
-[Pipeline] {
-[Pipeline] readFile
-[Pipeline] echo
-10:40:18  Auth stage complete: session_key + XSRF ready.
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] archiveArtifacts
-10:40:18  Archiving artifacts
 [Pipeline] }
