@@ -1,80 +1,37 @@
-[Pipeline] { (Pre-deploy health checks (Cognos REST + MotioCI))
+[Pipeline] stage
+[Pipeline] { (Source checks (DEV/TEST))
 [Pipeline] container
 [Pipeline] {
 [Pipeline] sh
-11:28:18  + set -eu
-11:28:18  + '[' -f MotioCI/api/motio_env ']'
-11:28:18  + . MotioCI/api/motio_env
-11:28:18  ++ COGNOS_SESSION_KEY='CAM MTsxMDE6YWM1YjdlOWUtMWJjZi1kOTRhLWUxYjktYTU4NDgzMGU4ZDg5OjA2MzE4NzQzODk7MDszOzA7'
-11:28:18  ++ COGNOS_XSRF=
-11:28:18  ++ COGNOS_AUTH_VALUE='CAM MTsxMDE6YWM1YjdlOWUtMWJjZi1kOTRhLWUxYjktYTU4NDgzMGU4ZDg5OjA2MzE4NzQzODk7MDszOzA7'
-11:28:18  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/api/v1
-11:28:18  + echo '1) Cognos REST check: /extensions with session_key'
-11:28:18  1) Cognos REST check: /extensions with session_key
-11:28:18  + set -- -H 'IBM-BA-Authorization: CAM MTsxMDE6YWM1YjdlOWUtMWJjZi1kOTRhLWUxYjktYTU4NDgzMGU4ZDg5OjA2MzE4NzQzODk7MDszOzA7' -H 'Accept: application/json'
-11:28:18  + '[' -n '' ']'
-11:28:18  + curl -sS --fail-with-body https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/extensions -H 'IBM-BA-Authorization: CAM MTsxMDE6YWM1YjdlOWUtMWJjZi1kOTRhLWUxYjktYTU4NDgzMGU4ZDg5OjA2MzE4NzQzODk7MDszOzA7' -H 'Accept: application/json' -c cookies.txt -b cookies.txt -D headers.txt -o extensions.json
-11:28:19  + python3 -
-11:28:19  Cognos REST OK.
-11:28:19  + echo '2) MotioCI project presence on PRD'
-11:28:19  2) MotioCI project presence on PRD
-11:28:19  + cd MotioCI/api/CLI
-11:28:19  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=4593cb0d-d7f6-47a4-afd0-44ad05343235 --instanceName=Cognos-PRD
-11:28:19  + tee projects_prd.txt
-11:28:19  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
-11:28:19  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
-11:28:19  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
-11:28:19  + grep -i -F -q Demo projects_prd.txt
-11:28:19  + echo 'MotioCI project OK.'
-11:28:19  MotioCI project OK.
-11:28:19  + cd -
-11:28:19  + echo '3) MotioCI namespace check on PRD (expects '\''AzureAD'\'')'
-11:28:19  3) MotioCI namespace check on PRD (expects 'AzureAD')
-11:28:19  + curl -sS --fail-with-body -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: 4593cb0d-d7f6-47a4-afd0-44ad05343235' -d '{"query":"query($id: Long!){ instance(id:$id){ namespaces { id name } } }", "variables":{"id":1}}'
-11:28:21  + echo 'Namespaces returned by PRD (name/id):'
-11:28:21  Namespaces returned by PRD (name/id):
-11:28:21  + python3 -
-11:28:21  - BAOps (id=BAOps)
-11:28:21  - LDAP (id=LDAP)
-11:28:21  - Azure (id=AzureAD)
-11:28:21  + mkdir -p MotioCI/api
-11:28:21  + python3 -
-11:28:21  ERROR: Namespace 'AzureAD' not found on PRD. Set COGNOS_NAMESPACE to one of:
-11:28:21    - BAOps (id=BAOps)
-11:28:21    - LDAP (id=LDAP)
-11:28:21    - Azure (id=AzureAD)
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Deploy (DEV/TEST → PRD))
-Stage "Deploy (DEV/TEST → PRD)" skipped due to earlier failure(s)
-[Pipeline] getContext
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Declarative: Post Actions)
-[Pipeline] echo
-11:28:21  Pipeline execution finished.
-[Pipeline] echo
-11:28:21  MotioCI pipeline failed.
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // timestamps
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] }
-[Pipeline] // podTemplate
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
-
-GitHub has been notified of this commit’s build result
-
-/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/newtesting@tmp/jfrog/39/.jfrog deleted
-Finished: FAILURE
+11:51:06  + set -eu
+11:51:06  + cd MotioCI/api/CLI
+11:51:06  + echo '1) List projects on Cognos-DEV/TEST (expect '\''Demo'\'')'
+11:51:06  1) List projects on Cognos-DEV/TEST (expect 'Demo')
+11:51:06  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=9134a1-470a-407d-ba3c-d9ec9f1072c7 --instanceName=Cognos-DEV/TEST
+11:51:06  + tee projects_src.txt
+11:51:06  Traceback (most recent call last):
+11:51:06    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 910, in json
+11:51:06      return complexjson.loads(self.text, **kwargs)
+11:51:06    File "/usr/lib64/python3.9/json/__init__.py", line 346, in loads
+11:51:06      return _default_decoder.decode(s)
+11:51:06    File "/usr/lib64/python3.9/json/decoder.py", line 337, in decode
+11:51:06      obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+11:51:06    File "/usr/lib64/python3.9/json/decoder.py", line 355, in raw_decode
+11:51:06      raise JSONDecodeError("Expecting value", s, err.value) from None
+11:51:06  json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+11:51:06  
+11:51:06  During handling of the above exception, another exception occurred:
+11:51:06  
+11:51:06  Traceback (most recent call last):
+11:51:06    File "/home/jenkins/agent/workspace/s_deployment_pipeline_newtesting/MotioCI/api/CLI/ci-cli.py", line 468, in <module>
+11:51:06      projects.get_projects_specific(args.instanceName)
+11:51:06    File "/home/jenkins/agent/workspace/s_deployment_pipeline_newtesting/MotioCI/api/CLI/projects.py", line 23, in get_projects_specific
+11:51:06      project_list = response.json()["data"]["instances"]["edges"][0]["node"]["projects"]["edges"]
+11:51:06    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 917, in json
+11:51:06      raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+11:51:06  requests.exceptions.JSONDecodeError: [Errno Expecting value] : 0
+11:51:06  + grep -i -F -q Demo projects_src.txt
+11:51:06  + echo 'ERROR: Project '\''Demo'\'' not found on Cognos-DEV/TEST via MotioCI.'
+11:51:06  ERROR: Project 'Demo' not found on Cognos-DEV/TEST via MotioCI.
+11:51:06  + sed -n 1,200p projects_src.txt
+11:51:06  + exit 1
