@@ -1,52 +1,39 @@
-Hi team down this is the response,
-
-I'm Tristan at IBM Cognos support and I'll answer the questions
-
-1) API base host & routing for REST:
-Your base host should be similar to below for test. Based on your testing this is already correct.
-https://dhcsdevtestcog.ca.analytics.ibm.com/api/v1/<endpoint>
-
-2) Auth flow via /api/v1/session
-AzureAD is only supported if password grant is allowed on the AzureAD side (your Azure admin will need to confirm. otherwise an API key must be used. Example Below
-https://www.ibm.com/docs/en/cognos-analytics/12.0.x?topic=api-getting-started-rest
-  "parameters": [
-    {
-         "name" : "CAMAPILoginKey",
-         "value" :"<yourapikey>"
-     }
-]
- }
-
-3) XSRF requirement & header:
-This is required once the header is set all follow up requests must contain the X-XSRF-Token header.
-
-4 & 5) Token to carry downstream (session_key vs. cookie):
-You should receive a session_key after authenticating with your API key I would verify that's the case before continuing once we have the response we can determine what you have configured.
-
-6) For 6 this is putting the api key session using a get request to make sure the session is valid (and get the XSRF value) then with the XSRF value header set returning the extensions in an environment.
-
- 
-
-curl --location --request PUT 'http://casupportdev.ca.analytics.ibm.com/api/v1/session' \
---header 'Content-Type: application/json' \
---data '{
-  "parameters": [
-    {
-         "name" : "CAMAPILoginKey",
-         "value" :"<myapikey>"
-     }
-]
-}'
- 
-
-curl --location 'http://casupportdev.ca.analytics.ibm.com/api/v1/session' \
---header 'Cookie: XSRF-TOKEN=<XSRF-TOKEN Value>'
- 
-curl --location 'http://casupportdev.ca.analytics.ibm.com/api/v1/extensions' \
---header 'X-XSRF-TOKEN: <XSRF-TOKEN Value>' \
---header 'Cookie: XSRF-TOKEN=<XSRF-TOKEN Value>'
- 
-
-7) Session timeout is 3600 seconds (an hour) by default but I'll have SRE pull down what the value is set to in DHCS Dev and Prod and update you with the response. If this needs to be modified let us know and it can be done.
-
-I'll spin-up an API example at my start of day tomorrow and provide that for point 6
+[Pipeline] stage
+[Pipeline] { (MotioCI Auth (CAMPassport exchange))
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+14:14:59  + set -eu
+14:14:59  + CAMPASSPORT=MTsxMDE6ZmFrZS1jYW1wYXNzcG9ydC12YWx1ZToxMjM0NTY3ODkwOzA7MzswOw==
+14:14:59  + NS_ID=AzureAD
+14:14:59  + mkdir -p MotioCI/api/CLI
+14:14:59  + cd MotioCI/api/CLI
+14:14:59  + echo 'Attempting MotioCI login with CAMPassport (CLI)...'
+14:14:59  Attempting MotioCI login with CAMPassport (CLI)...
+14:14:59  + set +e
+14:14:59  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --camPassportId MTsxMDE6ZmFrZS1jYW1wYXNzcG9ydC12YWx1ZToxMjM0NTY3ODkwOzA7MzswOw== --namespaceId AzureAD
+14:14:59  + LOGIN_OUT='Traceback (most recent call last):
+14:14:59    File "/home/jenkins/agent/workspace/s_deployment_pipeline_newtesting/MotioCI/api/CLI/ci-cli.py", line 12, in <module>
+14:14:59      import requests
+14:14:59  ModuleNotFoundError: No module named '\''requests'\'''
+14:14:59  + RC=1
+14:14:59  + set -e
+14:14:59  + TOKEN_CLEAN=
+14:14:59  + '[' 1 -eq 0 ']'
+14:14:59  + '[' -z '' ']'
+14:14:59  + echo 'ERROR: MotioCI CLI did not return a valid token with CAMPassport.'
+14:14:59  ERROR: MotioCI CLI did not return a valid token with CAMPassport.
+14:14:59  + echo 'Output tail for admins:'
+14:14:59  Output tail for admins:
+14:14:59  + printf '%s\n' 'Traceback (most recent call last):
+14:14:59    File "/home/jenkins/agent/workspace/s_deployment_pipeline_newtesting/MotioCI/api/CLI/ci-cli.py", line 12, in <module>
+14:14:59      import requests
+14:14:59  ModuleNotFoundError: No module named '\''requests'\'''
+14:14:59  + tail -n 50
+14:14:59  Traceback (most recent call last):
+14:14:59    File "/home/jenkins/agent/workspace/s_deployment_pipeline_newtesting/MotioCI/api/CLI/ci-cli.py", line 12, in <module>
+14:14:59      import requests
+14:14:59  ModuleNotFoundError: No module named 'requests'
+14:14:59  + exit 1
+[Pipeline] }
+[Pipeline] // container
