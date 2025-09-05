@@ -1,8 +1,62 @@
-09:41:35  Running pre-flight checks...
-[Pipeline] sh
-09:41:36  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/api/v1
-09:41:36  + APIKEY=AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r
-09:41:36  + curl -sS --fail-with-body -X PUT https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d '{"parameters":[{"name":"CAMAPILoginKey","value":"AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"}]}' -c cookies.txt -b cookies.txt -D headers.txt -o session.json
-09:41:37  + python3 -
-09:41:37  CAM MTsxMDE6ZjlkZWM2OTgtYjZmYy0xZWEzLTM4NjEtY2QxZGM1OWY2ZWNjOjAwODk5MTE0NTE7MDszOzA7
-[Pipeline] }
+    stage('MotioCI Login') {
+      steps {
+         
+          container('python') {
+            script {
+              echo "Installing MotioCI CLI dependencies"
+              sh '''
+            
+            cd MotioCI/api/CLI
+                python3 -m pip install --user -r requirements.txt
+                echo "Successfully installed packages"
+              '''
+              
+              echo "Running pre-flight checks..."
+              sh '''
+                BASE="https://dhcsprodcognos.ca.analytics.ibm.com/api/v1"
+APIKEY="AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"
+
+# Create a session with the API key
+curl -sS --fail-with-body -X PUT "$BASE/session" \
+  -H "Content-Type: application/json" \
+  -d '{"parameters":[{"name":"CAMAPILoginKey","value":"'"$APIKEY"'"}]}' \
+  -c cookies.txt -b cookies.txt \
+  -D headers.txt -o session.json
+
+# Print the session_key (should be non-empty)
+python3 - <<'PY'
+import json,sys
+print(json.load(open("session.json")).get("session_key",""))
+PY
+
+SESSION_KEY=$(python3 - <<'PY'
+import json; print(json.load(open("session.json")).get("session_key",""))
+PY
+)
+
+# Get XSRF-TOKEN cookie
+curl -sS --fail-with-body "$BASE/session" -c cookies.txt -b cookies.txt -o /dev/null
+XSRF=$(awk '$6=="XSRF-TOKEN"{print $7}' cookies.txt | tail -n1)
+
+# Build the IBM-BA-Authorization header correctly
+if [[ "$SESSION_KEY" == CAM\ * ]]; then
+  AUTH_VALUE="$SESSION_KEY"
+else
+  AUTH_VALUE="CAM $SESSION_KEY"
+fi
+
+# Sanity call (should be 200 and return JSON)
+curl -sS --fail-with-body "$BASE/extensions" \
+  -H "IBM-BA-Authorization: $AUTH_VALUE" \
+  ${XSRF:+ -H "X-XSRF-TOKEN: $XSRF"} \
+  -b cookies.txt -c cookies.txt -o extensions.json
+
+echo "OK — extensions.json saved (session works)."
+              '''
+              
+              
+            }
+          }
+        
+      }
+    }
