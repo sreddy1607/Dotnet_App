@@ -1,15 +1,33 @@
-[Pipeline] stage
-[Pipeline] { (Source checks (DEV/TEST))
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-12:07:08  + set -eu
-12:07:08  + cd MotioCI/api/CLI
-12:07:08  + SRC_ID=3
-12:07:08  + echo '1) Verify DEV/TEST instance & project via GraphQL (robust)'
-12:07:08  1) Verify DEV/TEST instance & project via GraphQL (robust)
-12:07:08  + cat
-12:07:08  + curl -sS --fail-with-body -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: 20a620-6e13-46de-823c-e33c6c01c647' -d @../src_projects.gql.json -D ../src_projects.headers.txt -o ../src_projects.json
-12:07:08  curl: (22) The requested URL returned error: 401
-[Pipeline] }
-[Pipeline] // container
+Logging into MotioCI with stored credentials file...
+15:14:32  ++ cd MotioCI/api/CLI
+15:14:32  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
+15:14:32  ++ tail -n1
+15:14:35  + TOKEN_RAW=e9fad6a3-71eb-4b88-a502-76eef91f25d1
+15:14:35  ++ printf %s e9fad6a3-71eb-4b88-a502-76eef91f25d1
+15:14:35  ++ sed -E 's/^[A-Za-z ]*:?[[:space:]]*//'
+15:14:35  + TOKEN_CLEAN=9fad6a3-71eb-4b88-a502-76eef91f25d1
+15:14:35  + '[' -z 9fad6a3-71eb-4b88-a502-76eef91f25d1 ']'
+15:14:35  + printf 'MOTIO_AUTH_TOKEN=%s
+15:14:35  ' 9fad6a3-71eb-4b88-a502-76eef91f25d1
+15:14:35  + python3 MotioCI/api/CLI/ci-cli.py --server https://cgrptmcip01.cloud.cammis.ca.gov instance ls --xauthtoken 9fad6a3-71eb-4b88-a502-76eef91f25d1
+15:14:36  Traceback (most recent call last):
+15:14:36    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 910, in json
+15:14:36      return complexjson.loads(self.text, **kwargs)
+15:14:36    File "/usr/lib64/python3.9/json/__init__.py", line 346, in loads
+15:14:36      return _default_decoder.decode(s)
+15:14:36    File "/usr/lib64/python3.9/json/decoder.py", line 337, in decode
+15:14:36      obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+15:14:36    File "/usr/lib64/python3.9/json/decoder.py", line 355, in raw_decode
+15:14:36      raise JSONDecodeError("Expecting value", s, err.value) from None
+15:14:36  json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+15:14:36  
+15:14:36  During handling of the above exception, another exception occurred:
+15:14:36  
+15:14:36  Traceback (most recent call last):
+15:14:36    File "/home/jenkins/agent/workspace/s_deployment_pipeline_newtesting/MotioCI/api/CLI/ci-cli.py", line 463, in <module>
+15:14:36      print(instances.get_instances_default())
+15:14:36    File "/home/jenkins/agent/workspace/s_deployment_pipeline_newtesting/MotioCI/api/CLI/instances.py", line 10, in get_instances_default
+15:14:36      instance_array = response.json()["data"]["instances"]["edges"]
+15:14:36    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/models.py", line 917, in json
+15:14:36      raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+15:14:36  requests.exceptions.JSONDecodeError: [Errno Expecting value] : 0
