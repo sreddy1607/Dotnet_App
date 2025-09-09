@@ -1,178 +1,32 @@
-def branch = env.BRANCH_NAME ?: "DEV"
-def namespace = env.NAMESPACE ?: "dev"
-def cloudName = env.CLOUD_NAME == "openshift" ? "openshift" : "kubernetes"
-def workingDir = "/home/jenkins/agent"
-
-APP_NAME = "combined-devops-cognos-deployments"
-
-pipeline {
-  agent {
-    kubernetes {
-      yaml """
-apiVersion: v1
-kind: Pod
-spec:
-  serviceAccountName: jenkins
-  volumes:
-    - name: dockersock
-      hostPath:
-        path: /var/run/docker.sock
-    - emptyDir: {}
-      name: varlibcontainers
-    - name: jenkins-trusted-ca-bundle
-      configMap:
-        name: jenkins-trusted-ca-bundle
-        defaultMode: 420
-        optional: true
-  containers:
-    - name: jnlp
-      securityContext:
-        privileged: true
-      envFrom:
-        - configMapRef:
-            name: jenkins-agent-env
-            optional: true
-      env:
-        - name: GIT_SSL_CAINFO
-          value: "/etc/pki/tls/certs/ca-bundle.crt"
-      volumeMounts:
-        - name: jenkins-trusted-ca-bundle
-          mountPath: /etc/pki/tls/certs
-    - name: node
-      image: registry.access.redhat.com/ubi8/nodejs-16:latest
-      tty: true
-      command: ["/bin/bash"]
-      securityContext:
-        privileged: true
-      workingDir: ${workingDir}
-      envFrom:
-        - configMapRef:
-            name: jenkins-agent-env
-            optional: true
-      env:
-        - name: HOME
-          value: ${workingDir}
-        - name: BRANCH
-          value: ${branch}
-        - name: GIT_SSL_CAINFO
-          value: "/etc/pki/tls/certs/ca-bundle.crt"
-      volumeMounts:
-        - name: jenkins-trusted-ca-bundle
-          mountPath: /etc/pki/tls/certs
-    - name: python
-      image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.2.0
-      tty: true
-      command: ["/bin/bash"]
-      securityContext:
-        privileged: true
-      workingDir: ${workingDir}
-      envFrom:
-        - configMapRef:
-            name: jenkins-agent-env
-            optional: true
-      env:
-        - name: HOME
-          value: ${workingDir}
-        - name: BRANCH
-          value: ${branch}
-        - name: GIT_SSL_CAINFO
-          value: "/etc/pki/tls/certs/ca-bundle.crt"
-      volumeMounts:
-        - name: jenkins-trusted-ca-bundle
-          mountPath: /etc/pki/tls/certs
-"""
-    }
-  }
-
-  environment {
-    GIT_BRANCH         = "${BRANCH_NAME}"
-
-    // MotioCI server (naming kept for minimal change)
-    COGNOS_SERVER_URL  = "https://cgrptmcip01.cloud.cammis.ca.gov"
-
-    // Cognos REST base (overridable)
-    COGNOS_API_BASE    = "https://dhcsprodcognos.ca.analytics.ibm.com/api"
-
-    // Deployment configuration
-    COGNOS_NAMESPACE   = "AzureAD"
-    SOURCE_INSTANCE_ID = "3"      // Cognos DEV/TEST
-    TARGET_INSTANCE_ID = "1"      // Cognos PROD
-    LABEL_ID           = "57"
-    PROJECT_NAME       = "Demo"
-  }
-
-  options {
-    disableConcurrentBuilds()
-    timestamps()
-  }
-
-  stages {
-    stage("initialize") {
-      steps {
-        script {
-          echo "Branch: ${env.GIT_BRANCH}"
-          echo "Initializing Motio pipeline..."
-          echo "=== Configuration Validation ==="
-          echo "MotioCI Server: ${env.COGNOS_SERVER_URL}"
-          echo "Cognos API Base: ${env.COGNOS_API_BASE}"
-          echo "Cognos Namespace: ${env.COGNOS_NAMESPACE}"
-          echo "Source Instance ID: ${env.SOURCE_INSTANCE_ID}"
-          echo "Target Instance ID: ${env.TARGET_INSTANCE_ID}"
-          echo "Label ID: ${env.LABEL_ID}"
-          echo "Project Name: ${env.PROJECT_NAME}"
-          echo "================================"
-        }
-      }
-    }
-
-    stage('Check Python Availability') {
-      steps {
-        container('python') {
-          sh '''
-            set -e
-            echo "Checking for Python3..."
-            which python3 || true
-            python3 --version || true
-          '''
-        }
-      }
-    }
-
-    stage('Install CLI deps') {
-      steps {
-        container('python') {
-          sh '''
-            set -e
-            cd MotioCI/api/CLI
-            python3 -m pip install --user -r requirements.txt
-            echo "Dependencies installed."
-          '''
-        }
-      }
-    }
-
-stage('MotioCI login → token') {
-      steps {
-        sh '''
-          set -eu
-          cd MotioCI/api/CLI
-
-          TOKEN=""
-          if [ -n "${COGNOS_API_KEY}" ]; then
-            echo "Login via PRD CAMPassport..."
-            TOKEN="$(python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" --non-interactive \
-                     login --camPassportId "${COGNOS_API_KEY}")" || true
-          fi
-
-          if [ -z "${TOKEN}" ] && [ -n "CMarksSS01@intra.dhs.ca.gov" ] && [ -n "Service@2024DHCS" ]; then
-            echo "Login via PRD username/password..."
-            TOKEN="$(python3 ci-cli.py --server="${MOTIO_SERVER}" --non-interactive \
-                     login --username "CMarksSS01@intra.dhs.ca.gov" --password "Service@2024DHCS" --namespaceId "AzureAD")" || true
-          fi
-
-          test -n "${TOKEN}" || { echo "ERROR: MotioCI login failed."; exit 1; }
-          printf "%s" "${TOKEN}" > .motio_token
-          echo "Saved token → $(pwd)/.motio_token"
-        '''
-      }
-    }
+[Pipeline] stage
+[Pipeline] { (MotioCI login → token)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
+09:40:53  + set -eu
+09:40:53  + cd MotioCI/api/CLI
+09:40:53  + TOKEN=
+09:40:53  + '[' -n **** ']'
+09:40:53  + echo 'Login via PRD CAMPassport...'
+09:40:53  Login via PRD CAMPassport...
+09:40:53  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --camPassportId ****
+09:40:54  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.govhttps', port=443): Max retries exceeded with url: //cgrptmcip01.cloud.cammis.ca.gov/api/login (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7fe96def3ca0>: Failed to establish a new connection: [Errno -2] Name or service not known'))
+09:40:54  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.govhttps', port=443): Max retries exceeded with url: //cgrptmcip01.cloud.cammis.ca.gov/api/login (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7fe96def3400>: Failed to establish a new connection: [Errno -2] Name or service not known'))
+09:40:54  ERROR: Login failed (no token returned).
+09:40:54  + TOKEN=
+09:40:54  + true
+09:40:54  + '[' -z '' ']'
+09:40:54  + '[' -n CMarksSS01@intra.dhs.ca.gov ']'
+09:40:54  + '[' -n Service@2024DHCS ']'
+09:40:54  + echo 'Login via PRD username/password...'
+09:40:54  Login via PRD username/password...
+09:40:54  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --username CMarksSS01@intra.dhs.ca.gov --password Service@2024DHCS --namespaceId AzureAD
+09:40:54  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.govhttps', port=443): Max retries exceeded with url: //cgrptmcip01.cloud.cammis.ca.gov/api/login (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f94295b8fa0>: Failed to establish a new connection: [Errno -2] Name or service not known'))
+09:40:54  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.govhttps', port=443): Max retries exceeded with url: //cgrptmcip01.cloud.cammis.ca.gov/api/login (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f94295b8dc0>: Failed to establish a new connection: [Errno -2] Name or service not known'))
+09:40:54  ERROR: Login failed (no token returned).
+09:40:54  + TOKEN=
+09:40:54  + true
+09:40:54  + test -n ''
+09:40:54  + echo 'ERROR: MotioCI login failed.'
+09:40:54  ERROR: MotioCI login failed.
+09:40:54  + exit 1
