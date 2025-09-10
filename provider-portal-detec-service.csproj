@@ -1,27 +1,30 @@
-stage('MotioCI login → token') {
-      steps {
-        container('python') {
-        sh '''
-          set -eu
-          cd MotioCI/api/CLI
-
-          TOKEN=""
-          if [ -n "${COGNOS_API_KEY}" ]; then
-            echo "Login via PRD CAMPassport..."
-            TOKEN="$(python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" --non-interactive \
-                     login --camPassportId "${COGNOS_API_KEY}")" || true
-          fi
-
-          if [ -z "${TOKEN}" ] && [ -n "ldapadmin" ] && [ -n "G0RL0uCwP4nIWrs8" ]; then
-            echo "Login via PRD username/password..."
-            TOKEN="$(python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" --non-interactive \
-                     login --username "ldapadmin" --password "G0RL0uCwP4nIWrs8" --namespaceId "LDAP")" || true
-          fi
-
-          test -n "${TOKEN}" || { echo "ERROR: MotioCI login failed."; exit 1; }
-          printf "%s" "${TOKEN}" > .motio_token
-          echo "Saved token → $(pwd)/.motio_token"
-        '''
-        }
-      }
-    }
+10:13:11  + cd MotioCI/api/CLI
+10:13:11  + python3 -m pip -q install --no-input requests
+10:13:11  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+10:13:11  + MOTIO_SERVER=https://cgrptmcip01.cloud.cammis.ca.gov
+10:13:11  + CAM_PASSPORT_ID=MTsxMDE6YzE2ZmQ1M2YtZTQxMC05ZTUzLWE5YWQtYmZjYzU1MDhlYzdiOjMyNDM4MDEyMTk7MDszOzA7
+10:13:11  + NS=LDAP
+10:13:11  + USER=ldapadmin
+10:13:11  + PASS=G0RL0uCwP4nIWrs8
+10:13:11  + TOKEN=
+10:13:11  + echo 'Trying MotioCI login with CAMPassport...'
+10:13:11  Trying MotioCI login with CAMPassport...
+10:13:11  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --camPassportId MTsxMDE6YzE2ZmQ1M2YtZTQxMC05ZTUzLWE5YWQtYmZjYzU1MDhlYzdiOjMyNDM4MDEyMTk7MDszOzA7
+10:13:12  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.gov', port=443): Max retries exceeded with url: /api/login (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1129)')))
+10:13:12  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.gov', port=443): Max retries exceeded with url: /api/login (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1129)')))
+10:13:12  ERROR: Login failed (no token returned).
+10:13:12  ++ true
+10:13:12  + TOKEN=
+10:13:12  + '[' -z '' ']'
+10:13:12  + echo 'CAMPassport failed; trying LDAP username/password...'
+10:13:12  CAMPassport failed; trying LDAP username/password...
+10:13:12  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --username ldapadmin --password G0RL0uCwP4nIWrs8 --namespaceId LDAP
+10:13:12  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.gov', port=443): Max retries exceeded with url: /api/login (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1129)')))
+10:13:12  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.gov', port=443): Max retries exceeded with url: /api/login (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1129)')))
+10:13:12  ERROR: Login failed (no token returned).
+10:13:12  ++ true
+10:13:12  + TOKEN=
+10:13:12  + test -n ''
+10:13:12  + echo 'ERROR: MotioCI login failed (both methods).'
+10:13:12  ERROR: MotioCI login failed (both methods).
+10:13:12  + exit 1
