@@ -1,33 +1,16 @@
-[Pipeline] stage
-[Pipeline] { (MotioCI Auth (CAMPassport exchange))
-[Pipeline] container
+[Pipeline] script
 [Pipeline] {
 [Pipeline] sh
-14:21:46  + set -eu
-14:21:46  + CAMPASSPORT=MTsxMDE6ZmFrZS1jYW1wYXNzcG9ydC12YWx1ZToxMjM0NTY3ODkwOzA7MzswOw==
-14:21:46  + NS_ID=AzureAD
-14:21:46  + mkdir -p MotioCI/api/CLI
-14:21:46  + cd MotioCI/api/CLI
-14:21:46  + echo 'Attempting MotioCI login with CAMPassport (CLI)...'
-14:21:46  Attempting MotioCI login with CAMPassport (CLI)...
-14:21:46  + set +e
-14:21:46  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --camPassportId MTsxMDE6ZmFrZS1jYW1wYXNzcG9ydC12YWx1ZToxMjM0NTY3ODkwOzA7MzswOw== --namespaceId AzureAD
-14:21:46  + LOGIN_OUT='ERROR: CAMPassport login failed (no token returned). Either your tenant does not expose a CAM→token mutation, or the mutation name differs.
-14:21:46  Ask your MotioCI admin for the supported mutation name, then retry with --camLoginMutationName <name>.'
-14:21:46  + RC=1
-14:21:46  + set -e
-14:21:46  + TOKEN_CLEAN=
-14:21:46  + '[' 1 -eq 0 ']'
-14:21:46  + '[' -z '' ']'
-14:21:46  + echo 'ERROR: MotioCI CLI did not return a valid token with CAMPassport.'
-14:21:46  ERROR: MotioCI CLI did not return a valid token with CAMPassport.
-14:21:46  + echo 'Output tail for admins:'
-14:21:46  Output tail for admins:
-14:21:46  + printf '%s\n' 'ERROR: CAMPassport login failed (no token returned). Either your tenant does not expose a CAM→token mutation, or the mutation name differs.
-14:21:46  Ask your MotioCI admin for the supported mutation name, then retry with --camLoginMutationName <name>.'
-14:21:46  + tail -n 50
-14:21:46  ERROR: CAMPassport login failed (no token returned). Either your tenant does not expose a CAM→token mutation, or the mutation name differs.
-14:21:46  Ask your MotioCI admin for the supported mutation name, then retry with --camLoginMutationName <name>.
-14:21:46  + exit 1
+16:40:53  Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+16:40:53  		 Affected argument(s) used the following variable(s): [CREDENTIALS_FILE]
+16:40:53  		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
+16:40:54  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
+16:40:54  + grep 'Auth Token:'
+16:40:54  + cut -d: -f2
+16:40:54  + tr -d ' '
+[Pipeline] error
 [Pipeline] }
-[Pipeline] // container
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
