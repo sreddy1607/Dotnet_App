@@ -1,32 +1,27 @@
-[Pipeline] stage
-[Pipeline] { (MotioCI login → token)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-09:40:53  + set -eu
-09:40:53  + cd MotioCI/api/CLI
-09:40:53  + TOKEN=
-09:40:53  + '[' -n **** ']'
-09:40:53  + echo 'Login via PRD CAMPassport...'
-09:40:53  Login via PRD CAMPassport...
-09:40:53  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --camPassportId ****
-09:40:54  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.govhttps', port=443): Max retries exceeded with url: //cgrptmcip01.cloud.cammis.ca.gov/api/login (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7fe96def3ca0>: Failed to establish a new connection: [Errno -2] Name or service not known'))
-09:40:54  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.govhttps', port=443): Max retries exceeded with url: //cgrptmcip01.cloud.cammis.ca.gov/api/login (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7fe96def3400>: Failed to establish a new connection: [Errno -2] Name or service not known'))
-09:40:54  ERROR: Login failed (no token returned).
-09:40:54  + TOKEN=
-09:40:54  + true
-09:40:54  + '[' -z '' ']'
-09:40:54  + '[' -n CMarksSS01@intra.dhs.ca.gov ']'
-09:40:54  + '[' -n Service@2024DHCS ']'
-09:40:54  + echo 'Login via PRD username/password...'
-09:40:54  Login via PRD username/password...
-09:40:54  ++ python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive login --username CMarksSS01@intra.dhs.ca.gov --password Service@2024DHCS --namespaceId AzureAD
-09:40:54  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.govhttps', port=443): Max retries exceeded with url: //cgrptmcip01.cloud.cammis.ca.gov/api/login (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f94295b8fa0>: Failed to establish a new connection: [Errno -2] Name or service not known'))
-09:40:54  ERROR: login request failed: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.govhttps', port=443): Max retries exceeded with url: //cgrptmcip01.cloud.cammis.ca.gov/api/login (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f94295b8dc0>: Failed to establish a new connection: [Errno -2] Name or service not known'))
-09:40:54  ERROR: Login failed (no token returned).
-09:40:54  + TOKEN=
-09:40:54  + true
-09:40:54  + test -n ''
-09:40:54  + echo 'ERROR: MotioCI login failed.'
-09:40:54  ERROR: MotioCI login failed.
-09:40:54  + exit 1
+stage('MotioCI login → token') {
+      steps {
+        container('python') {
+        sh '''
+          set -eu
+          cd MotioCI/api/CLI
+
+          TOKEN=""
+          if [ -n "${COGNOS_API_KEY}" ]; then
+            echo "Login via PRD CAMPassport..."
+            TOKEN="$(python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" --non-interactive \
+                     login --camPassportId "${COGNOS_API_KEY}")" || true
+          fi
+
+          if [ -z "${TOKEN}" ] && [ -n "ldapadmin" ] && [ -n "G0RL0uCwP4nIWrs8" ]; then
+            echo "Login via PRD username/password..."
+            TOKEN="$(python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" --non-interactive \
+                     login --username "ldapadmin" --password "G0RL0uCwP4nIWrs8" --namespaceId "LDAP")" || true
+          fi
+
+          test -n "${TOKEN}" || { echo "ERROR: MotioCI login failed."; exit 1; }
+          printf "%s" "${TOKEN}" > .motio_token
+          echo "Saved token → $(pwd)/.motio_token"
+        '''
+        }
+      }
+    }
