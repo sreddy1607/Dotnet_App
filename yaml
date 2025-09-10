@@ -1,57 +1,23 @@
 [Pipeline] script
 [Pipeline] {
 [Pipeline] sh
-16:48:48  + set -e
-16:48:48  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
-16:48:48  + awk '-F: ' '/^Auth Token/{print $2}'
+16:54:48  + set -euo pipefail
+16:54:48  + :
+16:54:48  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
+16:54:51  + grep -iE '^Auth[[:space:]]+Token:' login.out
+16:54:51  + sed -e 's/^[^:]*:[[:space:]]*//'
+16:54:51  + true
+16:54:51  + cat login.token
 [Pipeline] sh
-16:48:51  + set -e
-16:48:51  + echo 'DEBUG: printing login help for diagnostics:'
-16:48:51  DEBUG: printing login help for diagnostics:
-16:48:51  + python3 ci-cli.py --help
-16:48:51  usage: ci-cli.py [-h] --server SERVER
-16:48:51                   {login,instance,project,label,labelVersion,deploy,versionedItems,logout}
-16:48:51                   ...
-16:48:51  
-16:48:51  description: sample Python CLI to perform queries using the GraphiQL API.
-16:48:51  
-16:48:51  optional arguments:
-16:48:51    -h, --help            show this help message and exit
-16:48:51    --server SERVER       provide link to GraphiQL API for the commands to run
-16:48:51  
-16:48:51  subcommands:
-16:48:51    subjects description: The available subjects are stated below. To find out
-16:48:51    what actions can be performed on a subject, run python ci-cli.py [subject]
-16:48:51    -h. To run commands, the xauthtoken and server flags are required.
-16:48:51  
-16:48:51    {login,instance,project,label,labelVersion,deploy,versionedItems,logout}
-16:48:51      login               login to MotioCI. Generates authtoken that will be
-16:48:51                          used to run commands in the CLI.
-16:48:51      instance            perform queries on instances.
-16:48:51      project             perform queries on projects.
-16:48:51      label               perform queries/mutation on labels.
-16:48:51      labelVersion        perform queries/mutation on label versions.
-16:48:51      deploy              Execute a deployment.
-16:48:51      versionedItems      perform queries on versioned items.
-16:48:51      logout              logout of MotioCI. The authtoken will be unusable
-16:48:51                          afterwards.
-16:48:51  + python3 ci-cli.py login --help
-16:48:51  usage: ci-cli.py login [-h] [--credentials] [--credentialsFile]
-16:48:51  
-16:48:51  description: Login to MotioCI. There are three ways to run this command. 1. If
-16:48:51  no arguments are provided, the CLI will prompt the user to enter login
-16:48:51  information of instance name, namespace id, username and password. 2. The
-16:48:51  credentials flag and a properly formatted credentials string is provided. 3.
-16:48:51  The credentialsFile flag to load credentials from a JSON file. Examples of the
-16:48:51  login command using the credentials flag in either a windows/unix terminal are
-16:48:51  provided in the README.txt
-16:48:51  
-16:48:51  optional arguments:
-16:48:51    -h, --help          show this help message and exit
-16:48:51    --credentials       alternate method of login. Allows user to login using a
-16:48:51                        properly formatted credentials string.
-16:48:51    --credentialsFile   path to JSON file containing credentials (default:
-16:48:51                        credentials.json)
+16:54:51  + set -e
+16:54:51  + echo '------ MotioCI login output (sanitized) ------'
+16:54:51  ------ MotioCI login output (sanitized) ------
+16:54:51  + sed 's/"password":[^,}]*/"password":"***"/g' login.out
+16:54:51  Successfully loaded credentials from ****
+16:54:51  == DEBUG: Attempting login with masked credentials ==
+16:54:51  [{"namespaceId": "AzureAD", "username": "CMarksSS01@intra.dhs.ca.gov", "password":"***", "instanceId": "1"}, {"namespaceId": "AzureAD", "username": "CMarksSS01@intra.dhs.ca.gov", "password":"***", "instanceId": "3"}]
+16:54:51  Invalid parameters. Login cancelled!
+16:54:51  + echo ------------------------------------------------
+16:54:51  ------------------------------------------------
 [Pipeline] error
 [Pipeline] }
-[Pipeline] // script
