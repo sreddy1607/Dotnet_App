@@ -1,39 +1,43 @@
-[Pipeline] stage
-[Pipeline] { (Check Instance Permissions)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] sh
-12:15:29  + cd MotioCI/api/CLI
-12:15:29  + '[' -z 3d6c38b4-5176-421a-9e4e-f019d0788e5f ']'
-12:15:29  + SERVER=https://cgrptmcip01.cloud.cammis.ca.gov
-12:15:29  + INSTANCES='Cognos-DEV/TEST Cognos-PRD'
-12:15:29  + PROJECT=Demo
-12:15:29  + overall_rc=0
-12:15:29  + for inst in $INSTANCES
-12:15:29  + echo ''
-12:15:29  
-12:15:29  + echo '===== Checking permissions for instance: Cognos-DEV/TEST ====='
-12:15:29  ===== Checking permissions for instance: Cognos-DEV/TEST =====
-12:15:29  ++ echo Cognos-DEV/TEST
-12:15:29  ++ tr / _
-12:15:29  + inst_sanitized=Cognos-DEV_TEST
-12:15:29  + echo '  -> Listing projects...'
-12:15:29    -> Listing projects...
-12:15:29  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=3d6c38b4-5176-421a-9e4e-f019d0788e5f --instanceName=Cognos-DEV/TEST
-12:15:29  + proj_rc=0
-12:15:29  + '[' 0 -ne 0 ']'
-12:15:29  + grep -qiE 'access is denied|unauthorized|forbidden|401|403' /tmp/Cognos-DEV_TEST_projects.err
-12:15:29  + echo '  OK: Can list projects on Cognos-DEV/TEST'
-12:15:29    OK: Can list projects on Cognos-DEV/TEST
-12:15:29  + echo '  -> Listing labels for project '\''Demo'\''...'
-12:15:29    -> Listing labels for project 'Demo'...
-12:15:29  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=3d6c38b4-5176-421a-9e4e-f019d0788e5f --instanceName=Cognos-DEV/TEST --projectName=Demo
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
+    stage('Login to cognos API') {
+      steps {
+        script {
+          withCredentials([usernamePassword(credentialsId: 'Cognos_authentication', passwordVariable: 'COGNOS_PASSWORD', usernameVariable: 'COGNOS_USERNAME')]) {
+            def response = sh(script: """
+            curl -X PUT \
+                 -H "Content-Type: application/json" \
+                 -d '{
+                    "username": "${COGNOS_USERNAME}",
+                    "password": "${COGNOS_PASSWORD}"
+                  }' \
+                  ${COGNOS_API_URL}/session \
+                -o response.json
+                """, returnStdout:true).trim()
+            
+            def jsonResponse = readJSON file: 'response.json'
+            if (jsonResponse.authToken) {
+              env.COGNOS_AUTH_TOKEN = jsonResponse.authToken
+              echo "Successfully authenticated. Token: ${env.COGNOS_AUTH_TOKEN}"
+            } else {
+              error "Failed to authenticate with Cognos API"
+            }
+          }
+        }
+      }
+    }
+
+
+    stage('Use Cognos API') {
+      steps {
+          script {
+            def reportResponse = sh(script: """
+            curl -X GET \
+                 -H "Auhtorization: Bearer ${env.COGNOS_AUTH_TOKEN}" \
+                 -H "Content-type: application/json" \
+                 ${COGNOS_API_URL}/files \
+                 -o report_response.json
+            """, returnStdout:true).trim()
+          echo "Report Response: ${reportResponse}"
+        }
+      }
+    }
+  }
