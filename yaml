@@ -1,92 +1,42 @@
-17:46:08  Dependencies installed.
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (MotioCI Login)
-[Pipeline] withCredentials
-17:46:08  Masking supported pattern matches of $CREDENTIALS_FILE
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] echo
-17:46:08  Installing MotioCI CLI dependencies
-[Pipeline] sh
-17:46:09  + cd MotioCI/api/CLI
-17:46:09  + python3 -m pip install --user -r requirements.txt
-17:46:09  Requirement already satisfied: gql>=3.0.0 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from -r requirements.txt (line 1)) (4.0.0)
-17:46:09  Requirement already satisfied: python-dateutil==2.8.1 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from -r requirements.txt (line 2)) (2.8.1)
-17:46:09  Requirement already satisfied: python-gitlab~=2.9.0 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from -r requirements.txt (line 3)) (2.9.0)
-17:46:09  Requirement already satisfied: requests~=2.27.1 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from -r requirements.txt (line 4)) (2.27.1)
-17:46:09  Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.9/site-packages (from python-dateutil==2.8.1->-r requirements.txt (line 2)) (1.16.0)
-17:46:09  Requirement already satisfied: yarl<2.0,>=1.6 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from gql>=3.0.0->-r requirements.txt (line 1)) (1.20.1)
-17:46:09  Requirement already satisfied: anyio<5,>=3.0 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from gql>=3.0.0->-r requirements.txt (line 1)) (4.10.0)
-17:46:09  Requirement already satisfied: backoff<3.0,>=1.11.1 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from gql>=3.0.0->-r requirements.txt (line 1)) (2.2.1)
-17:46:09  Requirement already satisfied: graphql-core<3.3,>=3.2 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from gql>=3.0.0->-r requirements.txt (line 1)) (3.2.6)
-17:46:09  Requirement already satisfied: requests-toolbelt>=0.9.1 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from python-gitlab~=2.9.0->-r requirements.txt (line 3)) (1.0.0)
-17:46:09  Requirement already satisfied: certifi>=2017.4.17 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from requests~=2.27.1->-r requirements.txt (line 4)) (2025.8.3)
-17:46:09  Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.9/site-packages (from requests~=2.27.1->-r requirements.txt (line 4)) (1.26.18)
-17:46:09  Requirement already satisfied: idna<4,>=2.5 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from requests~=2.27.1->-r requirements.txt (line 4)) (3.10)
-17:46:09  Requirement already satisfied: charset-normalizer~=2.0.0 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from requests~=2.27.1->-r requirements.txt (line 4)) (2.0.12)
-17:46:09  Requirement already satisfied: typing_extensions>=4.5 in /usr/local/lib/python3.9/site-packages (from anyio<5,>=3.0->gql>=3.0.0->-r requirements.txt (line 1)) (4.10.0)
-17:46:09  Requirement already satisfied: sniffio>=1.1 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from anyio<5,>=3.0->gql>=3.0.0->-r requirements.txt (line 1)) (1.3.1)
-17:46:09  Requirement already satisfied: exceptiongroup>=1.0.2 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from anyio<5,>=3.0->gql>=3.0.0->-r requirements.txt (line 1)) (1.3.0)
-17:46:09  Requirement already satisfied: propcache>=0.2.1 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from yarl<2.0,>=1.6->gql>=3.0.0->-r requirements.txt (line 1)) (0.3.2)
-17:46:09  Requirement already satisfied: multidict>=4.0 in /home/jenkins/agent/.local/lib/python3.9/site-packages (from yarl<2.0,>=1.6->gql>=3.0.0->-r requirements.txt (line 1)) (6.6.4)
-17:46:09  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
-17:46:10  + echo 'Successfully installed packages'
-17:46:10  Successfully installed packages
-[Pipeline] echo
-17:46:10  Logging into MotioCI with stored credentials file
-[Pipeline] sh
-17:46:10  + cd MotioCI/api/CLI
-17:46:10  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
-17:46:10  + grep 'Auth Token:'
-17:46:10  + cut -d: -f2
-17:46:10  + tr -d ' '
-[Pipeline] echo
-17:46:10  MotioCI login completed - Token captured: 
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Debug Namespaces)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-17:46:11  + echo 'Checking available namespaces for PRD instance...'
-17:46:11  Checking available namespaces for PRD instance...
-17:46:11  + curl -sk -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: ' -d '{
-17:46:11              "query":"query($id: Long!){ instance(id:$id){ namespaces { id name } } }",
-17:46:11              "variables":{"id":1}
-17:46:11            }'
-17:46:11  + jq .
-17:46:12  {
-17:46:12    "data": {
-17:46:12      "instance": {
-17:46:12        "namespaces": [
-17:46:12          {
-17:46:12            "id": "BAOps",
-17:46:12            "name": "BAOps"
-17:46:12          },
-17:46:12          {
-17:46:12            "id": "LDAP",
-17:46:12            "name": "LDAP"
-17:46:12          },
-17:46:12          {
-17:46:12            "id": "AzureAD",
-17:46:12            "name": "Azure"
-17:46:12          }
-17:46:12        ]
-17:46:12      }
-17:46:12    }
-17:46:12  }
-[Pipeline] }
+{
+  "data": {
+    "instances": {
+      "edges": [
+        {
+          "node": {
+            "id": 1,
+            "name": "Cognos-PRD",
+            "namespaces": [
+              {
+                "id": "BAOps"
+              },
+              {
+                "id": "LDAP"
+              },
+              {
+                "id": "AzureAD"
+              }
+            ]
+          }
+        },
+        {
+          "node": {
+            "id": 3,
+            "name": "Cognos-DEV/TEST",
+            "namespaces": [
+              {
+                "id": "BAOps"
+              },
+              {
+                "id": "LDAP"
+              },
+              {
+                "id": "AzureAD"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
