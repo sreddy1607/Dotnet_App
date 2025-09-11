@@ -1,42 +1,16 @@
-{
-  "data": {
-    "instances": {
-      "edges": [
-        {
-          "node": {
-            "id": 1,
-            "name": "Cognos-PRD",
-            "namespaces": [
-              {
-                "id": "BAOps"
-              },
-              {
-                "id": "LDAP"
-              },
-              {
-                "id": "AzureAD"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "id": 3,
-            "name": "Cognos-DEV/TEST",
-            "namespaces": [
-              {
-                "id": "BAOps"
-              },
-              {
-                "id": "LDAP"
-              },
-              {
-                "id": "AzureAD"
-              }
-            ]
-          }
-        }
-      ]
-    }
-  }
-}
+] stage
+[Pipeline] { (Get camPassportIds)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
+13:35:41  + set -e
+13:35:41  + cd MotioCI/api/CLI
+13:35:41  + python3 session.py https://dhcsdevtestcog.ca.analytics.ibm.com --credentialsFile devtest-credentials.json
+13:35:41  + python3 session.py https://dhcsprodcog.ca.analytics.ibm.com --credentialsFile prod-credentials.json
+[Pipeline] sh
+13:35:42  + cat devtest_passport.txt
+13:35:42  cat: devtest_passport.txt: No such file or directory
+[Pipeline] }
+[Pipeline] // script
