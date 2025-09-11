@@ -1,37 +1,14 @@
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (MotioCI Login Debug)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] sh
-14:24:25  + set -e
-14:24:25  + cd MotioCI/api/CLI
-14:24:25  + cat
-14:24:25  + echo '=== creds.json ==='
-14:24:25  === creds.json ===
-14:24:25  + sed -E 's/"password":[^,}]*/"password":"***"/g' creds.json
-14:24:25  [
-14:24:25    {
-14:24:25      "instanceId": "3",
-14:24:25      "namespaceId": "AzureAD",
-14:24:25      "username": "CMarksSS01@intra.dhs.ca.gov",
-14:24:25      "password":"***"
-14:24:25    },
-14:24:25    {
-14:24:25      "instanceId": "1",
-14:24:25      "namespaceId": "AzureAD",
-14:24:25      "username": "CMarksSS01@intra.dhs.ca.gov",
-14:24:25      "password":"***"
-14:24:25    }
-14:24:25  ]
-14:24:25  + echo '=== Running MotioCI login (debug) ==='
-14:24:25  === Running MotioCI login (debug) ===
-14:24:25  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile creds.json
-14:24:28  Successfully loaded credentials from creds.json
-14:24:28  == DEBUG: Attempting login with masked credentials ==
-14:24:28  [{"instanceId": "3", "namespaceId": "AzureAD", "username": "CMarksSS01@intra.dhs.ca.gov", "password": "********"}, {"instanceId": "1", "namespaceId": "AzureAD", "username": "CMarksSS01@intra.dhs.ca.gov", "password": "********"}]
-14:24:28  Invalid parameters. Login cancelled!
+14:54:49  + cd -
+14:54:49  + mkdir -p MotioCI/api
+14:54:49  + start_session https://dhcsdevtestcog.ca.analytics.ibm.com **** DEVTEST
+14:54:49  + local BASE=https://dhcsdevtestcog.ca.analytics.ibm.com/v1
+14:54:49  + local API_KEY=****
+14:54:49  + local PREFIX=DEVTEST
+14:54:49  + echo 'Starting Cognos API session (DEVTEST)...'
+14:54:49  Starting Cognos API session (DEVTEST)...
+14:54:49  + rm -f login.json session.json headers.txt cookies.txt
+14:54:49  + cat
+14:54:49  + curl --fail-with-body -sS -X PUT https://dhcsdevtestcog.ca.analytics.ibm.com/v1/session -H 'Content-Type: application/json' -d @login.json -c cookies.txt -b cookies.txt -D headers.txt -o session.json
+14:54:49  curl: (22) The requested URL returned error: 404
 [Pipeline] }
-[Pipeline] // script
+[Pipeline] // withCredentials
