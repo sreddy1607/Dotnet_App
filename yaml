@@ -1,3 +1,4 @@
+[Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Get camPassportIds)
 [Pipeline] container
@@ -5,15 +6,34 @@
 [Pipeline] script
 [Pipeline] {
 [Pipeline] sh
-13:45:13  + cd MotioCI/api/CLI
-13:45:13  + python3 session.py https://dhcsdevtestcog.ca.analytics.ibm.com --credentialsFile devtest-credentials.json
+13:50:13  + cd MotioCI/api/CLI
+13:50:13  + python3 session.py https://dhcsdevtestcog.ca.analytics.ibm.com --credentialsFile devtest-credentials.json
 [Pipeline] sh
-13:45:14  + cd MotioCI/api/CLI
-13:45:14  + python3 session.py https://dhcsprodcog.ca.analytics.ibm.com --credentialsFile prod-credentials.json
+13:50:13  + cd MotioCI/api/CLI
+13:50:13  + python3 session.py https://dhcsprodcog.ca.analytics.ibm.com --credentialsFile prod-credentials.json
 [Pipeline] echo
-13:45:14  DevTest camPassportId: ...
+13:50:13  DevTest camPassportId: ...
 [Pipeline] echo
-13:45:14  Prod camPassportId: ...
+13:50:13  Prod camPassportId: ...
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Login to MotioCI)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
+13:50:14  + cd MotioCI/api/CLI
+13:50:14  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentials '[{"namespaceId":"AzureAD","camPassportId":"","instanceId":"3"},{"namespaceId":"AzureAD","camPassportId":"","instanceId":"1"}]'
+13:50:14  + grep x-auth_token
+13:50:14  + awk '{print $2}'
+[Pipeline] echo
+13:50:15  Captured MotioCI x-auth-token: ...
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] }
