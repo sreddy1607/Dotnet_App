@@ -1,19 +1,15 @@
-17:05:19  + set -euo pipefail
-17:05:19  + :
-17:05:19  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
-17:05:19  + grep -iE '^Auth[[:space:]]+Token:' login.out
-17:05:19  + sed -e 's/^[^:]*:[[:space:]]*//'
-17:05:19  + true
-17:05:19  + cat login.token
-[Pipeline] sh
-17:05:20  + set -e
-17:05:20  + echo '------ MotioCI login output (sanitized) ------'
-17:05:20  ------ MotioCI login output (sanitized) ------
-17:05:20  + sed 's/"password":[^,}]*/"password":"***"/g' login.out
-17:05:20  Successfully loaded credentials from ****
-17:05:20  == DEBUG: Attempting login with masked credentials ==
-17:05:20  [{"instanceName": "Cognos-PRD", "namespaceId": "AzureAD", "username": "CMarksSS01@intra.dhs.ca.gov", "password":"***"}, {"instanceName": "Cognos-DEV/TEST", "namespaceId": "AzureAD", "username": "CMarksSS01@intra.dhs.ca.gov", "password":"***"}]
-17:05:20  Invalid parameters. Login cancelled!
-17:05:20  + echo ------------------------------------------------
-17:05:20  ------------------------------------------------
-[Pipeline] error
+credential json (dev) - 
+[
+    {
+        "instanceId": "3",
+        "apiKey": "AWk1OUMyRkU3M0U2RUM0RUZEQUQ3MTY4ODBEN0NFNDVBRWu4kJkLtIYGd/Lpzr7rmNMqQUHn"
+    }
+]
+ 
+(prod)
+[
+    {
+        "instanceId": "1",
+        "apiKey": "AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"
+    }
+]
