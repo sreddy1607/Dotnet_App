@@ -1,16 +1,21 @@
-] stage
+[Pipeline] stage
 [Pipeline] { (Get camPassportIds)
 [Pipeline] container
 [Pipeline] {
 [Pipeline] script
 [Pipeline] {
 [Pipeline] sh
-13:35:41  + set -e
-13:35:41  + cd MotioCI/api/CLI
-13:35:41  + python3 session.py https://dhcsdevtestcog.ca.analytics.ibm.com --credentialsFile devtest-credentials.json
-13:35:41  + python3 session.py https://dhcsprodcog.ca.analytics.ibm.com --credentialsFile prod-credentials.json
+13:45:13  + cd MotioCI/api/CLI
+13:45:13  + python3 session.py https://dhcsdevtestcog.ca.analytics.ibm.com --credentialsFile devtest-credentials.json
 [Pipeline] sh
-13:35:42  + cat devtest_passport.txt
-13:35:42  cat: devtest_passport.txt: No such file or directory
+13:45:14  + cd MotioCI/api/CLI
+13:45:14  + python3 session.py https://dhcsprodcog.ca.analytics.ibm.com --credentialsFile prod-credentials.json
+[Pipeline] echo
+13:45:14  DevTest camPassportId: ...
+[Pipeline] echo
+13:45:14  Prod camPassportId: ...
 [Pipeline] }
 [Pipeline] // script
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
