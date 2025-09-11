@@ -1,18 +1,285 @@
-[Pipeline] // stage
-[Pipeline] stage (hide)
-[Pipeline] { (Auth: Cognos API session (PROD))
-[Pipeline] container
-[Pipeline] {
-[Pipeline] withCredentials
-15:59:41  Masking supported pattern matches of $COGNOS_API_KEY_PRD
-[Pipeline] {
-[Pipeline] sh
-15:59:41  + set -eu
-15:59:41  + echo 'Starting Cognos API session (PROD)...'
-15:59:41  Starting Cognos API session (PROD)...
-15:59:41  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/v1
-15:59:41  + rm -f login.json session.json
-15:59:41  + mkdir -p MotioCI/api
-15:59:41  + cat
-15:59:41  + curl --fail-with-body -sS -X PUT https://dhcsprodcognos.ca.analytics.ibm.com/v1/session -H 'Content-Type: application/json' -d @login.json -o session.json
-15:59:41  curl: (22) The requested URL returned error: 404
+// Jenkinsfile (hardened & non-interactive)
+def branch = env.BRANCH_NAME ?: "DEV"
+def namespace = env.NAMESPACE  ?: "dev"
+def cloudName = env.CLOUD_NAME == "openshift" ? "openshift" : "kubernetes"
+def workingDir = "/home/jenkins/agent"
+
+APP_NAME="combined-devops-cognos-deployments"
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  volumes:
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - emptyDir: {}
+      name: varlibcontainers
+    - name: jenkins-trusted-ca-bundle
+      configMap:
+        name: jenkins-trusted-ca-bundle
+        defaultMode: 420
+        optional: true
+  containers:
+    - name: jnlp
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+    - name: node
+      image: registry.access.redhat.com/ubi8/nodejs-16:latest
+      tty: true
+      command: ["/bin/bash"]
+      securityContext:
+        privileged: true
+      workingDir: ${workingDir}
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: ${workingDir}
+        - name: BRANCH
+          value: ${branch}
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+    - name: python
+      image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.2.0
+      tty: true
+      command: ["/bin/bash"]
+      securityContext:
+        privileged: true
+      workingDir: ${workingDir}
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: ${workingDir}
+        - name: BRANCH
+          value: ${branch}
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+        # Make requests trust the mounted CA bundle (no -k)
+        - name: REQUESTS_CA_BUNDLE
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+        - name: SSL_CERT_FILE
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+        # Non-interactive mode signal for the CLI
+        - name: CI
+          value: "1"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+"""
+    }
+  }
+
+  environment {
+    GIT_BRANCH = "${BRANCH_NAME}"
+    MOTIO_CI_URL       = "https://cgrptmcip01.cloud.cammis.ca.gov"
+
+    // Cognos API bases
+    COGNOS_API_BASE_DEV = "https://dhcsdevtestcog.ca.analytics.ibm.com/api"
+    COGNOS_API_BASE_PRD = "https://dhcsprodcognos.ca.analytics.ibm.com/api"
+
+    COGNOS_NAMESPACE   = "AzureAD"
+    SOURCE_INSTANCE_ID = "3"   // Dev/Test instance ID in MotioCI
+    TARGET_INSTANCE_ID = "1"   // Prod instance ID in MotioCI
+    PROJECT_NAME       = "Demo"
+  }
+
+  options {
+    disableConcurrentBuilds()
+    timestamps()
+  }
+
+  stages {
+    stage("initialize") {
+      steps {
+        script {
+          echo "Branch: ${env.GIT_BRANCH}"
+          echo "Initializing Motio pipeline..."
+        }
+      }
+    }
+
+    stage('Check Python Availability') {
+      steps {
+        container('node') {
+          sh '''
+            set -e
+            echo "Checking for Python3..."
+            which python3 || true
+            python3 --version || true
+          '''
+        }
+      }
+    }
+
+    stage('Install CLI deps') {
+      steps {
+        container('python') {
+          sh '''
+            set -e
+            cd MotioCI/api/CLI
+            python3 -m pip install --user -r requirements.txt
+            echo "Dependencies installed."
+          '''
+        }
+      }
+    }
+     stage('Auth: Cognos API session (PROD)') {
+      steps {
+        container('python') {
+          withCredentials([string(credentialsId: 'cognos-api-key-prd', variable: 'COGNOS_API_KEY_PRD')]) {
+            sh '''
+              set -eu
+              echo "Starting Cognos API session (PROD)..."
+              BASE="${COGNOS_API_BASE_PRD}/v1"
+
+              rm -f login.json session.json || true
+              mkdir -p MotioCI/api
+
+              cat > login.json <<JSON
+{ "parameters": [ { "name": "CAMAPILoginKey", "value": "${COGNOS_API_KEY_PRD}" } ] }
+JSON
+
+              curl --fail-with-body -sS -X PUT "$BASE/session" \
+                   -H "Content-Type: application/json" \
+                   -d @login.json -o session.json
+
+              SESSION_KEY=$(python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))')
+              if [ -z "$SESSION_KEY" ]; then
+                echo "ERROR: No session_key from PROD Cognos."
+                cat session.json || true
+                exit 1
+              fi
+
+              case "$SESSION_KEY" in
+                "CAM "*) AUTH_VALUE="$SESSION_KEY" ;;
+                "CAM"*)  AUTH_VALUE="$SESSION_KEY" ;;
+                *)       AUTH_VALUE="CAM $SESSION_KEY" ;;
+              esac
+
+              echo "✅ Cognos API session verified for PROD."
+              printf "PROD_CAMPASSPORT='%s'\n" "$AUTH_VALUE" > MotioCI/api/motio_env_prod
+            '''
+          }
+        }
+        script {
+          def envFile = readFile('MotioCI/api/motio_env_prod').trim()
+          envFile.split("\n").each { line ->
+            def (k,v) = line.split('=', 2)
+            if (v.startsWith("'") && v.endsWith("'")) {
+              v = v.substring(1, v.length()-1)
+            }
+            env[k] = v
+          }
+          echo "Captured Prod Passport: ${env.PROD_CAMPASSPORT.take(15)}..."
+        }
+      }
+    }
+
+    stage('Auth: Cognos API session (DEVTEST)') {
+      steps {
+        container('python') {
+          withCredentials([string(credentialsId: 'cognos-api-key-dev', variable: 'COGNOS_API_KEY_DEV')]) {
+            sh '''
+              set -eu
+              echo "Starting Cognos API session (DEVTEST)..."
+              BASE="${COGNOS_API_BASE_DEV}/v1"
+
+              rm -f login.json session.json || true
+              mkdir -p MotioCI/api
+
+              cat > login.json <<JSON
+{ "parameters": [ { "name": "CAMAPILoginKey", "value": "${COGNOS_API_KEY_DEV}" } ] }
+JSON
+
+              curl --fail-with-body -sS -X PUT "$BASE/session" \
+                   -H "Content-Type: application/json" \
+                   -d @login.json -o session.json
+
+              SESSION_KEY=$(python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))')
+              if [ -z "$SESSION_KEY" ]; then
+                echo "ERROR: No session_key from DEVTEST Cognos."
+                cat session.json || true
+                exit 1
+              fi
+
+              case "$SESSION_KEY" in
+                "CAM "*) AUTH_VALUE="$SESSION_KEY" ;;
+                "CAM"*)  AUTH_VALUE="$SESSION_KEY" ;;
+                *)       AUTH_VALUE="CAM $SESSION_KEY" ;;
+              esac
+
+              echo "✅ Cognos API session verified for DEVTEST."
+              printf "DEVTEST_CAMPASSPORT='%s'\n" "$AUTH_VALUE" > MotioCI/api/motio_env_dev
+            '''
+          }
+        }
+        script {
+          def envFile = readFile('MotioCI/api/motio_env_dev').trim()
+          envFile.split("\n").each { line ->
+            def (k,v) = line.split('=', 2)
+            if (v.startsWith("'") && v.endsWith("'")) {
+              v = v.substring(1, v.length()-1)
+            }
+            env[k] = v
+          }
+          echo "Captured DevTest Passport: ${env.DEVTEST_CAMPASSPORT.take(15)}..."
+        }
+      }
+    }
+    stage('Login to MotioCI') {
+      steps {
+        container('python') {
+          script {
+            env.MOTIO_AUTH_TOKEN = sh(
+              script: """
+                cd MotioCI/api/CLI
+                python3 ci-cli.py --server="${MOTIO_CI_URL}" login \
+                  --credentials '[{"namespaceId":"${COGNOS_NAMESPACE}","camPassportId":"${env.DEVTEST_CAMPASSPORT}","instanceId":"${SOURCE_INSTANCE_ID}"},{"namespaceId":"${COGNOS_NAMESPACE}","camPassportId":"${env.PROD_CAMPASSPORT}","instanceId":"${TARGET_INSTANCE_ID}"}]' \
+                  | grep "x-auth_token" | cut -d: -f2 | tr -d ' '
+              """,
+              returnStdout: true
+            ).trim()
+
+            echo "Captured MotioCI x-auth-token: ${env.MOTIO_AUTH_TOKEN.take(15)}..."
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "Pipeline execution finished."
+    }
+    success {
+      echo "MotioCI pipeline completed successfully."
+    }
+    failure {
+      echo "MotioCI pipeline failed."
+    }
+  }
+}
