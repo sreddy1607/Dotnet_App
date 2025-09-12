@@ -1,82 +1,3 @@
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Auth: Cognos API session (PROD))
-[Pipeline] container
-[Pipeline] {
-[Pipeline] withCredentials
-16:50:13  Masking supported pattern matches of $COGNOS_API_KEY_PRD
-[Pipeline] {
-[Pipeline] sh
-16:50:13  + set -eu
-16:50:13  + echo 'Starting Cognos API session (PROD)...'
-16:50:13  Starting Cognos API session (PROD)...
-16:50:13  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/api/v1
-16:50:13  + rm -f login.json session.json
-16:50:13  + mkdir -p MotioCI/api
-16:50:13  + cat
-16:50:13  + curl --fail-with-body -sS -X PUT https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d @login.json -o session.json
-16:50:14  ++ python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))'
-16:50:14  + SESSION_KEY='CAM MTsxMDE6NDEyMDkzYmMtNjk1MC02YjllLWE1OGYtNjJlYTIzNDQ1OWZjOjMzNzQzNDg4MjY7MDszOzA7'
-16:50:14  + '[' -z 'CAM MTsxMDE6NDEyMDkzYmMtNjk1MC02YjllLWE1OGYtNjJlYTIzNDQ1OWZjOjMzNzQzNDg4MjY7MDszOzA7' ']'
-16:50:14  + case "$SESSION_KEY" in
-16:50:14  + AUTH_VALUE='CAM MTsxMDE6NDEyMDkzYmMtNjk1MC02YjllLWE1OGYtNjJlYTIzNDQ1OWZjOjMzNzQzNDg4MjY7MDszOzA7'
-16:50:14  + echo '✅ Cognos API session verified for PROD.'
-16:50:14  ✅ Cognos API session verified for PROD.
-16:50:14  + printf 'PROD_CAMPASSPORT='\''%s'\''
-16:50:14  ' 'CAM MTsxMDE6NDEyMDkzYmMtNjk1MC02YjllLWE1OGYtNjJlYTIzNDQ1OWZjOjMzNzQzNDg4MjY7MDszOzA7'
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] script
-[Pipeline] {
-[Pipeline] readFile
-[Pipeline] echo
-16:50:14  Captured Prod Passport: CAM MTsxMDE6NDE...
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Auth: Cognos API session (DEVTEST))
-[Pipeline] container
-[Pipeline] {
-[Pipeline] withCredentials
-16:50:14  Masking supported pattern matches of $COGNOS_API_KEY_DEV
-[Pipeline] {
-[Pipeline] sh
-16:50:15  + set -eu
-16:50:15  + echo 'Starting Cognos API session (DEVTEST)...'
-16:50:15  Starting Cognos API session (DEVTEST)...
-16:50:15  + BASE=https://dhcsdevtestcog.ca.analytics.ibm.com/api/v1
-16:50:15  + rm -f login.json session.json
-16:50:15  + mkdir -p MotioCI/api
-16:50:15  + cat
-16:50:15  + curl --fail-with-body -sS -X PUT https://dhcsdevtestcog.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d @login.json -o session.json
-16:50:15  ++ python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))'
-16:50:15  + SESSION_KEY='CAM MTsxMDE6NDAyNjEwZGQtYmI2ZS02YjMxLWIyNWItMjNkZGM2ZWM5NTYyOjI0OTE3NDE4NjY7MDszOzA7'
-16:50:15  + '[' -z 'CAM MTsxMDE6NDAyNjEwZGQtYmI2ZS02YjMxLWIyNWItMjNkZGM2ZWM5NTYyOjI0OTE3NDE4NjY7MDszOzA7' ']'
-16:50:15  + case "$SESSION_KEY" in
-16:50:15  + AUTH_VALUE='CAM MTsxMDE6NDAyNjEwZGQtYmI2ZS02YjMxLWIyNWItMjNkZGM2ZWM5NTYyOjI0OTE3NDE4NjY7MDszOzA7'
-16:50:15  + echo '✅ Cognos API session verified for DEVTEST.'
-16:50:15  ✅ Cognos API session verified for DEVTEST.
-16:50:15  + printf 'DEVTEST_CAMPASSPORT='\''%s'\''
-16:50:15  ' 'CAM MTsxMDE6NDAyNjEwZGQtYmI2ZS02YjMxLWIyNWItMjNkZGM2ZWM5NTYyOjI0OTE3NDE4NjY7MDszOzA7'
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] script
-[Pipeline] {
-[Pipeline] readFile
-[Pipeline] echo
-16:50:15  Captured DevTest Passport: CAM MTsxMDE6NDA...
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // stage
 [Pipeline] stage
 [Pipeline] { (Login to MotioCI)
 [Pipeline] container
@@ -84,10 +5,45 @@
 [Pipeline] script
 [Pipeline] {
 [Pipeline] sh
-16:50:16  + cd MotioCI/api/CLI
-16:50:16  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentials '[{"namespaceId":"AzureAD","camPassportId":"CAM MTsxMDE6NDAyNjEwZGQtYmI2ZS02YjMxLWIyNWItMjNkZGM2ZWM5NTYyOjI0OTE3NDE4NjY7MDszOzA7","instanceId":"3"},{"namespaceId":"AzureAD","camPassportId":"CAM MTsxMDE6NDEyMDkzYmMtNjk1MC02YjllLWE1OGYtNjJlYTIzNDQ1OWZjOjMzNzQzNDg4MjY7MDszOzA7","instanceId":"1"}]'
-16:50:16  + grep x-auth_token
-16:50:16  + cut -d: -f2
-16:50:16  + tr -d ' '
+17:14:55  + cd MotioCI/api/CLI
+17:14:55  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentials '[{"namespaceId":"AzureAD","camPassportId":"CAM MTsxMDE6Zjc2Mzk5ZmUtMTg1Mi1kMjViLTJjYmQtOWNmMTRjMzRiZTQ2OjI3MDk1MjYwNjQ7MDszOzA7","instanceId":"3"},{"namespaceId":"AzureAD","camPassportId":"CAM MTsxMDE6ZGE4OTZhMjQtNTk5Yi03MjU3LTY5MDItYjE3OGRlNjA4ZGU0OjM1ODM0NDI5NTQ7MDszOzA7","instanceId":"1"}]'
 [Pipeline] echo
-16:50:16  Captured MotioCI x-auth-token: ...
+17:14:55  ==== Raw MotioCI login output ====
+[Pipeline] echo
+17:14:55  == DEBUG: Attempting login with masked credentials ==
+17:14:55  [{"namespaceId": "AzureAD", "camPassportId": "CAM MTsxMDE6Zjc2Mzk5ZmUtMTg1Mi1kMjViLTJjYmQtOWNmMTRjMzRiZTQ2OjI3MDk1MjYwNjQ7MDszOzA7", "instanceId": "3"}, {"namespaceId": "AzureAD", "camPassportId": "CAM MTsxMDE6ZGE4OTZhMjQtNTk5Yi03MjU3LTY5MDItYjE3OGRlNjA4ZGU0OjM1ODM0NDI5NTQ7MDszOzA7", "instanceId": "1"}]
+17:14:55  Invalid parameters. Login cancelled!
+[Pipeline] echo
+17:14:55  =================================
+[Pipeline] error
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+17:14:55  Pipeline execution finished.
+[Pipeline] echo
+17:14:55  MotioCI pipeline failed.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timestamps
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] }
+[Pipeline] // podTemplate
+[Pipeline] End of Pipeline
+ERROR: ❌ No x-auth-token found in MotioCI login output!
+
+GitHub has been notified of this commit’s build result
+
+/var/lib/jenkins/jobs/Cognos Jobs/jobs/Cognos_deployment_pipeline/workspace/newtesting@tmp/jfrog/115/.jfrog deleted
+Finished: FAILURE
