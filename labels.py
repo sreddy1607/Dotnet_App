@@ -11,7 +11,7 @@ import instances
 def get_label_id(project_id, label_name):
     variables = {'projectId': project_id, 'labelName': label_name}
     response = requests.post(constants.GRAPH_URL, headers={'x-auth-token': constants.X_AUTH_TOKEN},
-                             json={'query': queries.GET_LABEL_ID, 'variables': variables})
+                             json={'query': queries.GET_LABEL_ID, 'variables': variables}, verify=False)
     label_list = response.json()["data"]["project"]["labels"]["edges"]
 
     if len(label_list) == 0:
@@ -34,16 +34,41 @@ def create_label(project_id, label_name, versioned_item_ids):
         versioned_item_ids_list = versioned_item_ids
         if isinstance(versioned_item_ids, str):
             versioned_item_ids_list = ast.literal_eval(versioned_item_ids)
+    
+    # Use the correct schema: projectId, name, and versionedItemSource
     variables = {
         'projectId': int(project_id),
-        'labelName': label_name,
+        'name': label_name,
         'versionedItemSource': {
             'ids': versioned_item_ids_list
         }
     }
+    
+    # Add debugging
+    print(f"DEBUG: Creating label with project_id={project_id}, label_name={label_name}")
+    print(f"DEBUG: Variables: {variables}")
+    
     response = requests.post(constants.GRAPH_URL, headers={'x-auth-token': constants.X_AUTH_TOKEN},
-                             json={'query': queries.CREATE_LABEL, 'variables': variables})
-    label_id = response.json()["data"]["createLabel"]["id"]
+                             json={'query': queries.CREATE_LABEL, 'variables': variables}, verify=False)
+    
+    # Add debugging to see what we get back
+    print(f"DEBUG: Create label response status: {response.status_code}")
+    print(f"DEBUG: Create label response text: {response.text}")
+    
+    response_data = response.json()
+    if response_data is None:
+        print("ERROR: Response JSON is None")
+        return None
+        
+    if "data" not in response_data:
+        print("ERROR: No 'data' in response")
+        print(f"Response keys: {response_data.keys()}")
+        if "errors" in response_data:
+            print(f"Errors: {response_data['errors']}")
+        return None
+        
+    label_id = response_data["data"]["createLabel"]["id"]
+    print(f"DEBUG: Successfully created label with ID: {label_id}")
     return label_id
 
 
@@ -58,7 +83,7 @@ def create_label_init(instance_name, project_name, label_name, versioned_item_id
 # Query for all available labels.
 def get_labels_default():
     response = requests.post(constants.GRAPH_URL, headers={'x-auth-token': constants.X_AUTH_TOKEN},
-                             json={'query': queries.GET_ALL_LABELS})
+                             json={'query': queries.GET_ALL_LABELS}, verify=False)
     instance_array = response.json()["data"]["instances"]["edges"]
     for instance in instance_array:
         project_array = instance["node"]["projects"]["edges"]
@@ -71,7 +96,7 @@ def get_labels_default():
 def get_labels_specific(instance_name, project_name):
     variables = {'instanceName': instance_name, 'projectName': project_name}
     response = requests.post(constants.GRAPH_URL, headers={'x-auth-token': constants.X_AUTH_TOKEN},
-                             json={'query': queries.GET_LABELS_SPECIFIC, 'variables': variables})
+                             json={'query': queries.GET_LABELS_SPECIFIC, 'variables': variables}, verify=False)
     label_array = response.json()["data"]["instances"]["edges"][0]["node"]["projects"]["edges"][0]["node"]["labels"][
         "edges"]
     for label in label_array:
@@ -83,6 +108,6 @@ def get_labels_specific(instance_name, project_name):
 def get_label_specific(instance_name, project_name, label_name):
     variables = {'instanceName': instance_name, 'projectName': project_name, 'labelName': label_name}
     response = requests.post(constants.GRAPH_URL, headers={'x-auth-token': constants.X_AUTH_TOKEN},
-                             json={'query': queries.GET_LABEL_SPECIFIC, 'variables': variables})
+                             json={'query': queries.GET_LABEL_SPECIFIC, 'variables': variables}, verify=False)
     pprint.pprint(response.json())
     return
