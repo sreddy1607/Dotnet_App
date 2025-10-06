@@ -1,35 +1,48 @@
-13:53:48  + set -euo pipefail
-13:53:48  + cd MotioCI/api/CLI
-13:53:48  ++ cat ../token.txt
-13:53:48  + TOKEN=39b7433c-ab8c-4489-bdfd-13e022444691
-13:53:48  + echo 'Testing token: 39b743... (len=36)'
-13:53:48  Testing token: 39b743... (len=36)
-13:53:48  + echo '=== Listing instances ==='
-13:53:48  === Listing instances ===
-13:53:48  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov instance ls --xauthtoken 39b7433c-ab8c-4489-bdfd-13e022444691
-13:53:49  [{'node': {'id': 1, 'name': 'Cognos-PRD', 'namespaces': [{'name': 'BAOps', 'id': 'BAOps'}, {'name': 'LDAP', 'id': 'LDAP'}, {'name': 'Azure', 'id': 'AzureAD'}]}}, {'node': {'id': 3, 'name': 'Cognos-DEV/TEST', 'namespaces': [{'name': 'BAOps', 'id': 'BAOps'}, {'name': 'LDAP', 'id': 'LDAP'}, {'name': 'Azure', 'id': 'AzureAD'}]}}]
-13:53:49  + echo '=== Listing projects (DEV/TEST) ==='
-13:53:49  === Listing projects (DEV/TEST) ===
-13:53:49  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --instanceName Cognos-DEV/TEST --xauthtoken 39b7433c-ab8c-4489-bdfd-13e022444691
-13:53:49  {'node': {'id': 2, 'name': 'Admin', 'description': None}}
-13:53:49  {'node': {'id': 5, 'name': 'My Project', 'description': None}}
-13:53:49  {'node': {'id': 7, 'name': 'SURGE Reports', 'description': None}}
-13:53:49  {'node': {'id': 15, 'name': 'Deployments', 'description': None}}
-13:53:49  {'node': {'id': 17, 'name': 'Demo', 'description': None}}
-13:53:49  {'node': {'id': 19, 'name': 'SURGE SIT', 'description': None}}
-13:53:49  {'node': {'id': 20, 'name': 'SURGE SIT 2', 'description': None}}
-13:53:49  + echo '=== Listing projects (PRD) ==='
-13:53:49  === Listing projects (PRD) ===
-13:53:49  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --instanceName Cognos-PRD --xauthtoken 39b7433c-ab8c-4489-bdfd-13e022444691
-13:53:50  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
-13:53:50  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
-13:53:50  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
-13:53:50  + echo 'label create'
-13:53:50  label create
-13:53:50  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label create --xauthtoken 39b7433c-ab8c-4489-bdfd-13e022444691 --instanceName Cognos-DEV/TEST --projectName Demo --name JENKINS_TEST_LABEL --versionedItemIds '[]'
-13:53:51  DEBUG: Creating label with project_id=17, label_name=JENKINS_TEST_LABEL
-13:53:51  DEBUG: Variables: {'projectId': 17, 'name': 'JENKINS_TEST_LABEL', 'versionedItemSource': {'ids': []}}
-13:53:51  DEBUG: Create label response status: 200
-13:53:51  DEBUG: Create label response text: {"data":{"createLabel":{"name":"JENKINS_TEST_LABEL","description":null,"id":82}}}
-13:53:51  DEBUG: Successfully created label with ID: 82
-13:53:51  Label Created!
+[Pipeline] stage
+[Pipeline] { (MotioCI Deploy (DEV → PRD))
+[Pipeline] container
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
+14:15:20  + set -euo pipefail
+14:15:20  + cd MotioCI/api/CLI
+14:15:20  ++ cat ../token.txt
+14:15:20  + TOKEN=b9f71704-b7c4-45fd-8aa0-aba565a00aea
+14:15:20  + SOURCE_LABEL_ID=82
+14:15:20  + echo '=== Starting Promotion from DEV/TEST → PRD ==='
+14:15:20  === Starting Promotion from DEV/TEST → PRD ===
+14:15:20  + echo 'Using token: b9f717... (len=36)'
+14:15:20  Using token: b9f717... (len=36)
+14:15:20  + echo 'Promoting Label ID: 82 from DEV/TEST to PRD'
+14:15:20  Promoting Label ID: 82 from DEV/TEST to PRD
+14:15:20  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov deploy --xauthtoken b9f71704-b7c4-45fd-8aa0-aba565a00aea --sourceInstanceId 3 --targetInstanceId 1 --projectName Demo --labelId 82 --targetLabelName PROMOTED-22
+14:15:20  + true
+14:15:20  + echo '=== Deploy Output (first 100 lines) ==='
+14:15:20  === Deploy Output (first 100 lines) ===
+14:15:20  + sed -n 1,100p deploy.out
+14:15:20  usage: ci-cli.py deploy [-h] --xauthtoken XAUTHTOKEN
+14:15:20                          [--sourceInstanceId  | --sourceInstanceName ]
+14:15:20                          (--labelId  | --labelVersionId  | --versionedItemIds  | --searchPath  [...])
+14:15:20                          (--targetInstanceId  | --targetInstanceName  | --targetUnversionedInstanceId  | --targetUnversionedInstanceName )
+14:15:20                          [--targetLabelName] [--projectName] [--projectId]
+14:15:20                          (--camPassportId  | --username ) [--password]
+14:15:20                          [--namespaceId]
+14:15:20  ci-cli.py deploy: error: one of the arguments --camPassportId --username is required
+14:15:20  + echo =======================================
+14:15:20  =======================================
+14:15:20  + grep -q '"errors"' deploy.out
+14:15:20  + echo ' MotioCI Deploy stage completed successfully.'
+14:15:20   MotioCI Deploy stage completed successfully.
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+14:15:20  Pipeline execution finished.
+[Pipeline] echo
+14:15:20  MotioCI pipeline completed successfully.
