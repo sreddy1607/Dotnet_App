@@ -1,39 +1,35 @@
-13:46:51  + set -euo pipefail
-13:46:51  + cd MotioCI/api/CLI
-13:46:51  ++ cat ../token.txt
-13:46:51  + TOKEN=746d5629-fa35-415e-91f6-edac11be2a7c
-13:46:51  + echo 'Testing token: 746d56... (len=36)'
-13:46:51  Testing token: 746d56... (len=36)
-13:46:51  + echo '=== Listing instances ==='
-13:46:51  === Listing instances ===
-13:46:51  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov instance ls --xauthtoken 746d5629-fa35-415e-91f6-edac11be2a7c
-13:46:52  [{'node': {'id': 1, 'name': 'Cognos-PRD', 'namespaces': [{'name': 'BAOps', 'id': 'BAOps'}, {'name': 'LDAP', 'id': 'LDAP'}, {'name': 'Azure', 'id': 'AzureAD'}]}}, {'node': {'id': 3, 'name': 'Cognos-DEV/TEST', 'namespaces': [{'name': 'BAOps', 'id': 'BAOps'}, {'name': 'LDAP', 'id': 'LDAP'}, {'name': 'Azure', 'id': 'AzureAD'}]}}]
-13:46:52  + echo '=== Listing projects (DEV/TEST) ==='
-13:46:52  === Listing projects (DEV/TEST) ===
-13:46:52  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --instanceName Cognos-DEV/TEST --xauthtoken 746d5629-fa35-415e-91f6-edac11be2a7c
-13:46:52  {'node': {'id': 2, 'name': 'Admin', 'description': None}}
-13:46:52  {'node': {'id': 5, 'name': 'My Project', 'description': None}}
-13:46:52  {'node': {'id': 7, 'name': 'SURGE Reports', 'description': None}}
-13:46:52  {'node': {'id': 15, 'name': 'Deployments', 'description': None}}
-13:46:52  {'node': {'id': 17, 'name': 'Demo', 'description': None}}
-13:46:52  {'node': {'id': 19, 'name': 'SURGE SIT', 'description': None}}
-13:46:52  {'node': {'id': 20, 'name': 'SURGE SIT 2', 'description': None}}
-13:46:52  + echo '=== Listing projects (PRD) ==='
-13:46:52  === Listing projects (PRD) ===
-13:46:52  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --instanceName Cognos-PRD --xauthtoken 746d5629-fa35-415e-91f6-edac11be2a7c
-13:46:52  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
-13:46:52  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
-13:46:52  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
-13:46:52  + echo 'label create'
-13:46:52  label create
-13:46:52  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label create --xauthtoken 746d5629-fa35-415e-91f6-edac11be2a7c --instanceName Cognos-DEV/TEST --projectName Demo --name JENKINS_TEST_LABEL --versionedItemIds '[]'
-13:46:53  DEBUG: Creating label with project_id=17, label_name=JENKINS_TEST_LABEL
-13:46:53  DEBUG: Variables: {'projectId': 17, 'name': 'JENKINS_TEST_LABEL', 'versionedItemSource': {'ids': []}}
-13:46:53  DEBUG: Create label response status: 200
-13:46:53  DEBUG: Create label response text: {"errors":[{"message":"Validation error of type WrongType: argument 'input' with value 'ObjectValue{objectFields=[ObjectField{name='projectId', value=VariableReference{name='projectId'}}, ObjectField{name='name', value=VariableReference{name='labelName'}}, ObjectField{name='versionedItemIds', value=VariableReference{name='versionedItemIds'}}]}' contains a field not in 'CreateLabelInput': 'versionedItemIds' @ 'createLabel'","locations":[{"line":3,"column":15}],"extensions":{"classification":"ValidationError"}}]}
-13:46:53  ERROR: No 'data' in response
-13:46:53  Response keys: dict_keys(['errors'])
-13:46:53  Errors: [{'message': "Validation error of type WrongType: argument 'input' with value 'ObjectValue{objectFields=[ObjectField{name='projectId', value=VariableReference{name='projectId'}}, ObjectField{name='name', value=VariableReference{name='labelName'}}, ObjectField{name='versionedItemIds', value=VariableReference{name='versionedItemIds'}}]}' contains a field not in 'CreateLabelInput': 'versionedItemIds' @ 'createLabel'", 'locations': [{'line': 3, 'column': 15}], 'extensions': {'classification': 'ValidationError'}}]
-13:46:53  Label Created!
-[Pipeline] }
-[Pipeline] // container
+13:53:48  + set -euo pipefail
+13:53:48  + cd MotioCI/api/CLI
+13:53:48  ++ cat ../token.txt
+13:53:48  + TOKEN=39b7433c-ab8c-4489-bdfd-13e022444691
+13:53:48  + echo 'Testing token: 39b743... (len=36)'
+13:53:48  Testing token: 39b743... (len=36)
+13:53:48  + echo '=== Listing instances ==='
+13:53:48  === Listing instances ===
+13:53:48  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov instance ls --xauthtoken 39b7433c-ab8c-4489-bdfd-13e022444691
+13:53:49  [{'node': {'id': 1, 'name': 'Cognos-PRD', 'namespaces': [{'name': 'BAOps', 'id': 'BAOps'}, {'name': 'LDAP', 'id': 'LDAP'}, {'name': 'Azure', 'id': 'AzureAD'}]}}, {'node': {'id': 3, 'name': 'Cognos-DEV/TEST', 'namespaces': [{'name': 'BAOps', 'id': 'BAOps'}, {'name': 'LDAP', 'id': 'LDAP'}, {'name': 'Azure', 'id': 'AzureAD'}]}}]
+13:53:49  + echo '=== Listing projects (DEV/TEST) ==='
+13:53:49  === Listing projects (DEV/TEST) ===
+13:53:49  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --instanceName Cognos-DEV/TEST --xauthtoken 39b7433c-ab8c-4489-bdfd-13e022444691
+13:53:49  {'node': {'id': 2, 'name': 'Admin', 'description': None}}
+13:53:49  {'node': {'id': 5, 'name': 'My Project', 'description': None}}
+13:53:49  {'node': {'id': 7, 'name': 'SURGE Reports', 'description': None}}
+13:53:49  {'node': {'id': 15, 'name': 'Deployments', 'description': None}}
+13:53:49  {'node': {'id': 17, 'name': 'Demo', 'description': None}}
+13:53:49  {'node': {'id': 19, 'name': 'SURGE SIT', 'description': None}}
+13:53:49  {'node': {'id': 20, 'name': 'SURGE SIT 2', 'description': None}}
+13:53:49  + echo '=== Listing projects (PRD) ==='
+13:53:49  === Listing projects (PRD) ===
+13:53:49  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --instanceName Cognos-PRD --xauthtoken 39b7433c-ab8c-4489-bdfd-13e022444691
+13:53:50  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
+13:53:50  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
+13:53:50  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
+13:53:50  + echo 'label create'
+13:53:50  label create
+13:53:50  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label create --xauthtoken 39b7433c-ab8c-4489-bdfd-13e022444691 --instanceName Cognos-DEV/TEST --projectName Demo --name JENKINS_TEST_LABEL --versionedItemIds '[]'
+13:53:51  DEBUG: Creating label with project_id=17, label_name=JENKINS_TEST_LABEL
+13:53:51  DEBUG: Variables: {'projectId': 17, 'name': 'JENKINS_TEST_LABEL', 'versionedItemSource': {'ids': []}}
+13:53:51  DEBUG: Create label response status: 200
+13:53:51  DEBUG: Create label response text: {"data":{"createLabel":{"name":"JENKINS_TEST_LABEL","description":null,"id":82}}}
+13:53:51  DEBUG: Successfully created label with ID: 82
+13:53:51  Label Created!
