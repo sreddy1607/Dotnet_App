@@ -1,4 +1,3 @@
-import json
 import argparse
 import ast
 import login
@@ -12,68 +11,6 @@ import constants
 import instances
 import loginInput
 import queries
-import os
-import urllib3
-import ssl
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-# Monkey patch requests to disable SSL verification globally
-import requests
-original_post = requests.post
-def patched_post(*args, **kwargs):
-    kwargs['verify'] = False
-    return original_post(*args, **kwargs)
-requests.post = patched_post
-
-
-def mask_credentials_for_logging(credentials_string):
-    """Safely mask credentials for logging"""
-    try:
-        creds = json.loads(credentials_string)
-        masked_creds = []
-        for cred in creds:
-            masked_cred = {}
-            for key, value in cred.items():
-                if key.lower() in ['apikey', 'password', 'token', 'secret']:
-                    masked_cred[key] = '*' * 8
-                else:
-                    masked_cred[key] = value
-            masked_creds.append(masked_cred)
-        return json.dumps(masked_creds)
-    except:
-        return "*** MASKED CREDENTIALS ***"
-
-# Method for loading credentials from JSON file
-def load_credentials_from_json(file_path="credentials.json"):
-    """
-    Load credentials from a JSON file.
-    
-    Args:
-        file_path (str): Path to the credentials JSON file
-        
-    Returns:
-        str: JSON string of credentials or None if file not found/invalid
-    """
-    try:
-        if not os.path.exists(file_path):
-            print(f"ERROR: Credentials file '{file_path}' not found!")
-            return None
-            
-        with open(file_path, 'r') as file:
-            credentials_data = json.load(file)
-            
-        # Convert back to JSON string format expected by login_init
-        credentials_json = json.dumps(credentials_data)
-        
-        print(f"Successfully loaded credentials from {file_path}")
-        return credentials_json
-        
-    except json.JSONDecodeError as e:
-        print(f"ERROR: Invalid JSON format in credentials file - {e}")
-        return None
-    except Exception as e:
-        print(f"ERROR: Failed to load credentials file - {e}")
-        return None
 
 
 # Method for parsing command line parameters
@@ -90,13 +27,10 @@ def parse_args():
 
     # Subparser for login
     login_parser = subject_parser.add_parser('login',
-                                             description='''description: Login to MotioCI. There are three ways to run this command. 1. If no arguments are provided, the CLI will prompt the user to enter login information of instance name, namespace id, username and password. 2. The credentials flag and a properly formatted credentials string is provided. 3. The credentialsFile flag to load credentials from a JSON file. Examples of the login command using the credentials flag in either a windows/unix terminal are provided in the README.txt ''',
+                                             description='''description: Login to MotioCI. There are two ways to run this command. 1. If no arguments are provided, the CLI will prompt the user to enter login information of instance name, namespace id, username and password. 2. The credentials flag and a properly formatted credentials string is provided. Examples of the login command using the credentials flag in either a windows/unix terminal are provided in the README.txt ''',
                                              help="login to MotioCI. Generates authtoken that will be used to run commands in the CLI.")
     login_parser.add_argument('--credentials', type=str,
                               help="alternate method of login. Allows user to login using a properly formatted credentials string.",
-                              metavar='')
-    login_parser.add_argument('--credentialsFile', type=str, default="credentials.json",
-                              help="path to JSON file containing credentials (default: credentials.json)",
                               metavar='')
 
     # Subparser for instance subject. Commands available: ls
@@ -483,33 +417,19 @@ constants.LOGOUT_URL = constants.CI_URL + constants.LOGOUT_URL
 constants.GRAPH_URL = constants.CI_URL + constants.GRAPH_URL
 
 if args.subject == "login":
-    # Priority order: 1. credentials parameter, 2. credentialsFile parameter, 3. user input
-    if args.credentials is not None:
-        credentials_to_use = args.credentials
-    else:
-        credentials_to_use = load_credentials_from_json(args.credentialsFile)
-        
-        if credentials_to_use is None:
-            print("Falling back to manual credential input...")
-            credentials_to_use = loginInput.get_login_from_user()
-    
-    # SECURE: Only log masked credentials
-    print("== DEBUG: Attempting login with masked credentials ==")
-    print(mask_credentials_for_logging(credentials_to_use))
-    
-    # Attempt login
-    auth_token = login.login_init(credentials_to_use)
+    if args.credentials is None:
+        args.credentials = loginInput.get_login_from_user()
+    auth_token = login.login_init(args.credentials)
     if auth_token is None:
         print("Invalid parameters. Login cancelled!")
     else:
-        # SECURE: Don't log actual credentials, but DO show full auth token
+        print("Credentials: ", args.credentials)
         print("Login successful!")
-        # Show full auth token - it's needed for subsequent operations
         print("x-auth_token: ", auth_token)
+
 
 else:
     constants.X_AUTH_TOKEN = args.xauthtoken
-
 if args.subject == "instance":
     if args.verb == "ls":
         print(instances.get_instances_default())
