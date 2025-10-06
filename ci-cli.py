@@ -1,3 +1,4 @@
+import json
 import argparse
 import ast
 import login
@@ -11,6 +12,67 @@ import constants
 import instances
 import loginInput
 import queries
+import os
+import urllib3
+import ssl
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Monkey patch requests to disable SSL verification globally
+import requests
+original_post = requests.post
+def patched_post(*args, **kwargs):
+    kwargs['verify'] = False
+    return original_post(*args, **kwargs)
+requests.post = patched_post
+
+def mask_credentials_for_logging(credentials_string):
+    """Safely mask credentials for logging"""
+    try:
+        creds = json.loads(credentials_string)
+        masked_creds = []
+        for cred in creds:
+            masked_cred = {}
+            for key, value in cred.items():
+                if key.lower() in ['apikey', 'password', 'token', 'secret']:
+                    masked_cred[key] = '*' * 8
+                else:
+                    masked_cred[key] = value
+            masked_creds.append(masked_cred)
+        return json.dumps(masked_creds)
+    except:
+        return "*** MASKED CREDENTIALS ***"
+
+# Method for loading credentials from JSON file
+def load_credentials_from_json(file_path="credentials.json"):
+    """
+    Load credentials from a JSON file.
+   
+    Args:
+        file_path (str): Path to the credentials JSON file
+       
+    Returns:
+        str: JSON string of credentials or None if file not found/invalid
+    """
+    try:
+        if not os.path.exists(file_path):
+            print(f"ERROR: Credentials file '{file_path}' not found!")
+            return None
+           
+        with open(file_path, 'r') as file:
+            credentials_data = json.load(file)
+           
+        # Convert back to JSON string format expected by login_init
+        credentials_json = json.dumps(credentials_data)
+       
+        print(f"Successfully loaded credentials from {file_path}")
+        return credentials_json
+       
+    except json.JSONDecodeError as e:
+        print(f"ERROR: Invalid JSON format in credentials file - {e}")
+        return None
+    except Exception as e:
+        print(f"ERROR: Failed to load credentials file - {e}")
+        return None
 
 
 # Method for parsing command line parameters
@@ -27,10 +89,13 @@ def parse_args():
 
     # Subparser for login
     login_parser = subject_parser.add_parser('login',
-                                             description='''description: Login to MotioCI. There are two ways to run this command. 1. If no arguments are provided, the CLI will prompt the user to enter login information of instance name, namespace id, username and password. 2. The credentials flag and a properly formatted credentials string is provided. Examples of the login command using the credentials flag in either a windows/unix terminal are provided in the README.txt ''',
+                                             description='''description: Login to MotioCI. There are three ways to run this command. 1. If no arguments are provided, the CLI will prompt the user to enter login information of instance name, namespace id, username and password. 2. The credentials flag and a properly formatted credentials string is provided. 3. The credentialsFile flag to load credentials from a JSON file. Examples of the login command using the credentials flag in either a windows/unix terminal are provided in the README.txt ''',
                                              help="login to MotioCI. Generates authtoken that will be used to run commands in the CLI.")
     login_parser.add_argument('--credentials', type=str,
                               help="alternate method of login. Allows user to login using a properly formatted credentials string.",
+                              metavar='')
+    login_parser.add_argument('--credentialsFile', type=str, default="credentials.json",
+                              help="path to JSON file containing credentials (default: credentials.json)",
                               metavar='')
 
     # Subparser for instance subject. Commands available: ls
@@ -89,7 +154,7 @@ def parse_args():
                                                                       description='''
                                                         description: List label versions.There are two ways to call this verb: 1.With no arguments present,
                                                         list all of the label versions that the user has access to.2.With arguments
-                                                         instanceName, projectName, and labelName present, lists the label versions that fit the criteria within the instance, project, and label names. 
+                                                         instanceName, projectName, and labelName present, lists the label versions that fit the criteria within the instance, project, and label names.
                                                         ''')
 
     label_version_ls_parser.add_argument('--xauthtoken', type=str, required=True,
@@ -107,9 +172,11 @@ def parse_args():
 
     deployment_parser.add_argument('--xauthtoken', type=str, required=True,
                                    help="login token given after performing login command correctly.")
-    deployment_parser.add_argument('--sourceInstanceId', type=int, metavar='', help="specify source instance.")
-    deployment_parser.add_argument('--sourceInstanceName', type=str, metavar='',
-                                   help="used to find source instance id.")
+   
+    # FIXED: Added support for both sourceInstanceId and sourceInstanceName
+    source_instance_group = deployment_parser.add_mutually_exclusive_group(required=False)
+    source_instance_group.add_argument('--sourceInstanceId', type=int, metavar='', help="specify source instance by ID.")
+    source_instance_group.add_argument('--sourceInstanceName', type=str, metavar='', help="specify source instance by name.")
 
     label_source_group = deployment_parser.add_mutually_exclusive_group(required=True)
     label_source_group.add_argument('--labelId', type=int, metavar='', help="specify label.")
@@ -173,12 +240,11 @@ def parse_args():
 
 def run_deployment(args):
     # Get Source Input
-    # DeploymentSourceInput.instanceId always required
-    if args.sourceInstanceId is None:
-        source_instance_id = find_instance_id(args.sourceInstanceId, args.sourceInstanceId,
-                                              "Enter Source Instance Name/Id: ")
+    # FIXED: Handle both sourceInstanceId and sourceInstanceName properly
+    if args.sourceInstanceId is None and args.sourceInstanceName is None:
+        source_instance_id = find_instance_id(None, None, "Enter Source Instance Name/Id: ")
     else:
-        source_instance_id = args.sourceInstanceId
+        source_instance_id = find_instance_id(args.sourceInstanceId, args.sourceInstanceName, "Enter Source Instance Name/Id: ")
 
     # DeploymentSourceInput.label. Mutually Exclusive Options.
     if args.labelVersionId is not None:
@@ -407,7 +473,7 @@ List of if elif else statements for deciding which method to execute based on in
 args.subject options: login, instance, project, label, label version, versioned items, and logout
 args.verb options: ls, create (label only), promote (label version only)
 Each ls has a default option with no flags (except --authtoken) and a specific option with all flags needed to execute
-Each create and promote label requires all flags. 
+Each create and promote label requires all flags.
 '''
 
 args = parse_args()
@@ -417,19 +483,33 @@ constants.LOGOUT_URL = constants.CI_URL + constants.LOGOUT_URL
 constants.GRAPH_URL = constants.CI_URL + constants.GRAPH_URL
 
 if args.subject == "login":
-    if args.credentials is None:
-        args.credentials = loginInput.get_login_from_user()
-    auth_token = login.login_init(args.credentials)
+    # Priority order: 1. credentials parameter, 2. credentialsFile parameter, 3. user input
+    if args.credentials is not None:
+        credentials_to_use = args.credentials
+    else:
+        credentials_to_use = load_credentials_from_json(args.credentialsFile)
+       
+        if credentials_to_use is None:
+            print("Falling back to manual credential input...")
+            credentials_to_use = loginInput.get_login_from_user()
+   
+    # SECURE: Only log masked credentials
+    print("== DEBUG: Attempting login with masked credentials ==")
+    print(mask_credentials_for_logging(credentials_to_use))
+   
+    # Attempt login
+    auth_token = login.login_init(credentials_to_use)
     if auth_token is None:
         print("Invalid parameters. Login cancelled!")
     else:
-        print("Credentials: ", args.credentials)
+        # SECURE: Don't log actual credentials, but DO show full auth token
         print("Login successful!")
+        # Show full auth token - it's needed for subsequent operations
         print("x-auth_token: ", auth_token)
-
 
 else:
     constants.X_AUTH_TOKEN = args.xauthtoken
+
 if args.subject == "instance":
     if args.verb == "ls":
         print(instances.get_instances_default())
