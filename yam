@@ -1,48 +1,28 @@
-[Pipeline] stage
 [Pipeline] { (MotioCI Deploy (DEV → PRD))
 [Pipeline] container
 [Pipeline] {
 [Pipeline] script
 [Pipeline] {
 [Pipeline] sh
-14:15:20  + set -euo pipefail
-14:15:20  + cd MotioCI/api/CLI
-14:15:20  ++ cat ../token.txt
-14:15:20  + TOKEN=b9f71704-b7c4-45fd-8aa0-aba565a00aea
-14:15:20  + SOURCE_LABEL_ID=82
-14:15:20  + echo '=== Starting Promotion from DEV/TEST → PRD ==='
-14:15:20  === Starting Promotion from DEV/TEST → PRD ===
-14:15:20  + echo 'Using token: b9f717... (len=36)'
-14:15:20  Using token: b9f717... (len=36)
-14:15:20  + echo 'Promoting Label ID: 82 from DEV/TEST to PRD'
-14:15:20  Promoting Label ID: 82 from DEV/TEST to PRD
-14:15:20  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov deploy --xauthtoken b9f71704-b7c4-45fd-8aa0-aba565a00aea --sourceInstanceId 3 --targetInstanceId 1 --projectName Demo --labelId 82 --targetLabelName PROMOTED-22
-14:15:20  + true
-14:15:20  + echo '=== Deploy Output (first 100 lines) ==='
-14:15:20  === Deploy Output (first 100 lines) ===
-14:15:20  + sed -n 1,100p deploy.out
-14:15:20  usage: ci-cli.py deploy [-h] --xauthtoken XAUTHTOKEN
-14:15:20                          [--sourceInstanceId  | --sourceInstanceName ]
-14:15:20                          (--labelId  | --labelVersionId  | --versionedItemIds  | --searchPath  [...])
-14:15:20                          (--targetInstanceId  | --targetInstanceName  | --targetUnversionedInstanceId  | --targetUnversionedInstanceName )
-14:15:20                          [--targetLabelName] [--projectName] [--projectId]
-14:15:20                          (--camPassportId  | --username ) [--password]
-14:15:20                          [--namespaceId]
-14:15:20  ci-cli.py deploy: error: one of the arguments --camPassportId --username is required
-14:15:20  + echo =======================================
-14:15:20  =======================================
-14:15:20  + grep -q '"errors"' deploy.out
-14:15:20  + echo ' MotioCI Deploy stage completed successfully.'
-14:15:20   MotioCI Deploy stage completed successfully.
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Declarative: Post Actions)
-[Pipeline] echo
-14:15:20  Pipeline execution finished.
-[Pipeline] echo
-14:15:20  MotioCI pipeline completed successfully.
+14:25:38  + set -euo pipefail
+14:25:38  + cd MotioCI/api/CLI
+14:25:38  ++ cat ../token.txt
+14:25:38  + TOKEN=fdc80b08-77aa-4f0a-b0e5-bc5c699b49e7
+14:25:38  + SOURCE_LABEL_ID=82
+14:25:38  + echo '=== Starting Promotion from DEV/TEST → PRD ==='
+14:25:38  === Starting Promotion from DEV/TEST → PRD ===
+14:25:38  + echo 'Using token: fdc80b... (len=36)'
+14:25:38  Using token: fdc80b... (len=36)
+14:25:38  + echo 'Promoting Label ID: 82 from DEV/TEST to PRD'
+14:25:38  Promoting Label ID: 82 from DEV/TEST to PRD
+14:25:38  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov deploy --xauthtoken fdc80b08-77aa-4f0a-b0e5-bc5c699b49e7 --sourceInstanceId 3 --targetInstanceId 1 --projectName Demo --labelId 82 --targetLabelName PROMOTED-24 --camPassportId=MTsxMDE6NmQxNzBlODYtMTJhZS0yMjgxLWY0ZjktMmZmMDgxMjIwNzY2OjI3NTU2MjA2NjQ7MDszOzA7
+14:25:41  + echo '=== Deploy Output (first 100 lines) ==='
+14:25:41  === Deploy Output (first 100 lines) ===
+14:25:41  + sed -n 1,100p deploy.out
+14:25:41  Error performing the deployment:
+14:25:41    [{'message': 'failed to authenticate to instance with ID 1', 'locations': [{'line': 3, 'column': 5}], 'path': ['deploy'], 'extensions': {'code': 'DEPLOYMENT_AUTHENTICATION_FAILED', 'classification': 'DataFetchingException'}}]
+14:25:41  + echo =======================================
+14:25:41  =======================================
+14:25:41  + grep -q '"errors"' deploy.out
+14:25:41  + echo ' MotioCI Deploy stage completed successfully.'
+14:25:41   MotioCI Deploy stage completed successfully.
