@@ -1,11 +1,26 @@
-[Pipeline] sh
-11:13:29  + set -euo pipefail
-11:13:29  + cd MotioCI/api/CLI
-11:13:29  + echo 'Creating creds.json with both DEV/TEST and PRD credentials...'
-11:13:29  Creating creds.json with both DEV/TEST and PRD credentials...
-11:13:29  /home/jenkins/agent/workspace/Cognos Jobs/testing@tmp/durable-1c2806a8/script.sh.copy: line 33: warning: here-document at line 6 delimited by end-of-file (wanted `ENDJSON')
-11:13:29  + cat
-11:13:29  ++ cat login.token
-11:13:29  cat: login.token: No such file or directory
-11:13:29  ++ true
-11:13:29  /home/jenkins/agent/workspace/Cognos Jobs/testing@tmp/durable-1c2806a8/script.sh.copy: line 6: TOKEN: unbound variable
+11:35:53  + set -euo pipefail
+11:35:53  + cd MotioCI/api/CLI
+11:35:53  + echo 'Creating creds.json with both DEV/TEST and PRD credentials...'
+11:35:53  Creating creds.json with both DEV/TEST and PRD credentials...
+11:35:53  + cat
+11:35:53  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile creds.json
+11:35:53  + true
+11:35:53  + awk 'match($0,/(Auth[[:space:]]*[Tt]oken|xauthtoken)[:=][[:space:]]*([A-Za-z0-9._-]+)/,m){print m[2]}' login.out
+11:35:53  + tail -n1
+11:35:53  + '[' '!' -s login.token ']'
+11:35:53  + tail -n1
+11:35:53  + awk 'match($0,/"(authToken|xauthtoken)"[[:space:]]*:[[:space:]]*"([^"]+)"/,m){print m[2]}' login.out
+11:35:53  ++ cat login.token
+11:35:53  + TOKEN=
+11:35:53  + '[' -z '' ']'
+11:35:53  + echo 'Login failed. Showing first lines of login.out:'
+11:35:53  Login failed. Showing first lines of login.out:
+11:35:53  + sed -E 's/"camPassportId":[^,}]*/"camPassportId":"***"/g' login.out
+11:35:53  + sed -n 1,60p
+11:35:53  usage: ci-cli.py [-h] --server SERVER
+11:35:53                   {login,instance,project,label,labelVersion,deploy,versionedItems,logout}
+11:35:53                   ...
+11:35:53  ci-cli.py: error: unrecognized arguments: --credentialsFile creds.json
+11:35:53  + exit 1
+[Pipeline] }
+[Pipeline] // script
