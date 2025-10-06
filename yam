@@ -1,0 +1,11 @@
+[Pipeline] sh
+11:13:29  + set -euo pipefail
+11:13:29  + cd MotioCI/api/CLI
+11:13:29  + echo 'Creating creds.json with both DEV/TEST and PRD credentials...'
+11:13:29  Creating creds.json with both DEV/TEST and PRD credentials...
+11:13:29  /home/jenkins/agent/workspace/Cognos Jobs/testing@tmp/durable-1c2806a8/script.sh.copy: line 33: warning: here-document at line 6 delimited by end-of-file (wanted `ENDJSON')
+11:13:29  + cat
+11:13:29  ++ cat login.token
+11:13:29  cat: login.token: No such file or directory
+11:13:29  ++ true
+11:13:29  /home/jenkins/agent/workspace/Cognos Jobs/testing@tmp/durable-1c2806a8/script.sh.copy: line 6: TOKEN: unbound variable
