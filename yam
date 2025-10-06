@@ -1,23 +1,42 @@
-13:11:42  + echo 'Creating credentials JSON for DEV/TEST and PRD...'
-13:11:42  Creating credentials JSON for DEV/TEST and PRD...
-13:11:42  + cat
-13:11:42  + echo 'Logging in to MotioCI...'
-13:11:42  Logging in to MotioCI...
-13:11:42  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile creds.json
-13:11:50  + echo '=== login.out (first 40 lines) ==='
-13:11:50  === login.out (first 40 lines) ===
-13:11:50  + sed -n 1,40p login.out
-13:11:50  Successfully loaded credentials from creds.json
-13:11:50  == DEBUG: Attempting login with masked credentials ==
-13:11:50  [{"instanceId": "1", "apiKey": "********"}, {"instanceId": "3", "apiKey": "********"}]
-13:11:50  Login successful!
-13:11:50  x-auth_token:  cf1e916c-5a03-40b7-bc2b-fd8551c029f0
-13:11:50  + echo =================================
-13:11:50  =================================
-13:11:50  + awk 'match($0,/(Auth[[:space:]]*[Tt]oken|x-auth_token|xauthtoken)[[:space:]]*[:=][[:space:]]*([A-Za-z0-9._-]+)/,m){print m[2]}' login.out
-13:11:50  + tail -n1
-13:11:50  ++ cat login.token
-13:11:50  + TOKEN=cf1e916c-5a03-40b7-bc2b-fd8551c029f0
-13:11:50  + echo 'MotioCI token captured (len=36)'
-13:11:50  MotioCI token captured (len=36)
-13:11:50  + echo cf1e916c-5a03-40b7-bc2b-fd8551c029f0
+13:34:19  label create
+13:34:19  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label create --xauthtoken ebdcf449-1678-4475-9eb5-01ad2270865f --instanceName Cognos-DEV/TEST --projectName Demo --name JENKINS_TEST_LABEL --versionedItemIds '[]'
+13:34:20  Traceback (most recent call last):
+13:34:20    File "/home/jenkins/agent/workspace/Cognos Jobs/testing/MotioCI/api/CLI/ci-cli.py", line 524, in <module>
+13:34:20      labels.create_label_init(args.instanceName, args.projectName, args.name, args.versionedItemIds)
+13:34:20    File "/home/jenkins/agent/workspace/Cognos Jobs/testing/MotioCI/api/CLI/labels.py", line 54, in create_label_init
+13:34:20      create_label(project_id, label_name, versioned_item_ids)
+13:34:20    File "/home/jenkins/agent/workspace/Cognos Jobs/testing/MotioCI/api/CLI/labels.py", line 46, in create_label
+13:34:20      label_id = response.json()["data"]["createLabel"]["id"]
+13:34:20  KeyError: 'data'
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy)
+Stage "Deploy" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+13:34:20  Pipeline execution finished.
+[Pipeline] echo
+13:34:20  MotioCI pipeline failed.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timestamps
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] }
+[Pipeline] // podTemplate
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+/var/lib/jenkins/jobs/Cognos Jobs/workspace/testing@tmp/jfrog/18/.jfrog deleted
+Finished: FAILURE
