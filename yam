@@ -1,26 +1,74 @@
-11:35:53  + set -euo pipefail
-11:35:53  + cd MotioCI/api/CLI
-11:35:53  + echo 'Creating creds.json with both DEV/TEST and PRD credentials...'
-11:35:53  Creating creds.json with both DEV/TEST and PRD credentials...
-11:35:53  + cat
-11:35:53  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile creds.json
-11:35:53  + true
-11:35:53  + awk 'match($0,/(Auth[[:space:]]*[Tt]oken|xauthtoken)[:=][[:space:]]*([A-Za-z0-9._-]+)/,m){print m[2]}' login.out
-11:35:53  + tail -n1
-11:35:53  + '[' '!' -s login.token ']'
-11:35:53  + tail -n1
-11:35:53  + awk 'match($0,/"(authToken|xauthtoken)"[[:space:]]*:[[:space:]]*"([^"]+)"/,m){print m[2]}' login.out
-11:35:53  ++ cat login.token
-11:35:53  + TOKEN=
-11:35:53  + '[' -z '' ']'
-11:35:53  + echo 'Login failed. Showing first lines of login.out:'
-11:35:53  Login failed. Showing first lines of login.out:
-11:35:53  + sed -E 's/"camPassportId":[^,}]*/"camPassportId":"***"/g' login.out
-11:35:53  + sed -n 1,60p
-11:35:53  usage: ci-cli.py [-h] --server SERVER
-11:35:53                   {login,instance,project,label,labelVersion,deploy,versionedItems,logout}
-11:35:53                   ...
-11:35:53  ci-cli.py: error: unrecognized arguments: --credentialsFile creds.json
-11:35:53  + exit 1
-[Pipeline] }
-[Pipeline] // script
+11:46:25  + set -euo pipefail
+11:46:25  + cd MotioCI/api/CLI
+11:46:25  + echo 'Creating creds.json...'
+11:46:25  Creating creds.json...
+11:46:25  + cat
+11:46:25  ++ cat creds.json
+11:46:25  ++ tr -d '\r'
+11:46:25  ++ tr -d '\n'
+11:46:25  + CREDS='[  {    "instanceId": "1",    "namespaceId": "AzureAD",    "username": "CMarksSS01@intra.dhs.ca.gov",    "camPassportId": "AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"  },  {    "instanceId": "3",    "namespaceId": "AzureAD",    "username": "CMarksSS01@intra.dhs.ca.gov",    "camPassportId": "AWk1OUMyRkU3M0U2RUM0RUZEQUQ3MTY4ODBEN0NFNDVBRWu4kJkLtIYGd/Lpzr7rmNMqQUHn"  }]'
+11:46:25  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentials '[  {    "instanceId": "1",    "namespaceId": "AzureAD",    "username": "CMarksSS01@intra.dhs.ca.gov",    "camPassportId": "AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"  },  {    "instanceId": "3",    "namespaceId": "AzureAD",    "username": "CMarksSS01@intra.dhs.ca.gov",    "camPassportId": "AWk1OUMyRkU3M0U2RUM0RUZEQUQ3MTY4ODBEN0NFNDVBRWu4kJkLtIYGd/Lpzr7rmNMqQUHn"  }]'
+11:46:25  + true
+11:46:25  + tail -n1
+11:46:25  + awk 'match($0,/(Auth[[:space:]]*[Tt]oken|xauthtoken)[:=][[:space:]]*([A-Za-z0-9._-]+)/,m){print m[2]}' login.out
+11:46:25  + '[' '!' -s login.token ']'
+11:46:25  + tail -n1
+11:46:25  + awk 'match($0,/"(authToken|xauthtoken)"[[:space:]]*:[[:space:]]*"([^"]+)"/,m){print m[2]}' login.out
+11:46:25  ++ cat login.token
+11:46:25  + TOKEN=
+11:46:25  + '[' -z '' ']'
+11:46:25  + echo 'Login failed. Showing first lines of login.out:'
+11:46:25  Login failed. Showing first lines of login.out:
+11:46:25  + sed -n 1,60p
+11:46:25  + sed -E 's/"camPassportId":[^,}]*/"camPassportId":"***"/g' login.out
+11:46:25  Traceback (most recent call last):
+11:46:25    File "/usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py", line 715, in urlopen
+11:46:25      httplib_response = self._make_request(
+11:46:25    File "/usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py", line 404, in _make_request
+11:46:25      self._validate_conn(conn)
+11:46:25    File "/usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py", line 1058, in _validate_conn
+11:46:25      conn.connect()
+11:46:25    File "/usr/local/lib/python3.9/site-packages/urllib3/connection.py", line 419, in connect
+11:46:25      self.sock = ssl_wrap_socket(
+11:46:25    File "/usr/local/lib/python3.9/site-packages/urllib3/util/ssl_.py", line 449, in ssl_wrap_socket
+11:46:25      ssl_sock = _ssl_wrap_socket_impl(
+11:46:25    File "/usr/local/lib/python3.9/site-packages/urllib3/util/ssl_.py", line 493, in _ssl_wrap_socket_impl
+11:46:25      return ssl_context.wrap_socket(sock, server_hostname=server_hostname)
+11:46:25    File "/usr/lib64/python3.9/ssl.py", line 501, in wrap_socket
+11:46:25      return self.sslsocket_class._create(
+11:46:25    File "/usr/lib64/python3.9/ssl.py", line 1074, in _create
+11:46:25      self.do_handshake()
+11:46:25    File "/usr/lib64/python3.9/ssl.py", line 1343, in do_handshake
+11:46:25      self._sslobj.do_handshake()
+11:46:25  ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1129)
+11:46:25  
+11:46:25  During handling of the above exception, another exception occurred:
+11:46:25  
+11:46:25  Traceback (most recent call last):
+11:46:25    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/adapters.py", line 440, in send
+11:46:25      resp = conn.urlopen(
+11:46:25    File "/usr/local/lib/python3.9/site-packages/urllib3/connectionpool.py", line 799, in urlopen
+11:46:25      retries = retries.increment(
+11:46:25    File "/usr/local/lib/python3.9/site-packages/urllib3/util/retry.py", line 592, in increment
+11:46:25      raise MaxRetryError(_pool, url, error or ResponseError(cause))
+11:46:25  urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.gov', port=443): Max retries exceeded with url: /api/login (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1129)')))
+11:46:25  
+11:46:25  During handling of the above exception, another exception occurred:
+11:46:25  
+11:46:25  Traceback (most recent call last):
+11:46:25    File "/home/jenkins/agent/workspace/Cognos Jobs/testing/MotioCI/api/CLI/ci-cli.py", line 422, in <module>
+11:46:25      auth_token = login.login_init(args.credentials)
+11:46:25    File "/home/jenkins/agent/workspace/Cognos Jobs/testing/MotioCI/api/CLI/login.py", line 6, in login_init
+11:46:25      response = requests.post(constants.LOGIN_URL, data=login_instance_info)
+11:46:25    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/api.py", line 117, in post
+11:46:25      return request('post', url, data=data, json=json, **kwargs)
+11:46:25    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/api.py", line 61, in request
+11:46:25      return session.request(method=method, url=url, **kwargs)
+11:46:25    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/sessions.py", line 529, in request
+11:46:25      resp = self.send(prep, **send_kwargs)
+11:46:25    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/sessions.py", line 645, in send
+11:46:25      r = adapter.send(request, **kwargs)
+11:46:25    File "/home/jenkins/agent/.local/lib/python3.9/site-packages/requests/adapters.py", line 517, in send
+11:46:25      raise SSLError(e, request=request)
+11:46:25  requests.exceptions.SSLError: HTTPSConnectionPool(host='cgrptmcip01.cloud.cammis.ca.gov', port=443): Max retries exceeded with url: /api/login (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1129)')))
+11:46:25  + exit 1
