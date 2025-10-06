@@ -188,8 +188,8 @@ Used in labels.get_label_id(project_id, label_name)
 '''
 
 CREATE_LABEL = '''
-mutation createLabelMutation($projectId: Long!, $labelName: String!, $versionedItemIds: [Long!]){
-  createLabel(input:{projectId:$projectId, name:$labelName, versionedItemIds:$versionedItemIds}){
+mutation createLabelMutation($projectId: Long!, $name: String!, $versionedItemSource: VersionedItemSource){
+  createLabel(input:{projectId:$projectId, name:$name, versionedItemSource:$versionedItemSource}){
     name
     description
     id
