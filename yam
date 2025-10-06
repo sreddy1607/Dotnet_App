@@ -1,31 +1,23 @@
-11:53:11  + echo 'Creating credentials JSON...'
-11:53:11  Creating credentials JSON...
-11:53:11  + cat
-11:53:11  ++ cat creds.json
-11:53:11  ++ tr -d '\n'
-11:53:11  ++ tr -d '\r'
-11:53:11  + CREDS='[  {    "instanceId": "1",    "namespaceId": "AzureAD",    "username": "CMarksSS01@intra.dhs.ca.gov",    "camPassportId": "AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"  },  {    "instanceId": "3",    "namespaceId": "AzureAD",    "username": "CMarksSS01@intra.dhs.ca.gov",    "camPassportId": "AWk1OUMyRkU3M0U2RUM0RUZEQUQ3MTY4ODBEN0NFNDVBRWu4kJkLtIYGd/Lpzr7rmNMqQUHn"  }]'
-11:53:11  + export REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
-11:53:11  + REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
-11:53:11  + export SSL_CERT_FILE=/etc/pki/tls/certs/ca-bundle.crt
-11:53:11  + SSL_CERT_FILE=/etc/pki/tls/certs/ca-bundle.crt
-11:53:11  + echo 'Logging into MotioCI...'
-11:53:11  Logging into MotioCI...
-11:53:11  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentials '[  {    "instanceId": "1",    "namespaceId": "AzureAD",    "username": "CMarksSS01@intra.dhs.ca.gov",    "camPassportId": "AWk0N0VCMDhFMkY3NkM0QzhCQUQ0QzIyMjUxNDg1QjY4N9WL63EPWDOm8rcR9XxGG850b22r"  },  {    "instanceId": "3",    "namespaceId": "AzureAD",    "username": "CMarksSS01@intra.dhs.ca.gov",    "camPassportId": "AWk1OUMyRkU3M0U2RUM0RUZEQUQ3MTY4ODBEN0NFNDVBRWu4kJkLtIYGd/Lpzr7rmNMqQUHn"  }]'
-11:53:11  + echo '=== First lines of login.out ==='
-11:53:11  === First lines of login.out ===
-11:53:11  + sed -n 1,40p login.out
-11:53:11  Invalid parameters. Login cancelled!
-11:53:11  + echo ================================
-11:53:11  ================================
-11:53:11  + awk 'match($0,/(Auth[[:space:]]*[Tt]oken|xauthtoken)[:=][[:space:]]*([A-Za-z0-9._-]+)/,m){print m[2]}' login.out
-11:53:11  + tail -n1
-11:53:11  + '[' '!' -s login.token ']'
-11:53:11  + awk 'match($0,/"(authToken|xauthtoken)"[[:space:]]*:[[:space:]]*"([^"]+)"/,m){print m[2]}' login.out
-11:53:11  + tail -n1
-11:53:11  ++ cat login.token
-11:53:11  + TOKEN=
-11:53:11  + '[' -z '' ']'
-11:53:11  + echo 'Login failed or certificate still untrusted. Check login.out above.'
-11:53:11  Login failed or certificate still untrusted. Check login.out above.
-11:53:11  + exit 1
+13:11:42  + echo 'Creating credentials JSON for DEV/TEST and PRD...'
+13:11:42  Creating credentials JSON for DEV/TEST and PRD...
+13:11:42  + cat
+13:11:42  + echo 'Logging in to MotioCI...'
+13:11:42  Logging in to MotioCI...
+13:11:42  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile creds.json
+13:11:50  + echo '=== login.out (first 40 lines) ==='
+13:11:50  === login.out (first 40 lines) ===
+13:11:50  + sed -n 1,40p login.out
+13:11:50  Successfully loaded credentials from creds.json
+13:11:50  == DEBUG: Attempting login with masked credentials ==
+13:11:50  [{"instanceId": "1", "apiKey": "********"}, {"instanceId": "3", "apiKey": "********"}]
+13:11:50  Login successful!
+13:11:50  x-auth_token:  cf1e916c-5a03-40b7-bc2b-fd8551c029f0
+13:11:50  + echo =================================
+13:11:50  =================================
+13:11:50  + awk 'match($0,/(Auth[[:space:]]*[Tt]oken|x-auth_token|xauthtoken)[[:space:]]*[:=][[:space:]]*([A-Za-z0-9._-]+)/,m){print m[2]}' login.out
+13:11:50  + tail -n1
+13:11:50  ++ cat login.token
+13:11:50  + TOKEN=cf1e916c-5a03-40b7-bc2b-fd8551c029f0
+13:11:50  + echo 'MotioCI token captured (len=36)'
+13:11:50  MotioCI token captured (len=36)
+13:11:50  + echo cf1e916c-5a03-40b7-bc2b-fd8551c029f0
