@@ -1,90 +1,184 @@
-#  Dockerfile to build the mspdotnetapp container
-FROM docker.io/library/amazonlinux:latest as installer
-RUN echo "proxy=http://10.151.204.100:8080" >> /etc/yum.conf
-ENV BIN_DIR "/usr/local/bin"
-ENV KUBECTL_VERSION "1.26.1"
-ENV HELM_VERSION "v3.11.1"
-ENV ARGO_Version "v2.0.3"
-ENV TARGETOS "linux"
-ENV TARGETARCH "amd64"
-ENV KUSTOMIZE_VERSION "5.0.0"
-RUN yum update -y \
-  && yum install -y unzip \
-  && yum install -y zip \
-  && yum install -y gzip \
-  && yum install -y wget \
-  && yum install -y openssl \
-  && yum install -y tar \
-  && yum install -y jq \
-  && yum install -y ca-certificates \
-  && yum install -y which  \
-  && yum install -y libicu \
-  #&& wget https://download.visualstudio.microsoft.com/download/pr/17b6759f-1af0-41bc-ab12-209ba0377779/e8d02195dbf1434b940e0f05ae086453/dotnet-sdk-6.0.100-linux-x64.tar.gz \
-  #&& mkdir -p /usr/share/dotnet \
-  #&& tar -xzf dotnet-sdk-6.0.100-linux-x64.tar.gz -C /usr/share/dotnet  \
-  #&& rm dotnet-sdk-6.0.100-linux-x64.tar.gz \
-  #&& ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
-  && rpm --import https://packages.microsoft.com/keys/microsoft.asc \
-  && wget -O /etc/yum.repos.d/microsoft-prod.repo https://packages.microsoft.com/config/fedora/37/prod.repo \
-  && dnf install -y dotnet-sdk-8.0 \
-  && curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip \
-  && unzip -o -q awscliv2.zip \
-  # The --bin-dir is specified so that we can copy the
-  # entire bin directory from the installer stage into
-  # into /usr/local/bin of the final stage without
-  # accidentally copying over any other executables that
-  # may be present in /usr/local/bin of the installer stage.
-  && ./aws/install --bin-dir /aws-cli-bin \
-  # Install git
-  && yum install -y git \
-  && git init \
-  # Install kubectl
-  && wget https://storage.googleapis.com/kubernetes-release/release/v1.26.1/bin/linux/amd64/kubectl \
-  && chmod +x kubectl \
-  && mv kubectl ${BIN_DIR} \
-# install kustomize 
-  && curl -fL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_${TARGETOS}_${TARGETARCH}.tar.gz | tar xz \                                 
-  && chmod +x kustomize \
-  && mv kustomize ${BIN_DIR} \   
- # Install Helm
-  && curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
-  && chmod 700 get_helm.sh \
-  && ./get_helm.sh \
-  && yum install -y java-17-amazon-corretto-devel
-  
-# RUN curl -L -o /tmp/openjdk-17_linux-x64_bin.tar.gz https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-x64_bin.tar.gz \
-    # && tar xfvz /tmp/openjdk-17_linux-x64_bin.tar.gz -C /opt \
-    # && ln -s /opt/jdk-17 /opt/java \
-    # && rm /tmp/openjdk-17_linux-x64_bin.tar.gz
+[Pipeline] { (Update Versions)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
+[Pipeline] {
+[Pipeline] sh
++ aws ecr get-login-password --region us-west-2
+eyJwYXlsb2FkIjoiNGhPb3hPTnkwNG9qYnE5OU96TWNENjNsdVRrNGdEa2RuZzBCbVNvYXd4aGU2dEF3NHlrM05LZ1NUWnkvc1pUaGxuVHp2NVF1M1JpS2hsSjE4ZlhQazFCUUxXWC9XclQyNzNrTXR3SnNCVHhwN0pNbXJDWVdHMmZsNmVjV0pHeXVoN2dwZ2VndmRxM3R2YmVqWC81WTQ3VUhkZFJLdG1XSldRT0hoeXl4ZnNEbTI1ZU9uM3RlaFBrWXM4a09SM0dHWTg0dTY3R204eWw0N1V3eGVnZkdmSHdSSlI4UkRlS0Yya2NOcVNUcjc4UTA2SUVCZXY1Q25zeEdSWWMvS0w3NlR4YUlzWXIzNGx5NXh1NytpdHMrY1h2QnFkU2Y5Mlgrb3crcGhUVDhIbGFHNHNMZmxQMUZUVjJFVFRUWWo1dzE3aEYveUVjNmZCVE5oUVZyU1p0MmtFNHUxQzhVcjBaOUdZbmFwT3QxUlVkb0h5TzNEa3lQTi9qWUpDelQrR1doUDMrMjRtQlRTUUt4Q0k2Z2dLb01Fb0hsenRnNnZOQ2hYUERZUWlQeWNRcGVzOEluQmxiU2lGWlhjZXhpNmx5MW1GY0FLTS8va3hqTUZ6cStjeVQ1RzJnK3lRUW5QeDZKVGdpQ0p6bnlnTWhyZ0QvRy9TNHU2dmQzR0RBbjRSczdhZ2xvb0JJSXp4a2NERklJUzQwTUh0dUliVnBNS21PaFFDb24vQi9GUTZpQ1lMOTBiRTVOYjlZUU1XS0dkazd2eHhwcUZaVmZaaC9SbU1vcUwxZkIrVDVtU2Vnd1M2N0Iza2J1WTE5OTFLODVSUytmemxMNGF6U2dLcG9UYkpDK2xYSGkyZmNRNmlqRUVxWjRuak9ITEszeXZPbTdUNHEwTDlDQU5HbmRHUWM4RzliSGx2MHVTMWFObytRaTU0V1dIN3A2S0U4MzNSRWVLTDM1L0JLMlFnbFlyK1g5eWZYTyt1NXNwc2hyOWRzaDNjZEM2YnZlWnFNaVgvV1NBRTZRdzM2QWUyODNpdDdEV3hvRURnN1J1ZmJDTHJkcUxMQUR0c3IvWXZkM2FvNFRjNmhDdGNlbS9LVlVXWlh4RHJ0d2dsNGU2QnMwdHhscXBQQVdiVHBVQTVIbFkzdXRsbjVmcEJLVy9oUkw5Z3B1TWtKd1FLckFqQS91RzNWcGVvSkowaFI4MTFMbDZiektoMlpjcGhKZkE2MG1CT0Q3ajQvMFhFaW54QkZkR1VDN0ZWUzJ1dXRvazBCaGd6bzRSTWQ5eTBHcGRkWDVISUVFZFQxRFVVMVFoelIzaXkyU2E4dmZwOEZkQjNRY3lQZ2N2RnZqWnk0RlFqZDNxT2F1IiwiZGF0YWtleSI6IkFRRUJBSGo2bGM0WElKdy83bG4wSGMwMERNZWs2R0V4SENiWTRSSXBUTUNJNThJblV3QUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURFSHc4aUkydlRsOURuYzJFUUlCRUlBN0NneGlRVko5WWs5TXRhNzRyWGNBd0Uvckt3TU9uYXpOdEl1by9kQkZhUENhSGs5R3c2TEtuN3N2ei9XblpHTFFkdkZETkpNd1pZYnFrQms9IiwidmVyc2lvbiI6IjIiLCJ0eXBlIjoiREFUQV9LRVkiLCJleHBpcmF0aW9uIjoxNzYwMDAyOTI3fQ==
+[Pipeline] sh
++ aws ecr describe-images --repository-name cammissample --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
++ tr -d '
+'
+[Pipeline] echo
+version after: "2.0.23"
+Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
+[Pipeline] echo
+env_versionList: ["cammissample:2.0.23"]
+[Pipeline] echo
+g_result: [cammissample:2.0.23]
+[Pipeline] sh
++ aws ecr describe-images --repository-name cammiscloud --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
++ tr -d '
+'
+[Pipeline] echo
+version after: "5.0.0"
+Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
+[Pipeline] echo
+env_versionList: ["cammissample:2.0.23", "cammiscloud:5.0.0"]
+[Pipeline] echo
+g_result: [cammissample:2.0.23, cammiscloud:5.0.0]
+[Pipeline] sh
++ aws ecr describe-images --repository-name cammisbuildah --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
++ tr -d '
+'
+[Pipeline] echo
+version after: "1.0.keep"
+Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
+[Pipeline] echo
+env_versionList: ["cammissample:2.0.23", "cammiscloud:5.0.0", "cammisbuildah:1.0.keep"]
+[Pipeline] echo
+g_result: [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep]
+[Pipeline] sh
++ aws ecr describe-images --repository-name cammisterraform --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
++ tr -d '
+'
+[Pipeline] echo
+version after: "1.0.3"
+Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
+[Pipeline] echo
+env_versionList: ["cammissample:2.0.23", "cammiscloud:5.0.0", "cammisbuildah:1.0.keep", "cammisterraform:1.0.3"]
+[Pipeline] echo
+g_result: [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep, cammisterraform:1.0.3]
+[Pipeline] sh
++ aws ecr describe-images --repository-name cammisboto3 --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
++ tr -d '
+'
+[Pipeline] echo
+version after: "1.0.2"
+Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
+[Pipeline] echo
+env_versionList: ["cammissample:2.0.23", "cammiscloud:5.0.0", "cammisbuildah:1.0.keep", "cammisterraform:1.0.3", "cammisboto3:1.0.2"]
+[Pipeline] echo
+g_result: [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep, cammisterraform:1.0.3, cammisboto3:1.0.2]
+[Pipeline] sh
++ aws ecr describe-images --repository-name cammismaven --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
++ tr -d '
+'
+[Pipeline] echo
+version after: "latest"
+[Pipeline] echo
+version before : latest
+[Pipeline] sh
++ aws ecr describe-images --repository-name cammismaven --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[1]'
++ tr -d '
+'
+[Pipeline] echo
+version after: "0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a"
+Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
+[Pipeline] echo
+env_versionList: ["cammissample:2.0.23", "cammiscloud:5.0.0", "cammisbuildah:1.0.keep", "cammisterraform:1.0.3", "cammisboto3:1.0.2", "cammismaven:0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a"]
+[Pipeline] echo
+g_result: [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep, cammisterraform:1.0.3, cammisboto3:1.0.2, cammismaven:0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a]
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] container
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $NPASS
+[Pipeline] {
+[Pipeline] echo
+Inside the job tmp directory.
+[Pipeline] pwd
+[Pipeline] echo
+/home/jenkins/agent/workspace/cammis-msaspapp
+[Pipeline] git
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+using credential Github
+Warning: JENKINS-30600: special launcher org.csanchez.jenkins.plugins.kubernetes.pipeline.ContainerExecDecorator$1@3430bd24; decorates RemoteLauncher[hudson.remoting.Channel@58911885:JNLP4-connect connection from ip-10-155-5-241.us-west-2.compute.internal/10.155.5.241:44228] will be ignored (a typical symptom is the Git executable not being run inside a designated container)
+Fetching changes from the remote Git repository
+Checking out Revision 2905b217092259cd39656fb06884023ff5b8400c (refs/remotes/origin/feature/mspapp)
+ > git rev-parse --resolve-git-dir /home/jenkins/agent/workspace/cammis-msaspapp/.git # timeout=10
+ > git config remote.origin.url https://github.com/ca-mmis/cammis-jenkins-dockerfiles.git # timeout=10
+Fetching upstream changes from https://github.com/ca-mmis/cammis-jenkins-dockerfiles.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.39.5'
+using GIT_ASKPASS to set credentials Used by Jenkins to connect to Github
+ > git fetch --tags --force --progress -- https://github.com/ca-mmis/cammis-jenkins-dockerfiles.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/feature/mspapp^{commit} # timeout=10
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 2905b217092259cd39656fb06884023ff5b8400c # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git checkout -b feature/mspapp 2905b217092259cd39656fb06884023ff5b8400c # timeout=10
+Commit message: "Update Dockerfile"
+ > git rev-list --no-walk 6e0a5da7172533f6aa42838d5342077cc7437537 # timeout=10
+[Pipeline] echo
+g_result : [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep, cammisterraform:1.0.3, cammisboto3:1.0.2, cammismaven:0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a]
+[Pipeline] writeFile
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [NPASS]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ cat devops/versions.txt
+cammissample:2.0.23
+cammiscloud:5.0.0
+cammisbuildah:1.0.keep
+cammisterraform:1.0.3
+cammisboto3:1.0.2
+cammismaven:0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a
++ git status
+On branch feature/mspapp
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	auth.json
+	devops/ecr_cammismspapp_report.txt
 
-# Set Java environment variables
-# ENV JAVA_HOME=/opt/java
-# ENV PATH="$JAVA_HOME/bin:$PATH"
+nothing added to commit but untracked files present (use "git add" to track)
++ git add devops/versions.txt
++ git commit -m versions.txt for [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep, cammisterraform:1.0.3, cammisboto3:1.0.2, cammismaven:0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a])
+On branch feature/mspapp
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	auth.json
+	devops/ecr_cammismspapp_report.txt
 
-# Verify the installation
-RUN java -version
-
-# Define SonarScanner version
-ARG SONAR_SCANNER_VERSION=6.2.0.85879
-
-# Download and install SonarScanner for .NET
-RUN curl -LO https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/6.2.0.85879/sonar-scanner-6.2.0.85879-net-framework.zip\
-    && mkdir -p /opt/sonar-scanner \
-    && unzip sonar-scanner-6.2.0.85879-net-framework.zip -d /opt/sonar-scanner \
-    && rm sonar-scanner-6.2.0.85879-net-framework.zip \
-    && ln -s /opt/sonar-scanner/sonar-scanner-6.2.0.85879-net-framework /opt/sonar-scanner/latest
-
-# Add SonarScanner to PATH
-ENV PATH="/opt/sonar-scanner/latest:${PATH}"
-RUN unset http_proxy
-RUN unset https_proxy
-FROM docker.io/library/amazonlinux:latest
-RUN echo "proxy=http://10.151.204.100:8080" >> /etc/yum.conf
-COPY --from=installer /usr/ /usr/
-COPY --from=installer /aws-cli-bin/ /usr/local/bin/
-RUN yum update -y \
-  && yum install -y less groff \
-  && yum clean all
-RUN unset http_proxy
-RUN unset https_proxy
-ENTRYPOINT ["/bin/sh"]
+nothing added to commit but untracked files present (use "git add" to track)
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] }
+[Pipeline] // podTemplate
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE
