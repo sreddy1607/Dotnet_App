@@ -1,69 +1,67 @@
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-13:16:16  + echo 'Checking available namespaces for PRD instance...'
-13:16:16  Checking available namespaces for PRD instance...
-13:16:16  + curl -sk -X POST https://cgrptmcip01.cloud.cammis.ca.gov/api/graphql -H 'Content-Type: application/json' -H 'x-auth-token: d5050ddc-6d27-40c7-8965-bb3e4c9f01da' -d '{
-13:16:16              "query":"query($id: Long!){ instance(id:$id){ namespaces { id name } } }",
-13:16:16              "variables":{"id":1}
-13:16:16            }'
-13:16:16  + jq .
-13:16:16  {
-13:16:16    "data": {
-13:16:16      "instance": {
-13:16:16        "namespaces": [
-13:16:16          {
-13:16:16            "id": "BAOps",
-13:16:16            "name": "BAOps"
-13:16:16          },
-13:16:16          {
-13:16:16            "id": "LDAP",
-13:16:16            "name": "LDAP"
-13:16:16          },
-13:16:16          {
-13:16:16            "id": "AzureAD",
-13:16:16            "name": "Azure"
-13:16:16          }
-13:16:16        ]
-13:16:16      }
-13:16:16    }
-13:16:16  }
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Deploy)
-[Pipeline] withCredentials
-13:16:17  Masking supported pattern matches of $COG_USER or $COG_PASS
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-13:16:17  + set -euo pipefail
-13:16:17  + cd MotioCI/api/CLI
-13:16:17  + echo 'Sanity: list projects on Cognos-PRD...'
-13:16:17  Sanity: list projects on Cognos-PRD...
-13:16:17  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov project ls --xauthtoken=d5050ddc-6d27-40c7-8965-bb3e4c9f01da --instanceName=Cognos-PRD
-13:16:17  {'node': {'id': 1, 'name': 'Admin', 'description': None}}
-13:16:17  {'node': {'id': 13, 'name': 'Deployments', 'description': None}}
-13:16:17  {'node': {'id': 18, 'name': 'Demo', 'description': None}}
-13:16:17  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov --non-interactive deploy --xauthtoken=d5050ddc-6d27-40c7-8965-bb3e4c9f01da --sourceInstanceId=3 --targetInstanceId=1 --labelId=57 --projectName=Demo --targetLabelName=PROMOTED-20250712-115 --username=**** --password=**** --namespaceId=AzureAD
-13:16:20  Error performing the deployment:
-13:16:20    [{'message': 'Access is denied', 'locations': [{'line': 3, 'column': 5}], 'path': ['deploy'], 'extensions': {'code': 'ACCESS_DENIED', 'isLicenseValid': True, 'classification': 'DataFetchingException'}}]
-13:16:20  + echo 'Verification: labels after deployment'
-13:16:20  Verification: labels after deployment
-13:16:20  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken=d5050ddc-6d27-40c7-8965-bb3e4c9f01da --instanceName=Cognos-PRD --projectName=Demo
-13:16:20  + tee verify_labels.json
-13:16:20  {'node': {'name': 'Pre-Promotion Label for motioci-poc-101', 'id': 58, 'description': '', 'labelType': 'PRE_DEPLOYMENT'}}
-13:16:20  {'node': {'name': 'motioci-poc-101', 'id': 59, 'description': None, 'labelType': 'POST_DEPLOYMENT'}}
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Declarative: Post Actions)
-[Pipeline] echo
-13:16:20  Pipeline execution finished.
+#  Dockerfile to build the mspdotnetapp container
+FROM docker.io/library/amazonlinux:latest as installer
+RUN echo "proxy=http://10.151.204.100:8080" >> /etc/yum.conf
+ENV BIN_DIR "/usr/local/bin"
+ENV KUBECTL_VERSION "1.26.1"
+ENV HELM_VERSION "v3.11.1"
+ENV ARGO_Version "v2.0.3"
+ENV TARGETOS "linux"
+ENV TARGETARCH "amd64"
+ENV KUSTOMIZE_VERSION "5.0.0"
+RUN yum update -y \
+  && yum install -y unzip \
+  && yum install -y zip \
+  && yum install -y gzip \
+  && yum install -y wget \
+  && yum install -y openssl \
+  && yum install -y tar \
+  && yum install -y jq \
+  && yum install -y ca-certificates \
+  && yum install -y which  \
+  && yum install -y libicu \
+  #&& wget https://dotnetcli.azureedge.net/dotnet/Sdk/5.0.403/dotnet-sdk-5.0.403-linux-x64.tar.gz \
+  #&& mkdir -p /usr/share/dotnet \
+  #&& tar -xz dotnet-sdk-5.0.403-linux-x64.tar.gz -C /usr/share/dotnet  \
+  #&& rm dotnet-sdk-5.0.403-linux-x64.tar.gz \
+  #&& wget https://download.visualstudio.microsoft.com/download/pr/17b6759f-1af0-41bc-ab12-209ba0377779/e8d02195dbf1434b940e0f05ae086453/dotnet-sdk-6.0.100-linux-x64.tar.gz \
+  #&& wget https://download.visualstudio.microsoft.com/download/pr/1e449990-2934-47ee-97fb-b78f0e587c98/1c92c33593932f7a86efa5aff18960ed/dotnet-sdk-8.0.204-linux-arm64.tar.gz \
+  && wget https://download.visualstudio.microsoft.com/download/pr/e7dc89d5-3287-4f82-b1fa-e0a7f12f7736/3206b55ee6d717f4008a46e67048c100/dotnet-runtime-7.0.18-linux-arm64.tar.gz \
+  && mkdir -p /usr/share/dotnet \
+  && tar -xzf dotnet-runtime-7.0.18-linux-arm64.tar.gz -C /usr/share/dotnet  \
+  && rm dotnet-runtime-7.0.18-linux-arm64.tar.gz \
+  && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
+  && curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip \
+  && unzip -o -q awscliv2.zip \
+  # The --bin-dir is specified so that we can copy the
+  # entire bin directory from the installer stage into
+  # into /usr/local/bin of the final stage without
+  # accidentally copying over any other executables that
+  # may be present in /usr/local/bin of the installer stage.
+  && ./aws/install --bin-dir /aws-cli-bin \
+  # Install git
+  && yum install -y git \
+  && git init \
+  # Install kubectl
+  && wget https://storage.googleapis.com/kubernetes-release/release/v1.26.1/bin/linux/amd64/kubectl \
+  && chmod +x kubectl \
+  && mv kubectl ${BIN_DIR} \
+# install kustomize 
+  && curl -fL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_${TARGETOS}_${TARGETARCH}.tar.gz | tar xz \                                 
+  && chmod +x kustomize \
+  && mv kustomize ${BIN_DIR} \   
+ # Install Helm
+  && curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
+  && chmod 700 get_helm.sh \
+  && ./get_helm.sh
+RUN unset http_proxy
+RUN unset https_proxy
+FROM docker.io/library/amazonlinux:latest
+RUN echo "proxy=http://10.151.204.100:8080" >> /etc/yum.conf
+COPY --from=installer /usr/ /usr/
+COPY --from=installer /aws-cli-bin/ /usr/local/bin/
+RUN yum update -y \
+  && yum install -y less groff \
+  && yum clean all
+RUN unset http_proxy
+RUN unset https_proxy
+ENTRYPOINT ["/bin/sh"]
