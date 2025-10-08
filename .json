@@ -19,17 +19,14 @@ RUN yum update -y \
   && yum install -y ca-certificates \
   && yum install -y which  \
   && yum install -y libicu \
-  #&& wget https://dotnetcli.azureedge.net/dotnet/Sdk/5.0.403/dotnet-sdk-5.0.403-linux-x64.tar.gz \
-  #&& mkdir -p /usr/share/dotnet \
-  #&& tar -xz dotnet-sdk-5.0.403-linux-x64.tar.gz -C /usr/share/dotnet  \
-  #&& rm dotnet-sdk-5.0.403-linux-x64.tar.gz \
   #&& wget https://download.visualstudio.microsoft.com/download/pr/17b6759f-1af0-41bc-ab12-209ba0377779/e8d02195dbf1434b940e0f05ae086453/dotnet-sdk-6.0.100-linux-x64.tar.gz \
-  #&& wget https://download.visualstudio.microsoft.com/download/pr/1e449990-2934-47ee-97fb-b78f0e587c98/1c92c33593932f7a86efa5aff18960ed/dotnet-sdk-8.0.204-linux-arm64.tar.gz \
-  && wget https://download.visualstudio.microsoft.com/download/pr/e7dc89d5-3287-4f82-b1fa-e0a7f12f7736/3206b55ee6d717f4008a46e67048c100/dotnet-runtime-7.0.18-linux-arm64.tar.gz \
-  && mkdir -p /usr/share/dotnet \
-  && tar -xzf dotnet-runtime-7.0.18-linux-arm64.tar.gz -C /usr/share/dotnet  \
-  && rm dotnet-runtime-7.0.18-linux-arm64.tar.gz \
-  && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
+  #&& mkdir -p /usr/share/dotnet \
+  #&& tar -xzf dotnet-sdk-6.0.100-linux-x64.tar.gz -C /usr/share/dotnet  \
+  #&& rm dotnet-sdk-6.0.100-linux-x64.tar.gz \
+  #&& ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
+  && rpm --import https://packages.microsoft.com/keys/microsoft.asc \
+  && wget -O /etc/yum.repos.d/microsoft-prod.repo https://packages.microsoft.com/config/fedora/37/prod.repo \
+  && dnf install -y dotnet-sdk-8.0 \
   && curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip \
   && unzip -o -q awscliv2.zip \
   # The --bin-dir is specified so that we can copy the
@@ -52,7 +49,33 @@ RUN yum update -y \
  # Install Helm
   && curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
   && chmod 700 get_helm.sh \
-  && ./get_helm.sh
+  && ./get_helm.sh \
+  && yum install -y java-17-amazon-corretto-devel
+  
+# RUN curl -L -o /tmp/openjdk-17_linux-x64_bin.tar.gz https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-x64_bin.tar.gz \
+    # && tar xfvz /tmp/openjdk-17_linux-x64_bin.tar.gz -C /opt \
+    # && ln -s /opt/jdk-17 /opt/java \
+    # && rm /tmp/openjdk-17_linux-x64_bin.tar.gz
+
+# Set Java environment variables
+# ENV JAVA_HOME=/opt/java
+# ENV PATH="$JAVA_HOME/bin:$PATH"
+
+# Verify the installation
+RUN java -version
+
+# Define SonarScanner version
+ARG SONAR_SCANNER_VERSION=6.2.0.85879
+
+# Download and install SonarScanner for .NET
+RUN curl -LO https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/6.2.0.85879/sonar-scanner-6.2.0.85879-net-framework.zip\
+    && mkdir -p /opt/sonar-scanner \
+    && unzip sonar-scanner-6.2.0.85879-net-framework.zip -d /opt/sonar-scanner \
+    && rm sonar-scanner-6.2.0.85879-net-framework.zip \
+    && ln -s /opt/sonar-scanner/sonar-scanner-6.2.0.85879-net-framework /opt/sonar-scanner/latest
+
+# Add SonarScanner to PATH
+ENV PATH="/opt/sonar-scanner/latest:${PATH}"
 RUN unset http_proxy
 RUN unset https_proxy
 FROM docker.io/library/amazonlinux:latest
