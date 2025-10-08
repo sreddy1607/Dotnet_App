@@ -1,184 +1,1157 @@
-[Pipeline] { (Update Versions)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] withCredentials
-Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
-[Pipeline] {
-[Pipeline] withCredentials
-Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
-[Pipeline] {
-[Pipeline] sh
-+ aws ecr get-login-password --region us-west-2
-eyJwYXlsb2FkIjoiNGhPb3hPTnkwNG9qYnE5OU96TWNENjNsdVRrNGdEa2RuZzBCbVNvYXd4aGU2dEF3NHlrM05LZ1NUWnkvc1pUaGxuVHp2NVF1M1JpS2hsSjE4ZlhQazFCUUxXWC9XclQyNzNrTXR3SnNCVHhwN0pNbXJDWVdHMmZsNmVjV0pHeXVoN2dwZ2VndmRxM3R2YmVqWC81WTQ3VUhkZFJLdG1XSldRT0hoeXl4ZnNEbTI1ZU9uM3RlaFBrWXM4a09SM0dHWTg0dTY3R204eWw0N1V3eGVnZkdmSHdSSlI4UkRlS0Yya2NOcVNUcjc4UTA2SUVCZXY1Q25zeEdSWWMvS0w3NlR4YUlzWXIzNGx5NXh1NytpdHMrY1h2QnFkU2Y5Mlgrb3crcGhUVDhIbGFHNHNMZmxQMUZUVjJFVFRUWWo1dzE3aEYveUVjNmZCVE5oUVZyU1p0MmtFNHUxQzhVcjBaOUdZbmFwT3QxUlVkb0h5TzNEa3lQTi9qWUpDelQrR1doUDMrMjRtQlRTUUt4Q0k2Z2dLb01Fb0hsenRnNnZOQ2hYUERZUWlQeWNRcGVzOEluQmxiU2lGWlhjZXhpNmx5MW1GY0FLTS8va3hqTUZ6cStjeVQ1RzJnK3lRUW5QeDZKVGdpQ0p6bnlnTWhyZ0QvRy9TNHU2dmQzR0RBbjRSczdhZ2xvb0JJSXp4a2NERklJUzQwTUh0dUliVnBNS21PaFFDb24vQi9GUTZpQ1lMOTBiRTVOYjlZUU1XS0dkazd2eHhwcUZaVmZaaC9SbU1vcUwxZkIrVDVtU2Vnd1M2N0Iza2J1WTE5OTFLODVSUytmemxMNGF6U2dLcG9UYkpDK2xYSGkyZmNRNmlqRUVxWjRuak9ITEszeXZPbTdUNHEwTDlDQU5HbmRHUWM4RzliSGx2MHVTMWFObytRaTU0V1dIN3A2S0U4MzNSRWVLTDM1L0JLMlFnbFlyK1g5eWZYTyt1NXNwc2hyOWRzaDNjZEM2YnZlWnFNaVgvV1NBRTZRdzM2QWUyODNpdDdEV3hvRURnN1J1ZmJDTHJkcUxMQUR0c3IvWXZkM2FvNFRjNmhDdGNlbS9LVlVXWlh4RHJ0d2dsNGU2QnMwdHhscXBQQVdiVHBVQTVIbFkzdXRsbjVmcEJLVy9oUkw5Z3B1TWtKd1FLckFqQS91RzNWcGVvSkowaFI4MTFMbDZiektoMlpjcGhKZkE2MG1CT0Q3ajQvMFhFaW54QkZkR1VDN0ZWUzJ1dXRvazBCaGd6bzRSTWQ5eTBHcGRkWDVISUVFZFQxRFVVMVFoelIzaXkyU2E4dmZwOEZkQjNRY3lQZ2N2RnZqWnk0RlFqZDNxT2F1IiwiZGF0YWtleSI6IkFRRUJBSGo2bGM0WElKdy83bG4wSGMwMERNZWs2R0V4SENiWTRSSXBUTUNJNThJblV3QUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURFSHc4aUkydlRsOURuYzJFUUlCRUlBN0NneGlRVko5WWs5TXRhNzRyWGNBd0Uvckt3TU9uYXpOdEl1by9kQkZhUENhSGs5R3c2TEtuN3N2ei9XblpHTFFkdkZETkpNd1pZYnFrQms9IiwidmVyc2lvbiI6IjIiLCJ0eXBlIjoiREFUQV9LRVkiLCJleHBpcmF0aW9uIjoxNzYwMDAyOTI3fQ==
-[Pipeline] sh
-+ aws ecr describe-images --repository-name cammissample --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
-+ tr -d '
-'
-[Pipeline] echo
-version after: "2.0.23"
-Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
-[Pipeline] echo
-env_versionList: ["cammissample:2.0.23"]
-[Pipeline] echo
-g_result: [cammissample:2.0.23]
-[Pipeline] sh
-+ aws ecr describe-images --repository-name cammiscloud --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
-+ tr -d '
-'
-[Pipeline] echo
-version after: "5.0.0"
-Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
-[Pipeline] echo
-env_versionList: ["cammissample:2.0.23", "cammiscloud:5.0.0"]
-[Pipeline] echo
-g_result: [cammissample:2.0.23, cammiscloud:5.0.0]
-[Pipeline] sh
-+ aws ecr describe-images --repository-name cammisbuildah --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
-+ tr -d '
-'
-[Pipeline] echo
-version after: "1.0.keep"
-Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
-[Pipeline] echo
-env_versionList: ["cammissample:2.0.23", "cammiscloud:5.0.0", "cammisbuildah:1.0.keep"]
-[Pipeline] echo
-g_result: [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep]
-[Pipeline] sh
-+ aws ecr describe-images --repository-name cammisterraform --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
-+ tr -d '
-'
-[Pipeline] echo
-version after: "1.0.3"
-Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
-[Pipeline] echo
-env_versionList: ["cammissample:2.0.23", "cammiscloud:5.0.0", "cammisbuildah:1.0.keep", "cammisterraform:1.0.3"]
-[Pipeline] echo
-g_result: [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep, cammisterraform:1.0.3]
-[Pipeline] sh
-+ aws ecr describe-images --repository-name cammisboto3 --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
-+ tr -d '
-'
-[Pipeline] echo
-version after: "1.0.2"
-Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
-[Pipeline] echo
-env_versionList: ["cammissample:2.0.23", "cammiscloud:5.0.0", "cammisbuildah:1.0.keep", "cammisterraform:1.0.3", "cammisboto3:1.0.2"]
-[Pipeline] echo
-g_result: [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep, cammisterraform:1.0.3, cammisboto3:1.0.2]
-[Pipeline] sh
-+ aws ecr describe-images --repository-name cammismaven --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
-+ tr -d '
-'
-[Pipeline] echo
-version after: "latest"
-[Pipeline] echo
-version before : latest
-[Pipeline] sh
-+ aws ecr describe-images --repository-name cammismaven --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[1]'
-+ tr -d '
-'
-[Pipeline] echo
-version after: "0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a"
-Did you forget the `def` keyword? WorkflowScript seems to be setting a field named env_versionList (to a value of type ArrayList) which could lead to memory leaks or other issues.
-[Pipeline] echo
-env_versionList: ["cammissample:2.0.23", "cammiscloud:5.0.0", "cammisbuildah:1.0.keep", "cammisterraform:1.0.3", "cammisboto3:1.0.2", "cammismaven:0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a"]
-[Pipeline] echo
-g_result: [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep, cammisterraform:1.0.3, cammisboto3:1.0.2, cammismaven:0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a]
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] withCredentials
-Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
-[Pipeline] {
-[Pipeline] withCredentials
-Masking supported pattern matches of $NPASS
-[Pipeline] {
-[Pipeline] echo
-Inside the job tmp directory.
-[Pipeline] pwd
-[Pipeline] echo
-/home/jenkins/agent/workspace/cammis-msaspapp
-[Pipeline] git
-Selected Git installation does not exist. Using Default
-The recommended git tool is: NONE
-using credential Github
-Warning: JENKINS-30600: special launcher org.csanchez.jenkins.plugins.kubernetes.pipeline.ContainerExecDecorator$1@3430bd24; decorates RemoteLauncher[hudson.remoting.Channel@58911885:JNLP4-connect connection from ip-10-155-5-241.us-west-2.compute.internal/10.155.5.241:44228] will be ignored (a typical symptom is the Git executable not being run inside a designated container)
-Fetching changes from the remote Git repository
-Checking out Revision 2905b217092259cd39656fb06884023ff5b8400c (refs/remotes/origin/feature/mspapp)
- > git rev-parse --resolve-git-dir /home/jenkins/agent/workspace/cammis-msaspapp/.git # timeout=10
- > git config remote.origin.url https://github.com/ca-mmis/cammis-jenkins-dockerfiles.git # timeout=10
-Fetching upstream changes from https://github.com/ca-mmis/cammis-jenkins-dockerfiles.git
- > git --version # timeout=10
- > git --version # 'git version 2.39.5'
-using GIT_ASKPASS to set credentials Used by Jenkins to connect to Github
- > git fetch --tags --force --progress -- https://github.com/ca-mmis/cammis-jenkins-dockerfiles.git +refs/heads/*:refs/remotes/origin/* # timeout=10
- > git rev-parse refs/remotes/origin/feature/mspapp^{commit} # timeout=10
- > git config core.sparsecheckout # timeout=10
- > git checkout -f 2905b217092259cd39656fb06884023ff5b8400c # timeout=10
- > git branch -a -v --no-abbrev # timeout=10
- > git checkout -b feature/mspapp 2905b217092259cd39656fb06884023ff5b8400c # timeout=10
-Commit message: "Update Dockerfile"
- > git rev-list --no-walk 6e0a5da7172533f6aa42838d5342077cc7437537 # timeout=10
-[Pipeline] echo
-g_result : [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep, cammisterraform:1.0.3, cammisboto3:1.0.2, cammismaven:0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a]
-[Pipeline] writeFile
-[Pipeline] sh
-Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
-		 Affected argument(s) used the following variable(s): [NPASS]
-		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
-+ cat devops/versions.txt
-cammissample:2.0.23
-cammiscloud:5.0.0
-cammisbuildah:1.0.keep
-cammisterraform:1.0.3
-cammisboto3:1.0.2
-cammismaven:0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a
-+ git status
-On branch feature/mspapp
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-	auth.json
-	devops/ecr_cammismspapp_report.txt
+/*
+=======================================================================================
+This file is being updated constantly by the DevOps team to introduce new enhancements
+based on the template for ngnix apps.  If you have suggestions for improvement,
+please contact the DevOps team so that we can incorporate the changes into the
+template.  In the meantime, if you have made changes here or don't want this file to be
+updated, please indicate so at the beginning of this file.
+=======================================================================================
+*/
 
-nothing added to commit but untracked files present (use "git add" to track)
-+ git add devops/versions.txt
-+ git commit -m versions.txt for [cammissample:2.0.23, cammiscloud:5.0.0, cammisbuildah:1.0.keep, cammisterraform:1.0.3, cammisboto3:1.0.2, cammismaven:0.0.1-SNAPSHOT_devops-openshift_40_efa52d3a])
-On branch feature/mspapp
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-	auth.json
-	devops/ecr_cammismspapp_report.txt
+    
+/*
+naming convention:
+    APP_NAME - all cap variables are either from Jenkinsfile.properties or jenkins built-in variables
+               or pipeline parameters.
+    g_stage_index - variables starting with "g_" are global variables declared in this file
+    env_git_branch_type - variables starting with "env_" are declared in the environment section
+*/
 
-nothing added to commit but untracked files present (use "git add" to track)
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] }
-[Pipeline] // podTemplate
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
-Finished: FAILURE
+
+// Useful commands that can used.
+//prev_merge=$(git log |grep -C1 Merge | grep commit |head -n1 | awk {'print $2'})
+//commit=$(git log |head -n 1  | awk {'print $2'})
+//git diff --name-only $prev_merge $commit
+//git whatchanged origin/master -n 1
+//git diff --name-only HEAD HEAD~1
+
+//aws ecr list-images --repository-name cammiscloud --max-items 1
+//aws ecr list-images --repository-name cammiscloud --max-items 1 | jq  .imageIds[].imageTag | tr -d '"'
+//1.13
+//aws ecr describe-images --repository-name cammiscloud --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' | tr -d '"'
+//aws ecr describe-images --repository-name cammissample --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[1]' | tr -d '"'
+
+//this points to the current type of environment the build is supposed to be deployed and tested.
+//BRANCHES[env_git_branch_type].stages[g_stage_index]
+//should be part of environment. but env variables can't be integer
+//g_stage_index=1
+//g_my_docker_image=null
+//namespace array for an env type
+//g_namespaces=[]
+g_results=[]
+
+def NEWSECRET
+node {
+ withCredentials([string(credentialsId: 'GitHub-Token', variable: 'NEWSECRET')]) { //set SECRET with the credential content
+    echo "My secret from Node '${NEWSECRET}'"
+    
+  }
+}
+pipeline {
+  agent {
+    kubernetes {
+      yamlFile "devops/kubePodTemplate.yaml"
+    }
+  }
+ 
+  environment {
+    AWS_DEFAULT_REGION="us-west-2"
+    env_environment=""
+    env_action=""
+    env_release_type=""
+    env_full_version=""
+    env_relType=""
+    env_versions=""
+    env_version_data=""
+    env_versionList=""
+    env_git_branch_name=""
+    env_current_git_commit=""
+    env_git_repo_url=""
+    env_stage_name=""
+    env_step_name=""
+    env_git_tag_name="Initial"
+    env_cluster_subdomain="${CLUSTER_SUBDOMAIN}"
+    
+    env_cammiscloud=""
+    env_cammisbuildah=""
+    env_cammissample=""
+    env_cammisboto3=""
+	  env_cammismaven=""
+    env_cammismspapp=""
+  }
+
+ stages {
+    stage("initialize") {
+      steps {
+        container(name: "jnlp") {
+          script {
+           withCredentials([string(credentialsId: 'GitHub-Token', variable: 'SECRET')]) { //set SECRET with the credential content
+            echo "My secret text is '${SECRET}'"
+            
+            // if you modify anything in the choice parameter be mindful of the fact that you might have to approve the new
+            // scripts in manage jenkins - in-process script approval
+            //echo "env_versionList: ${env_versionList}"
+            //echo "g_results: ${g_results}"          
+            properties([
+              parameters([
+                  booleanParam(name: 'cammiscloud', defaultValue: false, description: 'Use this option to build and push the cammiscloud Container'),
+                  booleanParam(name: 'cammisbuildah', defaultValue: false, description: 'Use this option to build and push the cammisbuildah Container'),
+                  booleanParam(name: 'cammisterraform', defaultValue: false, description: 'Use this option to test changes to the jenkinsfile - build and push the cammisterraform Container'),
+                  booleanParam(name: 'cammissample', defaultValue: false, description: 'Use this option to test changes to the jenkinsfile - build and push the cammissample Container'),
+                  booleanParam(name: 'cammisboto3', defaultValue: false, description: 'Use this option to test changes to the jenkinsfile - build and push the cammisboto3 Container'),
+				          booleanParam(name: 'cammismaven', defaultValue: false, description: 'Use this option to test changes to the jenkinsfile - build and push the cammismaven Container'),
+                  booleanParam(name: 'cammismspapp', defaultValue: false, description: 'Use this option to test changes to the jenkinsfile - build and push the cammismspapp Container'),
+                  [$class: 'CascadeChoiceParameter', 
+                    choiceType: 'PT_SINGLE_SELECT', 
+                    description: 'Select the Release Type from the Dropdown List',
+                    name: 'RELEASE_TYPE',  
+                    script: 
+                      [$class: 'GroovyScript', 
+                      fallbackScript: [
+                        classpath: [], 
+                        sandbox: true, 
+                        script: "return['No Param Available of this operation - RELEASE_TYPE']"
+                      ], 
+                      script: [
+                        classpath: [], 
+                        sandbox: true, 
+                        script: """
+                          return["PATCH:selected","MINOR","MAJOR"]
+                        """
+                      ] 
+                    ]
+                  ],
+                  [$class: 'DynamicReferenceParameter', 
+                    choiceType: 'ET_ORDERED_LIST', 
+                    description: 'Current versions', 
+                    name: 'Current versions',  
+                    script: 
+                      [$class: 'GroovyScript',
+                        sandbox: true, 
+                        script: 'return["Could not find configurations"]', 
+                        script: [
+                          script: """
+                            def urlrv = "curl -s https://${SECRET}@raw.githubusercontent.com/ca-mmis/combined-devops-jenkins-dockerfiles/feature/mspapp/devops/versions.txt"
+                            def procrv = urlrv.execute();
+                            def outputStreamrv = new StringBuffer();
+                            procrv.waitForProcessOutput(outputStreamrv, System.err);
+                            datarv = outputStreamrv.toString();
+                            def listrv = datarv.readLines();
+                            return listrv 
+                          """                          
+                        ]
+                      ]
+                  ]
+              ])
+            ])
+             
+            env_stage_name = "initialize" 
+            env_step_name = "checkout"
+           
+            deleteDir()
+
+            echo 'checkout source and get the commit id'
+            env_current_git_commit = checkout(scm).GIT_COMMIT
+            echo "env_current_git_commit =>${env_current_git_commit}<-"
+
+            env_git_repo_url = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
+            echo "env_git_repo_url =>${env_git_repo_url}<-"
+
+            echo 'Loading properties file'
+            env_step_name = "load properties"
+            // load the pipeline properties
+            load("devops/Jenkinsfile.properties")
+
+            echo "The cluster subdomain is ${env_cluster_subdomain}"
+
+            env_step_name = "set global variables"
+            echo 'initialize slack channels and tokens'
+        //    initSlackChannels()
+
+            echo 'set branch name'
+            env_git_branch_name = "master"
+
+            //env_tag_only=ECR_TAG_ONLY
+            //env_dry_run=DRY_RUN
+            env_cammiscloud=params.cammiscloud
+            env_cammisbuildah=params.cammisbuildah
+            env_cammissample=params.cammissample
+            env_cammisterraform=params.cammisterraform
+            env_cammisboto3=params.cammisboto3
+			      env_cammismaven=params.cammismaven
+            env_cammismspapp=params.cammismspapp
+
+            if (params.USE_GIT_TAG) {
+              env_git_tag_name = params.GIT_TAG
+            }
+
+            if (params.RELEASE_TYPE) {
+              // Release type - New/Rebuild
+              env_release_type=params.RELEASE_TYPE
+            }
+
+            //set default image name space
+            //change it to SANDBOX_IMAGE_SPACE if it's a feature branch
+            env_image_namespace=NON_SANDBOX_IMAGE_SPACE
+
+            //override release name
+            if ( ! params.RELEASE == "" )
+                RELEASE_NAME=params.RELEASE_TYPE
+
+            // get the short version of commit
+            env_current_git_commit="${env_current_git_commit[0..7]}"
+            echo "env_current_git_commit =>${env_current_git_commit}<-"
+
+            //include commit id in build name
+            currentBuild.displayName = "#${BUILD_NUMBER} --- ${env_current_git_commit}"
+
+            //set the values for the initial environment for deployment and tests
+            
+      //      slackNotification("pipeline","${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}console|build #${BUILD_NUMBER}> started.","#439FE0","false")
+           } // End With
+          } //END script
+        } //END container
+      } //END steps
+    } //END stage
+    
+    stage('build cammissample') {
+      when {
+        expression {
+          params.cammissample == true
+        }
+      }
+      steps {
+        container(name:"buildah") {
+          script {
+            env_stage_name = 'build cammissample image'
+            env_step_name = "build"
+            env_relType=params.RELEASE_TYPE
+            
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+              //login in the ecr
+              sh """
+                aws ecr get-login-password --region us-west-2 | buildah login --authfile ./auth.json -u AWS --password-stdin 136299550619.dkr.ecr.us-west-2.amazonaws.com
+                cat ./auth.json
+              """  
+            
+              // get version info.
+              def version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammissample --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' | tr -d '\n' "
+              
+              version = version.toString().replaceAll('\\"','')	
+              if ( version == "latest" ) {
+                echo "version before : ${version}"
+                version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammissample --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[1]' | tr -d '\n' "
+                version = version.toString().replaceAll('\\"','')	
+                echo "version after: ${version}"
+              }
+              
+              if ( version == "null" ) {
+                env_full_version="1.0.0" 
+              }else {
+                echo "version: ${version}"
+                //version = version.toString().replaceAll('\\"','')	
+                //echo "version: ${version}"
+                def (major, minor, patch) = version.tokenize('.')
+                
+                if (patch == null && minor != "") {
+                  patch = minor
+                  minor = 0  
+                }
+                //def Integer newPatch = patch
+                //def Integer newMinor = minor
+                //def Integer newMajor = major
+                
+                def int newPatch = patch.toInteger();
+                def int newMinor = minor.toInteger();
+                def int newMajor = major.toInteger();
+            
+                if(env_relType == "PATCH" ) {
+                  newPatch = newPatch+1
+                } else if (env_relType == "MINOR") {
+                  newMinor = newMinor+1
+                  newPatch = 0
+                } else if (env_relType == "MAJOR") {
+                  newMajor = newMajor+1
+                  newMinor = 0
+                  newPatch = 0
+                }
+                env_full_version=newMajor+'.'+newMinor+'.'+ newPatch
+              
+              }
+              APP_IMAGE="${IMAGE_REGISTRY}/cammissample:${env_full_version}"
+              echo "APP_IMAGE: ${APP_IMAGE}"
+            
+              APP_LATEST="${IMAGE_REGISTRY}/cammissample:latest"
+              echo "APP_LATEST: ${APP_LATEST}"
+            
+              // Tag containers prior to push
+              sh """
+                echo "Building image"
+                #buildah --storage-driver vfs bud --tls-verify="false" --authfile ./auth.json --format=docker -f cammissample/Dockerfile -t ${APP_LATEST} -t ${APP_IMAGE} .
+                buildah --storage-driver vfs bud --tls-verify="false" --authfile ./auth.json --format=docker -f cammissample/Dockerfile -t ${APP_IMAGE} .
+                buildah --storage-driver vfs images -a
+              
+              """
+
+              sh """
+                echo "Show images"
+                buildah --storage-driver vfs images --digests
+              """
+              // Added Cammis - Outside of shell
+              echo "Building def"
+            
+              // Push to container to ECR
+              sh """
+                echo Buildah push
+                echo "IMAGE_REGISTRY: ${IMAGE_REGISTRY}"
+                buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_IMAGE}"
+                #buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_LATEST}"
+                aws ecr list-images --repository-name cammissample
+
+                sleep 15
+              """
+             
+            }  // End With
+          }  //Script
+        } // end container
+        container(name:"awscli") {
+          script {
+            env_step_name = "pull vulnerability report"
+            //env_image_fullspec="${env_image_namespace}/cammissample"
+            env_image_fullspec="cammissample"
+            echo "env_image_fullspec = ${env_image_fullspec}"
+            getVulnerabilityInfo(env_image_fullspec,env_full_version)
+          }
+        }  // END Container awscli
+        container(name:"jnlp") {
+          script {
+            echo "send slack message"
+            // env_step_name = "tag"
+            // slackNotification("pipeline","${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}console|build #${BUILD_NUMBER}> published to ECR.","#31C624","false")      
+          }  // END Script
+        }  // END Container
+        
+        
+      }  // End Steps
+    } // END Stage 
+
+    stage('build cammiscloud') {
+      when {
+        expression {
+          params.cammiscloud == true
+        }
+      }
+      steps {
+        container(name:"buildah") {
+          script {
+            env_stage_name = 'build cammiscloud image'
+            env_step_name = "build"
+            env_relType=params.RELEASE_TYPE
+            
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+              //login in the ecr
+              sh """
+                aws ecr get-login-password --region us-west-2 | buildah login --authfile ./auth.json -u AWS --password-stdin 136299550619.dkr.ecr.us-west-2.amazonaws.com
+                cat ./auth.json
+              """  
+            
+              // Setup version info.
+              // ******  Get the file that has changed.
+              def version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammiscloud --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' | tr -d '\n' "
+              
+              version = version.toString().replaceAll('\\"','')	
+              if ( version == "latest" ) {
+                echo "version before : ${version}"
+                version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammiscloud --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[1]' | tr -d '\n' "
+                version = version.toString().replaceAll('\\"','')	
+                echo "version after: ${version}"
+              }
+              
+              if ( version == "null" ) {
+                env_full_version="1.0.0"  
+              }else {
+                echo "version: ${version}"
+                //version = version.toString().replaceAll('\\"','')	
+                //echo "version: ${version}"
+                def (major, minor, patch) = version.tokenize('.')
+                
+                if (patch == null && minor != "") {
+                  patch = minor
+                  minor = 0  
+                }
+                //def Integer newPatch = patch
+                //def Integer newMinor = minor
+                //def Integer newMajor = major
+                
+                def int newPatch = patch.toInteger();
+                def int newMinor = minor.toInteger();
+                def int newMajor = major.toInteger();
+            
+                if(env_relType == "PATCH" ) {
+                  newPatch = newPatch+1
+                } else if (env_relType == "MINOR") {
+                  newMinor = newMinor+1
+                  newPatch = 0
+                } else if (env_relType == "MAJOR") {
+                  newMajor = newMajor+1
+                  newMinor = 0
+                  newPatch = 0
+                }
+                env_full_version=newMajor+'.'+newMinor+'.'+ newPatch
+              
+              }
+              APP_IMAGE="${IMAGE_REGISTRY}/cammiscloud:${env_full_version}"
+              echo "APP_IMAGE: ${APP_IMAGE}"
+            
+              APP_LATEST="${IMAGE_REGISTRY}/cammiscloud:latest"
+              echo "APP_LATEST: ${APP_LATEST}"
+            
+              // Tag containers prior to push
+              sh """
+                echo "Building image"
+                buildah --storage-driver vfs bud --tls-verify="false" --authfile ./auth.json --format=docker -f cammiscloud/Dockerfile -t ${APP_LATEST} -t ${APP_IMAGE} .
+                #buildah --storage-driver vfs bud --tls-verify="false" --authfile ./auth.json --format=docker -f cammiscloud/Dockerfile -t ${APP_IMAGE} .
+                buildah --storage-driver vfs images -a
+              
+              """
+
+              sh """
+                echo "Show images"
+                buildah --storage-driver vfs images --digests
+              """
+              // Added Cammis - Outside of shell
+              echo "Building def"
+            
+              // Push to container to ECR
+              sh """
+                echo Buildah push
+                echo "IMAGE_REGISTRY: ${IMAGE_REGISTRY}"
+                buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_IMAGE}"
+                #buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_LATEST}"
+                aws ecr list-images --repository-name cammiscloud
+
+                sleep 15
+              """
+             
+            }  // End With
+          }  //Script
+        } // end container
+        container(name:"awscli") {
+          script {
+            env_step_name = "pull vulnerability report"
+            //env_image_fullspec="${env_image_namespace}/cammiscloud"
+            env_image_fullspec="cammiscloud"
+            echo "env_image_fullspec = ${env_image_fullspec}"
+            getVulnerabilityInfo(env_image_fullspec,env_full_version)
+          }
+        }  // END Container awscli
+        container(name:"jnlp") {
+          script {
+            echo "send slack message"
+            // env_step_name = "tag"
+            // slackNotification("pipeline","${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}console|build #${BUILD_NUMBER}> published to ECR.","#31C624","false")      
+          }  // END Script
+        }  // END Container
+        
+      }  // End Steps
+    } // END Stage 
+
+   stage('build cammisbuildah') {
+      when {
+        expression {
+          params.cammisbuildah == true
+        }
+      }
+      steps {
+        container(name:"buildah") {
+          script {
+            env_stage_name = 'build cammisbuildah image'
+            env_step_name = "build"
+            env_relType=params.RELEASE_TYPE
+            
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+              //login in the ecr
+              sh """
+                aws ecr get-login-password --region us-west-2 | buildah login --authfile ./auth.json -u AWS --password-stdin 136299550619.dkr.ecr.us-west-2.amazonaws.com
+                cat ./auth.json
+              """  
+            
+              // Setup version info.
+              // ******  Get the file that has changed.
+              def version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammisbuildah --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' | tr -d '\n' "
+              
+              version = version.toString().replaceAll('\\"','')	
+              if ( version == "latest" ) {
+                echo "version before : ${version}"
+                version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammisbuildah --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[1]' | tr -d '\n' "
+                version = version.toString().replaceAll('\\"','')	
+                echo "version after: ${version}"
+              }
+              
+              if ( version == "null" ) {
+                env_full_version="1.0.0" 
+              } else {
+                echo "version: ${version}"
+                //version = version.toString().replaceAll('\\"','')	
+                //echo "version: ${version}"
+                def (major, minor, patch) = version.tokenize('.')
+                
+                if (patch == null && minor != "") {
+                  patch = minor
+                  minor = 0  
+                }
+                
+                //def Integer newPatch = patch
+                //def Integer newMinor = minor
+                //def Integer newMajor = major
+            
+                def int newPatch = patch.toInteger();
+                def int newMinor = minor.toInteger();
+                def int newMajor = major.toInteger();
+            
+                if(env_relType == "PATCH" ) {
+                  newPatch = newPatch+1
+                } else if (env_relType == "MINOR") {
+                  newMinor = newMinor+1
+                  newPatch = 0
+                } else if (env_relType == "MAJOR") {
+                  newMajor = newMajor+1
+                  newMinor = 0
+                  newPatch = 0
+                }
+                env_full_version=newMajor+'.'+newMinor+'.'+ newPatch
+              
+              }
+              APP_IMAGE="${IMAGE_REGISTRY}/cammisbuildah:${env_full_version}"
+              echo "APP_IMAGE: ${APP_IMAGE}"
+            
+              APP_LATEST="${IMAGE_REGISTRY}/cammisbuildah:latest"
+              echo "APP_LATEST: ${APP_LATEST}"
+            
+              // Tag containers prior to push
+              sh """
+                echo "Building image"
+                buildah --storage-driver vfs bud --tls-verify="false" --authfile ./auth.json --format=docker -f cammisbuildah/Dockerfile -t ${APP_LATEST} -t ${APP_IMAGE} .
+                #buildah --storage-driver vfs bud --tls-verify="false" --authfile ./auth.json --format=docker -f cammisbuildah/Dockerfile -t ${APP_IMAGE} .
+                buildah --storage-driver vfs images -a
+              
+              """
+
+              sh """
+                echo "Show images"
+                buildah --storage-driver vfs images --digests
+              """
+              // Added Cammis - Outside of shell
+              echo "Building def"
+            
+              // Push to container to ECR
+              sh """
+                echo Buildah push
+                echo "IMAGE_REGISTRY: ${IMAGE_REGISTRY}"
+                buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_IMAGE}"
+                #buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_LATEST}"
+                aws ecr list-images --repository-name cammiscloud
+
+                sleep 15
+              """
+             
+            }  // End With
+          }  //Script
+        } // end container
+        
+        container(name:"awscli") {
+          script {
+            env_step_name = "pull vulnerability report"
+            //env_image_fullspec="${env_image_namespace}/cammisbuildah"
+            env_image_fullspec="cammisbuildah"
+            echo "env_image_fullspec = ${env_image_fullspec}"
+            getVulnerabilityInfo(env_image_fullspec,env_full_version)
+          }
+        }  // END Container awscli
+        container(name:"jnlp") {
+          script {
+            echo "send slack message"
+            // env_step_name = "tag"
+            // slackNotification("pipeline","${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}console|build #${BUILD_NUMBER}> published to ECR.","#31C624","false")      
+          }  // END Script
+        }  // END Container
+        
+        
+      }  // End Steps
+    } // END Stage 
+
+    
+	
+	stage('build cammismaven') {
+      when {
+        expression {
+          params.cammismaven == true
+        }
+      }
+      steps {
+        container(name:"buildah") {
+          script {
+            env_stage_name = 'build cammismaven image'
+            env_step_name = "build"
+            env_relType=params.RELEASE_TYPE
+            
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+              //login in the ecr
+              sh """
+                aws ecr get-login-password --region us-west-2 | buildah login --authfile ./auth.json -u AWS --password-stdin 136299550619.dkr.ecr.us-west-2.amazonaws.com
+                cat ./auth.json
+              """  
+              // Check if repository exists, if not, create it
+                    def repositoryExists = sh(returnStatus: true, script: "aws ecr describe-repositories --repository-names cammismaven").toInteger() == 0
+                    if (!repositoryExists) {
+                        sh "aws ecr create-repository --repository-name cammismaven"
+                    }
+					
+              // get version info.
+              def version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammismaven --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' | tr -d '\n' "
+              
+              version = version.toString().replaceAll('\\"','')	
+              if ( version == "latest" ) {
+                echo "version before : ${version}"
+                version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammismaven --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[1]' | tr -d '\n' "
+                version = version.toString().replaceAll('\\"','')	
+                echo "version after: ${version}"
+              }
+              
+              if ( version == "null" ) {
+                env_full_version="1.0.0" 
+              }else {
+                echo "version: ${version}"
+                //version = version.toString().replaceAll('\\"','')	
+                //echo "version: ${version}"
+                def (major, minor, patch) = version.tokenize('.')
+                
+                if (patch == null && minor != "") {
+                  patch = minor
+                  minor = 0  
+                }
+                //def Integer newPatch = patch
+                //def Integer newMinor = minor
+                //def Integer newMajor = major
+                
+                def int newPatch = patch.toInteger();
+                def int newMinor = minor.toInteger();
+                def int newMajor = major.toInteger();
+            
+                if(env_relType == "PATCH" ) {
+                  newPatch = newPatch+1
+                } else if (env_relType == "MINOR") {
+                  newMinor = newMinor+1
+                  newPatch = 0
+                } else if (env_relType == "MAJOR") {
+                  newMajor = newMajor+1
+                  newMinor = 0
+                  newPatch = 0
+                }
+                env_full_version=newMajor+'.'+newMinor+'.'+ newPatch
+              
+              }
+              APP_IMAGE="${IMAGE_REGISTRY}/cammismaven:${env_full_version}"
+              echo "APP_IMAGE: ${APP_IMAGE}"
+            
+              APP_LATEST="${IMAGE_REGISTRY}/cammismaven:latest"
+              echo "APP_LATEST: ${APP_LATEST}"
+            
+              // Tag containers prior to push
+            sh """
+		  ls -la
+		  echo 'Building image'
+		  buildah --storage-driver vfs bud --tls-verify="false" --authfile ./auth.json --format=docker -f cammismaven/Dockerfile -t ${APP_IMAGE} .
+                  buildah --storage-driver vfs images -a
+		"""
+
+              sh """
+                echo "Show images"
+                buildah --storage-driver vfs images --digests
+              """
+              // Added Cammis - Outside of shell
+              echo "Building def"
+            
+              // Push to container to ECR
+              sh """
+                echo Buildah push
+                echo "IMAGE_REGISTRY: ${IMAGE_REGISTRY}"
+                buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_IMAGE}"
+                #buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_LATEST}"
+                aws ecr list-images --repository-name cammismaven
+
+                sleep 15
+              """
+             
+            }  // End With
+          }  //Script
+        } // end container
+        container(name:"awscli") {
+          script {
+            env_step_name = "pull vulnerability report"
+            //env_image_fullspec="${env_image_namespace}/cammismaven"
+            env_image_fullspec="cammismaven"
+            echo "env_image_fullspec = ${env_image_fullspec}"
+            getVulnerabilityInfo(env_image_fullspec,env_full_version)
+          }
+        }  // END Container awscli
+        container(name:"jnlp") {
+          script {
+            echo "send slack message"
+            // env_step_name = "tag"
+            // slackNotification("pipeline","${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}console|build #${BUILD_NUMBER}> published to ECR.","#31C624","false")      
+          }  // END Script
+        }  // END Container
+        
+        
+      }  // End Steps
+    } // END Stage 
+
+
+    stage('build cammismspapp') {
+      when {
+        expression {
+          params.cammismspapp == true
+        }
+      }
+      steps {
+        container(name:"buildah") {
+          script {
+            env_stage_name = 'build cammismspapp image'
+            env_step_name = "build"
+            env_relType=params.RELEASE_TYPE
+            
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+              //login in the ecr
+              sh """
+
+                aws ecr get-login-password --region us-west-2 | buildah login --authfile ./auth.json -u AWS --password-stdin 136299550619.dkr.ecr.us-west-2.amazonaws.com
+                cat ./auth.json
+              """  
+              // Check if repository exists, if not, create it
+                    def repositoryExists = sh(returnStatus: true, script: "aws ecr describe-repositories --repository-names cammismspapp").toInteger() == 0
+                    if (!repositoryExists) {
+                        sh "aws ecr create-repository --repository-name cammismspapp"
+                    }
+					
+              // get version info.
+              def version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammismspapp --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' | tr -d '\n' "
+              
+              version = version.toString().replaceAll('\\"','')	
+              if ( version == "latest" ) {
+                echo "version before : ${version}"
+                version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammismspapp --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[1]' | tr -d '\n' "
+                version = version.toString().replaceAll('\\"','')	
+                echo "version after: ${version}"
+              }
+              
+              if ( version == "null" ) {
+                env_full_version="1.0.0" 
+              }else {
+                echo "version: ${version}"
+                //version = version.toString().replaceAll('\\"','')	
+                //echo "version: ${version}"
+                def (major, minor, patch) = version.tokenize('.')
+                
+                if (patch == null && minor != "") {
+                  patch = minor
+                  minor = 0  
+                }
+                //def Integer newPatch = patch
+                //def Integer newMinor = minor
+                //def Integer newMajor = major
+                
+                def int newPatch = patch.toInteger();
+                def int newMinor = minor.toInteger();
+                def int newMajor = major.toInteger();
+            
+                if(env_relType == "PATCH" ) {
+                  newPatch = newPatch+1
+                } else if (env_relType == "MINOR") {
+                  newMinor = newMinor+1
+                  newPatch = 0
+                } else if (env_relType == "MAJOR") {
+                  newMajor = newMajor+1
+                  newMinor = 0
+                  newPatch = 0
+                }
+                env_full_version=newMajor+'.'+newMinor+'.'+ newPatch
+              
+              }
+              APP_IMAGE="${IMAGE_REGISTRY}/cammismspapp:${env_full_version}"
+              echo "APP_IMAGE: ${APP_IMAGE}"
+            
+              APP_LATEST="${IMAGE_REGISTRY}/cammismspapp:latest"
+              echo "APP_LATEST: ${APP_LATEST}"
+            
+              // Tag containers prior to push
+            sh """
+		  ls -la
+		  echo 'Building image'
+		  buildah --storage-driver vfs bud --tls-verify="false" --authfile ./auth.json --format=docker -f cammismspapp/Dockerfile -t ${APP_IMAGE} .
+                  buildah --storage-driver vfs images -a
+		"""
+
+              sh """
+                echo "Show images"
+                buildah --storage-driver vfs images --digests
+              """
+              // Added Cammis - Outside of shell
+              echo "Building def"
+            
+              // Push to container to ECR
+              sh """
+                echo Buildah push
+                echo "IMAGE_REGISTRY: ${IMAGE_REGISTRY}"
+                buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_IMAGE}"
+                #buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_LATEST}"
+                aws ecr list-images --repository-name cammismspapp
+
+                sleep 15
+              """
+             
+            }  // End With
+          }  //Script
+        } // end container
+        container(name:"awscli") {
+          script {
+            env_step_name = "pull vulnerability report"
+            //env_image_fullspec="${env_image_namespace}/cammismspapp"
+            env_image_fullspec="cammismspapp"
+            echo "env_image_fullspec = ${env_image_fullspec}"
+            getVulnerabilityInfo(env_image_fullspec,env_full_version)
+          }
+        }  // END Container awscli
+        container(name:"jnlp") {
+          script {
+            echo "send slack message"
+            // env_step_name = "tag"
+            // slackNotification("pipeline","${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}console|build #${BUILD_NUMBER}> published to ECR.","#31C624","false")      
+          }  // END Script
+        }  // END Container
+        
+        
+      }  // End Steps
+    } // END Stage 
+
+
+    stage('build cammisterraform') {
+      when {
+        expression {
+          params.cammisterraform == true
+        }
+      }
+      steps {
+        container(name:"buildah") {
+          script {
+            env_stage_name = 'build cammisterraform image'
+            env_step_name = "build"
+            env_relType=params.RELEASE_TYPE
+            
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+              //login in the ecr
+              sh """
+                aws ecr get-login-password --region us-west-2 | buildah login --authfile ./auth.json -u AWS --password-stdin 136299550619.dkr.ecr.us-west-2.amazonaws.com
+                cat ./auth.json
+              """  
+            
+              // Setup version info.
+              // ******  Get the file that has changed.
+              def version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammisterraform --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' | tr -d '\n' "
+              
+              version = version.toString().replaceAll('\\"','')	
+              if ( version == "latest" ) {
+                echo "version before : ${version}"
+                version= sh returnStdout: true, script: "aws ecr describe-images --repository-name cammisterraform --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[1]' | tr -d '\n' "
+                version = version.toString().replaceAll('\\"','')	
+                echo "version after: ${version}"
+              }
+              
+              if ( version == "null" ) {
+                env_full_version="1.0.0"  
+              }else {
+                echo "version: ${version}"
+                //version = version.toString().replaceAll('\\"','')	
+                //echo "version: ${version}"
+                def (major, minor, patch) = version.tokenize('.')
+                
+                echo "major:>${major}<"
+                echo "minor:>${minor}<"
+                echo "patch:>${patch}<"
+                
+                if (patch == null && minor != "") {
+                  patch = minor
+                  minor = 0  
+                }
+                //def Integer xnewPatch = patch
+                //def Integer xnewMinor = minor
+                //def Integer xnewMajor = major
+                
+                def int xnewPatch = patch.toInteger();
+                def int xnewMinor = minor.toInteger();
+                def int xnewMajor = major.toInteger();
+                
+                echo "xnewMajor: ${xnewMajor}"
+                echo "xnewMinor: ${xnewMinor}"
+                echo "xnewPatch: ${xnewPatch}"
+            
+                if(env_relType == "PATCH" ) {
+                  xnewPatch = xnewPatch+1
+                } else if (env_relType == "MINOR") {
+                  xnewMinor = xnewMinor+1
+                  xnewPatch = 0
+                } else if (env_relType == "MAJOR") {
+                  xnewMajor = xnewMajor+1
+                  xnewMinor = 0
+                  xnewPatch = 0
+                }
+                env_full_version=xnewMajor+'.'+xnewMinor+'.'+ xnewPatch
+              
+              }
+              APP_IMAGE="${IMAGE_REGISTRY}/cammisterraform:${env_full_version}"
+              echo "APP_IMAGE: ${APP_IMAGE}"
+            
+              APP_LATEST="${IMAGE_REGISTRY}/cammisterraform:latest"
+              echo "APP_LATEST: ${APP_LATEST}"
+            
+              // Tag containers prior to push
+              sh """
+                echo "Building image"
+                # buildah --storage-driver vfs bud --tls-verify="false" --authfile ./auth.json --format=docker -f cammisterraform/Dockerfile -t ${APP_LATEST} -t ${APP_IMAGE} .
+                buildah --storage-driver vfs bud --tls-verify="false" --authfile ./auth.json --format=docker -f cammisterraform/Dockerfile -t ${APP_IMAGE} .
+                buildah --storage-driver vfs images -a
+              
+              """
+
+              sh """
+                echo "Show images"
+                buildah --storage-driver vfs images --digests
+              """
+              // Added Cammis - Outside of shell
+              echo "Building def"
+            
+              // Push to container to ECR
+              sh """
+                echo Buildah push
+                echo "IMAGE_REGISTRY: ${IMAGE_REGISTRY}"
+                buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_IMAGE}"
+                #buildah --storage-driver vfs push --tls-verify="false" --authfile ./auth.json "${APP_LATEST}"
+                aws ecr list-images --repository-name cammisterraform
+
+                sleep 15
+              """
+             
+            }  // End With
+          }  //Script
+        } // end container
+        container(name:"awscli") {
+          script {
+            env_step_name = "pull vulnerability report"
+            //env_image_fullspec="${env_image_namespace}/cammisterraform"
+            env_image_fullspec="cammisterraform"
+            echo "env_image_fullspec = ${env_image_fullspec}"
+            getVulnerabilityInfo(env_image_fullspec,env_full_version)
+          }
+        }  // END Container awscli
+        container(name:"jnlp") {
+          script {
+            echo "send slack message"
+            // env_step_name = "tag"
+            // slackNotification("pipeline","${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}console|build #${BUILD_NUMBER}> published to ECR.","#31C624","false")      
+          }  // END Script
+        }  // END Container
+        
+      }  // End Steps
+    } // END Stage 
+
+    stage('Update Versions') {
+      when {
+        expression {
+          params.cammissample == true || params.cammiscloud == true || params.cammisbuildah == true || params.cammisterraform == true || params.cammisboto3 == true || params.cammismaven == true || params.cammismspapp == true
+        }
+      }
+      steps {
+        container(name:'awscli') {
+          script { 
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+            
+              getallversions()
+              
+            } // END withCredentials
+          }  // END Script
+        } // END Container
+        
+        container(name:'jnlp') {
+          script {    
+              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              
+                writeversioninfo()
+               
+              }  // END With
+          }  // END Script
+        }  // END Container
+      }  // END Step
+    }  // END Stage  
+  }  // END Stages
+} // END Pipeline 
+  
+//set slack channels and tokens
+def initSlackChannels() {
+  SLACK_CHANNELS.each { key, value ->
+      withCredentials([usernamePassword(credentialsId: value.channel,
+                   passwordVariable: 'channel_token',
+                   usernameVariable: 'channel_name')]) {
+                     value.channel="#$channel_name"
+                     value.token="$channel_token"
+                     echo "channel_token is '${channel_token}'"
+		                 echo "channel_name is '${channel_name}'"
+                   }
+  }
+}
+
+// slack notification
+// channel - "pipeline", "po" or "gate_keeper"
+// msg - string
+// color - "good", "danger" , may need more work
+def slackNotification(channel,msg,color,nc) {
+    def lt,lc
+
+    lt=SLACK_CHANNELS[channel].token
+    lc=SLACK_CHANNELS[channel].channel
+
+    slackSend color: color, channel: lc, message: msg, baseUrl: SLACK_URL, token: lt, notifyCommitters: nc
+}
+
+//get vulnerability assessment information from cloud registry scan
+def getVulnerabilityInfo(fullImageSpec,full_version) {
+  withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+      echo "Pulling vulnerability assessment information from AWS ECR Cloud Registry..."
+      def imageTag="${full_version}"
+
+      try {
+
+           	sh 'aws ecr get-login-password --region us-west-2'
+
+
+	  	// wait for scan every 5 seconds 60 times.   Returns 255 on failure
+	  	def COUNT = sh returnStdout: true, script: "aws ecr wait image-scan-complete --repository-name ${fullImageSpec} --image-id imageTag=${imageTag} --region us-west-2 | tr -d '\n'"
+	  	echo "COUNT : ${COUNT}"
+
+	    // 255 means the scan did not complete in 5 minutes
+	  	if ((COUNT != "255")) {
+			echo 'Found report'
+	  		sh "aws ecr describe-image-scan-findings --repository-name ${fullImageSpec} --image-id imageTag=${imageTag} --region us-west-2  --output text | tee devops/ecr_${fullImageSpec}_report.txt"
+
+	  	} else {
+
+	    		echo "Vulnerability scan has taken more then 5 minutes" > devops/ecr_report.txt
+
+	  	} // end if-else
+          publishHTML (target: [
+              allowMissing: true,
+              alwaysLinkToLastBuild: false,
+              keepAll: false,
+              reportDir: 'devops',
+              //reportFiles: 'ecr_report.txt,npm_audit.html',
+              reportFiles: 'ecr_"${fullImageSpec}"_report.txt',
+              reportName: "Vulnerability Assessment Report"
+            ])
+        }
+
+      catch(Exception e) {
+        echo "Scan failed to complete. Please try again later."
+        echo e.toString()
+      }
+  }
+}
+
+//Write version info to version.txt and push to git hub.
+def writeversioninfo() {
+
+  withCredentials([usernamePassword(credentialsId: "${GITHUB_CREDS_ID}", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+    
+    echo "Inside the job tmp directory."
+    echo pwd()
+      
+    git(url: "https://${GIT_HOST}/${GIT_GROUP}/${GIT_DEPLOYMENT_REPO_NAME}.git",credentialsId: "Github",branch: "feature/mspapp") 
+      
+    def version_data=""
+    //File file = new File("devops/versions.txt")
+    //def firstwrite="n"
+    echo "g_result : ${g_results}"
+    
+    for (String g : g_results) {
+      version_data=version_data+"${g}\n"
+    }
+    
+    writeFile(file: 'devops/versions.txt', text: version_data)
+   
+    sh """
+      cat devops/versions.txt
+      git status
+        
+      git add devops/versions.txt
+        
+      git commit -m "versions.txt for ${g_results})"
+      echo "${GIT_HOST}/${GIT_GROUP}/${GIT_DEPLOYMENT_REPO_NAME}"
+      git push -f https://${NUSER}:${NPASS}@${GIT_HOST}/${GIT_GROUP}/${GIT_DEPLOYMENT_REPO_NAME}.git
+    """
+      
+  }
+}
+//
+// Get the version for the containers from ECR.
+//
+def getallversions() {
+  withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+    //login in the ecr
+    sh """
+      aws ecr get-login-password --region us-west-2
+    """  
+              
+    def containerline=""
+    def result=[]
+    def version=""
+    def containerlist = ["cammissample","cammiscloud","cammisbuildah","cammisterraform","cammisboto3","cammismaven"]
+              
+    for (String e : containerlist) {
+              
+      // get version info.
+      version= sh returnStdout: true, script: "aws ecr describe-images --repository-name ${e} --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' | tr -d '\n' "
+      echo "version after: ${version}"
+      version = version.toString().replaceAll('\\"','')	
+                
+      if ( version == "latest" ) {
+        echo "version before : ${version}"
+        version= sh returnStdout: true, script: "aws ecr describe-images --repository-name ${e} --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[1]' | tr -d '\n' "
+        echo "version after: ${version}"
+        version = version.toString().replaceAll('\\"','')	
+        containerline = e+":"+"${version}"
+        g_results.add(containerline)
+        containerline = '"'+containerline+'"'
+        result.add(containerline)
+                   
+        }
+      else {
+        //version = version.toString().replaceAll('\\"','')	
+        containerline = e+":"+"${version}"
+        g_results.add(containerline)
+        containerline = '"'+containerline+'"'
+        result.add(containerline)
+      }
+              
+      env_versionList = result
+      echo "env_versionList: ${env_versionList}"
+      echo "g_result: ${g_results}"
+                       
+    }  // End for         
+  } // END With
+}  // END Script
