@@ -1,59 +1,55 @@
-# syntax=docker/dockerfile:1
-
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/engine/reference/builder/
-
-################################################################################
-
-# Learn about building .NET container images:
-# https://github.com/dotnet/dotnet-docker/blob/main/samples/README.md
-
-# Create a stage for building the application.
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS build
-ARG TARGETARCH
-
-COPY . /source
-
-WORKDIR /source/src
-
-# Build the application.
-# Leverage a cache mount to /root/.nuget/packages so that subsequent builds don't have to re-download packages.
-# If TARGETARCH is "amd64", replace it with "x64" - "x64" is .NET's canonical name for this and "amd64" doesn't
-#   work in .NET 6.0.
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
-    dotnet publish -a ${TARGETARCH/amd64/x64} --use-current-runtime --self-contained false -o /app
-
-# If you need to enable globalization and time zones:
-# https://github.com/dotnet/dotnet-docker/blob/main/samples/enable-globalization.md
-################################################################################
-# Create a new stage for running the application that contains the minimal
-# runtime dependencies for the application. This often uses a different base
-# image from the build stage where the necessary files are copied from the build
-# stage.
-#
-# The example below uses an aspnet alpine image as the foundation for running the app.
-# It will also use whatever happens to be the most recent version of that tag when you
-# build your Dockerfile. If reproducability is important, consider using a more specific
-# version (e.g., aspnet:7.0.10-alpine-3.18),
-# or SHA (e.g., mcr.microsoft.com/dotnet/aspnet@sha256:f3d99f54d504a21d38e4cc2f13ff47d67235efeeb85c109d3d1ff1808b38d034).
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine AS final
-WORKDIR /app
-
-# Copy everything needed to run the app from the "build" stage.
-COPY --from=build /app .
-
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
-ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
-USER appuser
-
-ENTRYPOINT ["dotnet", "myWebApp.dll"]
+#  Dockerfile to build the cammisboto3 container
+FROM docker.io/library/amazonlinux:latest as installer
+RUN echo "proxy=http://10.151.204.100:8080" >> /etc/yum.conf
+# Things that might change (version numbers, etc.) or reused
+ENV BIN_DIR "/usr/local/bin"
+ENV KUBECTL_VERSION "1.26.1"
+ENV HELM_VERSION "v3.11.1"
+ENV ARGO_Version "v2.0.3"
+ENV TARGETOS "linux"
+ENV TARGETARCH "amd64"
+ENV KUSTOMIZE_VERSION "5.0.0"
+RUN yum update -y \
+  && yum install -y unzip \
+  && yum install -y zip \
+  && yum install -y wget \
+  && yum install -y openssl \
+  && yum install -y tar \
+  && yum install -y jq \
+  && yum install -y python3 python3-pip \
+  && python3 -m pip install boto3 pandas s3fs terminaltables progressbar2\
+  && curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip \
+  && unzip -o -q awscliv2.zip \
+  # The --bin-dir is specified so that we can copy the
+  # entire bin directory from the installer stage into
+  # into /usr/local/bin of the final stage without
+  # accidentally copying over any other executables that
+  # may be present in /usr/local/bin of the installer stage.
+  && ./aws/install --bin-dir /aws-cli-bin \
+  # Install git
+  && yum install -y git \
+  && git init \
+  # Install kubectl
+  && wget https://storage.googleapis.com/kubernetes-release/release/v1.26.1/bin/linux/amd64/kubectl \
+  && chmod +x kubectl \
+  && mv kubectl ${BIN_DIR} \
+ # install kustomize 
+  && curl -fL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_${TARGETOS}_${TARGETARCH}.tar.gz | tar xz \                                 
+  && chmod +x kustomize \
+  && mv kustomize ${BIN_DIR} \   
+ # Install Helm
+  && curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
+  && chmod 700 get_helm.sh \
+  && ./get_helm.sh
+RUN unset http_proxy
+RUN unset https_proxy
+FROM docker.io/library/amazonlinux:latest
+RUN echo "proxy=http://10.151.204.100:8080" >> /etc/yum.conf
+COPY --from=installer /usr/ /usr/
+COPY --from=installer /aws-cli-bin/ /usr/local/bin/
+RUN yum update -y \
+  && yum install -y less groff \
+  && yum clean all
+RUN unset http_proxy
+RUN unset https_proxy
+ENTRYPOINT ["/bin/sh"]
