@@ -1,411 +1,308 @@
-Started by user Srinivas.Reddy@dhcs.ca.gov
-Replayed #63
-[Pipeline] Start of Pipeline
-Did you forget the `def` keyword? WorkflowScript seems to be setting a field named APP_NAME (to a value of type String) which could lead to memory leaks or other issues.
-[Pipeline] podTemplate
-[Pipeline] {
-[Pipeline] node
-[PodInfo] jenkins-builder/cognos-jobs-testing-64-pnnbl-4mkpn-m1p3k
-	Container [jnlp] waiting [ContainerCreating] No message
-	Container [node] waiting [ContainerCreating] No message
-	Container [python] waiting [ContainerCreating] No message
-	Pod [Pending][ContainersNotReady] containers with unready status: [jnlp node python]
-Created Pod: kubernetes jenkins-builder/cognos-jobs-testing-64-pnnbl-4mkpn-m1p3k
-[PodInfo] jenkins-builder/cognos-jobs-testing-64-pnnbl-4mkpn-m1p3k
-	Container [jnlp] waiting [ContainerCreating] No message
-	Container [node] waiting [ContainerCreating] No message
-	Container [python] waiting [ContainerCreating] No message
-	Pod [Pending][ContainersNotReady] containers with unready status: [jnlp node python]
-Agent cognos-jobs-testing-64-pnnbl-4mkpn-m1p3k is provisioned from template Cognos_Jobs_testing_64-pnnbl-4mkpn
----
-apiVersion: "v1"
-kind: "Pod"
-metadata:
-  annotations:
-    kubernetes.jenkins.io/last-refresh: "1762549039929"
-    buildUrl: "http://jenkins.jenkins-builder.svc.cluster.local:80/job/Cognos%20Jobs/job/testing/64/"
-    runUrl: "job/Cognos%20Jobs/job/testing/64/"
-  labels:
-    jenkins: "slave"
-    jenkins/label-digest: "d49305814323477c9d70c8b777799b6c07c3c4ad"
-    jenkins/label: "Cognos_Jobs_testing_64-pnnbl"
-    kubernetes.jenkins.io/controller: "http___jenkins_jenkins-builder_svc_cluster_local_80x"
-  name: "cognos-jobs-testing-64-pnnbl-4mkpn-m1p3k"
-  namespace: "jenkins-builder"
-spec:
-  containers:
-  - env:
-    - name: "GIT_SSL_CAINFO"
-      value: "/etc/pki/tls/certs/ca-bundle.crt"
-    - name: "JENKINS_SECRET"
-      value: "********"
-    - name: "JENKINS_TUNNEL"
-      value: "jenkins-jnlp.jenkins-builder.svc.cluster.local:50000"
-    - name: "JENKINS_AGENT_NAME"
-      value: "cognos-jobs-testing-64-pnnbl-4mkpn-m1p3k"
-    - name: "REMOTING_OPTS"
-      value: "-noReconnectAfter 1d"
-    - name: "JENKINS_NAME"
-      value: "cognos-jobs-testing-64-pnnbl-4mkpn-m1p3k"
-    - name: "JENKINS_AGENT_WORKDIR"
-      value: "/home/jenkins/agent"
-    - name: "JENKINS_URL"
-      value: "http://jenkins.jenkins-builder.svc.cluster.local:80/"
-    envFrom:
-    - configMapRef:
-        name: "jenkins-agent-env"
-        optional: true
-    image: "jenkins/inbound-agent:3309.v27b_9314fd1a_4-1"
-    name: "jnlp"
-    resources:
-      requests:
-        memory: "256Mi"
-        cpu: "100m"
-    securityContext:
-      privileged: true
-    volumeMounts:
-    - mountPath: "/etc/pki/tls/certs"
-      name: "jenkins-trusted-ca-bundle"
-    - mountPath: "/home/jenkins/agent"
-      name: "workspace-volume"
-      readOnly: false
-  - command:
-    - "/bin/bash"
-    env:
-    - name: "HOME"
-      value: "/home/jenkins/agent"
-    - name: "BRANCH"
-      value: "DEV"
-    - name: "GIT_SSL_CAINFO"
-      value: "/etc/pki/tls/certs/ca-bundle.crt"
-    envFrom:
-    - configMapRef:
-        name: "jenkins-agent-env"
-        optional: true
-    image: "registry.access.redhat.com/ubi8/nodejs-16:latest"
-    name: "node"
-    securityContext:
-      privileged: true
-    tty: true
-    volumeMounts:
-    - mountPath: "/etc/pki/tls/certs"
-      name: "jenkins-trusted-ca-bundle"
-    - mountPath: "/home/jenkins/agent"
-      name: "workspace-volume"
-      readOnly: false
-    workingDir: "/home/jenkins/agent"
-  - command:
-    - "/bin/bash"
-    env:
-    - name: "HOME"
-      value: "/home/jenkins/agent"
-    - name: "BRANCH"
-      value: "DEV"
-    - name: "GIT_SSL_CAINFO"
-      value: "/etc/pki/tls/certs/ca-bundle.crt"
-    envFrom:
-    - configMapRef:
-        name: "jenkins-agent-env"
-        optional: true
-    image: "136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.2.0"
-    name: "python"
-    securityContext:
-      privileged: true
-    tty: true
-    volumeMounts:
-    - mountPath: "/etc/pki/tls/certs"
-      name: "jenkins-trusted-ca-bundle"
-    - mountPath: "/home/jenkins/agent"
-      name: "workspace-volume"
-      readOnly: false
-    workingDir: "/home/jenkins/agent"
-  nodeSelector:
-    kubernetes.io/os: "linux"
-  restartPolicy: "Never"
-  serviceAccountName: "jenkins"
-  volumes:
-  - hostPath:
-      path: "/var/run/docker.sock"
-    name: "dockersock"
-  - configMap:
-      defaultMode: 420
-      name: "jenkins-trusted-ca-bundle"
-      optional: true
-    name: "jenkins-trusted-ca-bundle"
-  - emptyDir: {}
-    name: "varlibcontainers"
-  - emptyDir:
-      medium: ""
-    name: "workspace-volume"
+/*
+=======================================================================================
+MotioCI → Cognos Automated Deployment Pipeline
+Maintained by: DevOps Team
+Purpose: Automate Cognos content promotion from DEV/TEST to PRD using MotioCI CLI.
+=======================================================================================
+*/
 
-Running on cognos-jobs-testing-64-pnnbl-4mkpn-m1p3k in /home/jenkins/agent/workspace/Cognos Jobs/testing
-[Pipeline] {
-[Pipeline] stage
-[Pipeline] { (Declarative: Checkout SCM)
-[Pipeline] checkout
-Selected Git installation does not exist. Using Default
-The recommended git tool is: NONE
-using credential githubkey
-Cloning the remote Git repository
-Avoid second fetch
-Checking out Revision fe67017f817aba6f7b23baafb965416746f7701a (refs/remotes/origin/sritesting)
-Cloning repository https://github.com/ca-mmis/combined-devops-cognos-deployments.git
- > git init /home/jenkins/agent/workspace/Cognos Jobs/testing # timeout=10
-Fetching upstream changes from https://github.com/ca-mmis/combined-devops-cognos-deployments.git
- > git --version # timeout=10
- > git --version # 'git version 2.39.5'
-using GIT_ASKPASS to set credentials githubkey
- > git fetch --tags --force --progress -- https://github.com/ca-mmis/combined-devops-cognos-deployments.git +refs/heads/*:refs/remotes/origin/* # timeout=10
- > git config remote.origin.url https://github.com/ca-mmis/combined-devops-cognos-deployments.git # timeout=10
- > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
- > git rev-parse refs/remotes/origin/sritesting^{commit} # timeout=10
- > git config core.sparsecheckout # timeout=10
- > git checkout -f fe67017f817aba6f7b23baafb965416746f7701a # timeout=10
-Commit message: "Update Jenkinsfile"
- > git rev-list --no-walk fe67017f817aba6f7b23baafb965416746f7701a # timeout=10
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] withEnv
-[Pipeline] {
-[Pipeline] withEnv
-[Pipeline] {
-[Pipeline] timestamps
-[Pipeline] {
-[Pipeline] stage
-[Pipeline] { (Initialize)
-[Pipeline] script
-[Pipeline] {
-[Pipeline] echo
-12:57:27  ================================================
-[Pipeline] echo
-12:57:27  MotioCI → Cognos Deployment Pipeline
-[Pipeline] echo
-12:57:27  ================================================
-[Pipeline] echo
-12:57:27  Branch: null
-[Pipeline] echo
-12:57:27  Build Number: 64
-[Pipeline] echo
-12:57:27  Initializing searchPath-based deployment...
-[Pipeline] echo
-12:57:27  ================================================
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (MotioCI Login)
-[Pipeline] withCredentials
-12:57:27  Masking supported pattern matches of $CREDENTIALS_FILE
-[Pipeline] {
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-12:57:28  + set -euo pipefail
-12:57:28  + cd MotioCI/api/CLI
-12:57:28  + echo 'Installing MotioCI CLI dependencies...'
-12:57:28  Installing MotioCI CLI dependencies...
-12:57:28  + python3 -m pip install --user -r requirements.txt
-12:57:28  Collecting gql>=3.0.0
-12:57:28    Downloading gql-4.0.0-py3-none-any.whl (89 kB)
-12:57:28  Collecting python-dateutil==2.8.1
-12:57:28    Downloading python_dateutil-2.8.1-py2.py3-none-any.whl (227 kB)
-12:57:28  Collecting python-gitlab~=2.9.0
-12:57:28    Downloading python_gitlab-2.9.0-py3-none-any.whl (108 kB)
-12:57:28  Collecting requests~=2.27.1
-12:57:28    Downloading requests-2.27.1-py2.py3-none-any.whl (63 kB)
-12:57:28  Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.9/site-packages (from python-dateutil==2.8.1->-r requirements.txt (line 2)) (1.16.0)
-12:57:29  Collecting graphql-core<3.3,>=3.2
-12:57:29    Downloading graphql_core-3.2.7-py3-none-any.whl (207 kB)
-12:57:29  Collecting backoff<3.0,>=1.11.1
-12:57:29    Downloading backoff-2.2.1-py3-none-any.whl (15 kB)
-12:57:30  Collecting yarl<2.0,>=1.6
-12:57:30    Downloading yarl-1.22.0-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (346 kB)
-12:57:30  Collecting anyio<5,>=3.0
-12:57:30    Downloading anyio-4.11.0-py3-none-any.whl (109 kB)
-12:57:30  Collecting requests-toolbelt>=0.9.1
-12:57:30    Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
-12:57:30  Collecting certifi>=2017.4.17
-12:57:30    Downloading certifi-2025.10.5-py3-none-any.whl (163 kB)
-12:57:30  Collecting idna<4,>=2.5
-12:57:30    Downloading idna-3.11-py3-none-any.whl (71 kB)
-12:57:31  Collecting charset-normalizer~=2.0.0
-12:57:31    Downloading charset_normalizer-2.0.12-py3-none-any.whl (39 kB)
-12:57:31  Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.9/site-packages (from requests~=2.27.1->-r requirements.txt (line 4)) (1.26.18)
-12:57:31  Collecting exceptiongroup>=1.0.2
-12:57:31    Downloading exceptiongroup-1.3.0-py3-none-any.whl (16 kB)
-12:57:31  Collecting sniffio>=1.1
-12:57:31    Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
-12:57:31  Requirement already satisfied: typing_extensions>=4.5 in /usr/local/lib/python3.9/site-packages (from anyio<5,>=3.0->gql>=3.0.0->-r requirements.txt (line 1)) (4.10.0)
-12:57:31  Collecting propcache>=0.2.1
-12:57:31    Downloading propcache-0.4.1-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (197 kB)
-12:57:32  Collecting multidict>=4.0
-12:57:32    Downloading multidict-6.7.0-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (239 kB)
-12:57:32  Installing collected packages: idna, charset-normalizer, certifi, sniffio, requests, propcache, multidict, exceptiongroup, yarl, requests-toolbelt, graphql-core, backoff, anyio, python-gitlab, python-dateutil, gql
-12:57:33    WARNING: The script normalizer is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
-12:57:33    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-12:57:33    WARNING: The script gitlab is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
-12:57:33    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-12:57:33    WARNING: The script gql-cli is installed in '/home/jenkins/agent/.local/bin' which is not on PATH.
-12:57:33    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-12:57:33  ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-12:57:33  pandas 2.2.1 requires python-dateutil>=2.8.2, but you have python-dateutil 2.8.1 which is incompatible.
-12:57:33  Successfully installed anyio-4.11.0 backoff-2.2.1 certifi-2025.10.5 charset-normalizer-2.0.12 exceptiongroup-1.3.0 gql-4.0.0 graphql-core-3.2.7 idna-3.11 multidict-6.7.0 propcache-0.4.1 python-dateutil-2.8.1 python-gitlab-2.9.0 requests-2.27.1 requests-toolbelt-1.0.0 sniffio-1.3.1 yarl-1.22.0
-12:57:33  WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
-12:57:33  + echo 'Logging in to MotioCI with stored credentials file...'
-12:57:33  Logging in to MotioCI with stored credentials file...
-12:57:33  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov login --credentialsFile ****
-12:57:40  + awk 'match($0,/(Auth[[:space:]]*[Tt]oken|x-auth_token|xauthtoken)[[:space:]]*[:=][[:space:]]*([A-Za-z0-9._-]+)/,m){print m[2]}' login.out
-12:57:40  + tail -n1
-12:57:40  ++ cat login.token
-12:57:40  + TOKEN=f9254ea4-fe38-4006-afb4-c88c7c7a70dd
-12:57:40  + echo 'MotioCI token captured (length: 36)'
-12:57:40  MotioCI token captured (length: 36)
-12:57:40  + '[' -z f9254ea4-fe38-4006-afb4-c88c7c7a70dd ']'
-12:57:40  + '[' 36 -lt 10 ']'
-12:57:40  + echo f9254ea4-fe38-4006-afb4-c88c7c7a70dd
-12:57:40  + echo '✓ Login successful'
-12:57:40  ✓ Login successful
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Create Label with Admin Items)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] sh
-12:57:41  + set -euo pipefail
-12:57:41  + cd MotioCI/api/CLI
-12:57:41  ++ cat ../token.txt
-12:57:41  + TOKEN=f9254ea4-fe38-4006-afb4-c88c7c7a70dd
-12:57:41  + VERSION_NAME=Admin-Deploy-64
-12:57:41  + echo 'Getting Admin item IDs...'
-12:57:41  Getting Admin item IDs...
-12:57:41  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov versionedItems ls --xauthtoken f9254ea4-fe38-4006-afb4-c88c7c7a70dd --instanceName Cognos-DEV/TEST --projectName Demo --searchPath 'starts:/Team Content/MotioCI Reports/Testing/Test Results Detail'
-12:57:41  + grep ''\''id'\'':' items.out
-12:57:41  + grep -v instanceId
-12:57:41  + head -20
-12:57:41  + grep -o '[0-9][0-9]*'
-12:57:41  + paste -sd, -
-12:57:41  ++ cat ids.txt
-12:57:41  + IDS=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
-12:57:41  + echo 'Creating label with IDs: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]'
-12:57:41  Creating label with IDs: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
-12:57:41  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label create --xauthtoken f9254ea4-fe38-4006-afb4-c88c7c7a70dd --instanceName Cognos-DEV/TEST --projectName Demo --name Admin-Deploy-64 --versionedItemIds '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]'
-12:57:41  DEBUG: Creating label with project_id=17, label_name=Admin-Deploy-64
-12:57:41  DEBUG: Variables: {'projectId': 17, 'name': 'Admin-Deploy-64', 'versionedItemSource': {'ids': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]}}
-12:57:41  DEBUG: Create label response status: 200
-12:57:41  DEBUG: Create label response text: {"data":{"createLabel":{"name":"Admin-Deploy-64","description":null,"id":125}}}
-12:57:41  DEBUG: Successfully created label with ID: 125
-12:57:41  Label Created!
-12:57:41  + echo 'Label Admin-Deploy-64 created'
-12:57:41  Label Admin-Deploy-64 created
-12:57:41  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken f9254ea4-fe38-4006-afb4-c88c7c7a70dd --instanceName Cognos-DEV/TEST --projectName Demo --labelName Admin-Deploy-64
-12:57:42  ++ python3 -c 'import ast; data=open('\''label_info.out'\'').read(); parsed=ast.literal_eval(data); print(parsed['\''data'\'']['\''instances'\'']['\''edges'\''][0]['\''node'\'']['\''projects'\'']['\''edges'\''][0]['\''node'\'']['\''labels'\'']['\''edges'\''][0]['\''node'\'']['\''id'\''])'
-12:57:42  + LABEL_ID=125
-12:57:42  + echo 'Label ID: 125'
-12:57:42  Label ID: 125
-12:57:42  + echo 125
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Retrieve CAMPASSPORT ID)
-[Pipeline] container
-[Pipeline] {
-[Pipeline] withCredentials
-12:57:42  Masking supported pattern matches of $COGNOS_API_KEY_PRD
-[Pipeline] {
-[Pipeline] sh
-12:57:43  + set -eu
-12:57:43  + echo 'Starting Cognos API session (PROD)...'
-12:57:43  Starting Cognos API session (PROD)...
-12:57:43  + BASE=https://dhcsprodcognos.ca.analytics.ibm.com/api/v1
-12:57:43  + rm -f login.json session.json
-12:57:43  + mkdir -p MotioCI/api
-12:57:43  + cat
-12:57:43  + curl --fail-with-body -sS -X PUT https://dhcsprodcognos.ca.analytics.ibm.com/api/v1/session -H 'Content-Type: application/json' -d @login.json -o session.json
-12:57:43  ++ python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))'
-12:57:43  + RAW_KEY='CAM MTsxMDE6ZjVhMzMwMmEtZjNjNS1jNzhhLTVmODktMzgxNDhkZTFkMGFjOjIzMDIxMDg5NjQ7MDszOzA7'
-12:57:43  + '[' -z 'CAM MTsxMDE6ZjVhMzMwMmEtZjNjNS1jNzhhLTVmODktMzgxNDhkZTFkMGFjOjIzMDIxMDg5NjQ7MDszOzA7' ']'
-12:57:43  ++ echo 'CAM MTsxMDE6ZjVhMzMwMmEtZjNjNS1jNzhhLTVmODktMzgxNDhkZTFkMGFjOjIzMDIxMDg5NjQ7MDszOzA7'
-12:57:43  ++ sed 's/^CAM[ ]*//'
-12:57:43  + SESSION_KEY=MTsxMDE6ZjVhMzMwMmEtZjNjNS1jNzhhLTVmODktMzgxNDhkZTFkMGFjOjIzMDIxMDg5NjQ7MDszOzA7
-12:57:43  + echo 'Cognos API session verified for PROD.'
-12:57:43  Cognos API session verified for PROD.
-12:57:43  + printf 'PROD_CAMPASSPORT='\''%s'\''
-12:57:43  ' MTsxMDE6ZjVhMzMwMmEtZjNjNS1jNzhhLTVmODktMzgxNDhkZTFkMGFjOjIzMDIxMDg5NjQ7MDszOzA7
-12:57:43  + echo '✓ Saved clean session key (no CAM prefix)'
-12:57:43  ✓ Saved clean session key (no CAM prefix)
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] script
-[Pipeline] {
-[Pipeline] readFile
-[Pipeline] echo
-12:57:43  Captured Cognos PROD Passport: MTsxMDE6ZjVhMzM...
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (MotioCI Deploy (DEV → PRD))
-[Pipeline] container
-[Pipeline] {
-[Pipeline] script
-[Pipeline] {
-[Pipeline] sh
-12:57:44  + set -euo pipefail
-12:57:44  + cd MotioCI/api/CLI
-12:57:44  ++ cat ../token.txt
-12:57:44  + TOKEN=f9254ea4-fe38-4006-afb4-c88c7c7a70dd
-12:57:44  ++ cat ../label_id.txt
-12:57:44  + SOURCE_LABEL_ID=125
-12:57:44  + echo 'Promoting Label ID: 125'
-12:57:44  Promoting Label ID: 125
-12:57:44  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov deploy --xauthtoken f9254ea4-fe38-4006-afb4-c88c7c7a70dd --sourceInstanceId 3 --targetInstanceId 1 --projectId 18 --labelId 125 --targetLabelName PROMOTED-64 --camPassportId MTsxMDE6ZjVhMzMwMmEtZjNjNS1jNzhhLTVmODktMzgxNDhkZTFkMGFjOjIzMDIxMDg5NjQ7MDszOzA7
-12:58:02  + cat deploy.out
-12:58:02  deploymentID: 56
-12:58:02  deployment result: RUNNING
-12:58:02  deployment result: EXECUTED
-12:58:02  Deployed!
-12:58:02  + grep -q '"errors"' deploy.out
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // container
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Declarative: Post Actions)
-[Pipeline] echo
-12:58:02  ================================================
-[Pipeline] echo
-12:58:02  Pipeline execution finished.
-[Pipeline] echo
-12:58:02  Build: 64
-[Pipeline] echo
-12:58:02  ================================================
-[Pipeline] echo
-12:58:02  MotioCI pipeline completed successfully.
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // timestamps
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] }
-[Pipeline] // podTemplate
-[Pipeline] End of Pipeline
-/var/lib/jenkins/jobs/Cognos Jobs/workspace/testing@tmp/jfrog/64/.jfrog deleted
-Finished: SUCCESS
+def branch = env.BRANCH_NAME ?: "DEV"
+def namespace = env.NAMESPACE ?: "dev"
+def cloudName = env.CLOUD_NAME == "openshift" ? "openshift" : "kubernetes"
+def workingDir = "/home/jenkins/agent"
+
+APP_NAME = "combined-devops-cognos-deployments"
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  volumes:
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - name: varlibcontainers
+      emptyDir: {}
+    - name: jenkins-trusted-ca-bundle
+      configMap:
+        name: jenkins-trusted-ca-bundle
+        defaultMode: 420
+        optional: true
+  containers:
+    - name: jnlp
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+
+    - name: node
+      image: registry.access.redhat.com/ubi8/nodejs-16:latest
+      tty: true
+      command: ["/bin/bash"]
+      workingDir: ${workingDir}
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: ${workingDir}
+        - name: BRANCH
+          value: ${branch}
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+
+    - name: python
+      image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.2.0
+      tty: true
+      command: ["/bin/bash"]
+      workingDir: ${workingDir}
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: ${workingDir}
+        - name: BRANCH
+          value: ${branch}
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+"""
+    }
+  }
+
+  environment {
+    GIT_BRANCH = "${BRANCH_NAME}"
+    MOTIO_SERVER = "https://cgrptmcip01.cloud.cammis.ca.gov"
+  }
+  
+  parameters {
+    choice(name: 'SOURCE_ENV', choices: ['Cognos-DEV/TEST'], description: 'Source Cognos environment')
+    choice(name: 'TARGET_ENV', choices: ['Cognos-PRD'], description: 'Target Cognos environment')
+    string(name: 'PROJECT_NAME', defaultValue: '', description: 'MotioCI project name')
+    string(name: 'OBJECT_PATH', defaultValue: '', description: 'Folder/report path to promote')
+    booleanParam(name: 'AUTO_LABEL', defaultValue: true, description: 'Create Pre/Post deployment labels automatically')
+    string(name: 'ROLLBACK_LABEL', defaultValue: '', description: 'Optional: enter label name to redeploy instead of creating new one')
+  }
+  
+  options {
+    disableConcurrentBuilds()
+    timestamps()
+  }
+
+  stages {
+
+    stage('Initialize') {
+      steps {
+        script {
+          echo "Branch: ${env.GIT_BRANCH}"
+          
+                  echo """
+                  ================================================
+                  MotioCI → Cognos Deployment Pipeline (Enhanced)
+                  ================================================
+                  Source: ${params.SOURCE_ENV}
+                  Target: ${params.TARGET_ENV}
+                  Project: ${params.PROJECT_NAME}
+                  Object Path: ${params.OBJECT_PATH}
+                  Rollback Label: ${params.ROLLBACK_LABEL ?: "N/A"}
+                  ================================================
+                  """
+        }
+      }
+    }
+    
+    stage('MotioCI Login') {
+      steps {
+        withCredentials([
+          file(credentialsId: 'cognos-credentials', variable: 'CREDENTIALS_FILE')
+        ]) {
+          container('python') {
+            sh '''
+              set -euo pipefail
+              cd MotioCI/api/CLI
+
+              echo "Installing MotioCI CLI dependencies..."
+              python3 -m pip install --user -r requirements.txt
+
+              echo "Logging in to MotioCI with stored credentials file..."
+              python3 ci-cli.py --server="$MOTIO_SERVER" \
+                login --credentialsFile "$CREDENTIALS_FILE" > login.out 2>&1 || true
+
+              # Extract auth token from login output
+              awk 'match($0,/(Auth[[:space:]]*[Tt]oken|x-auth_token|xauthtoken)[[:space:]]*[:=][[:space:]]*([A-Za-z0-9._-]+)/,m){print m[2]}' login.out | tail -n1 > login.token || true
+
+              TOKEN=$(cat login.token 2>/dev/null || true)
+              echo "MotioCI token captured (length: ${#TOKEN})"
+             
+              if [ -z "$TOKEN" ] || [ "${#TOKEN}" -lt 10 ]; then
+                echo "ERROR: Failed to capture valid auth token!"
+                echo "Login output:"
+                cat login.out
+                exit 1
+              fi
+             
+              echo "$TOKEN" > ../token.txt
+              echo "Login successful"
+            '''
+          }
+        }
+      }
+    }
+  stage('Prepare deployment') {
+      when { expression { return !params.ROLLBACK_LABEL?.trim() } }
+      steps {
+        container('python') {
+          sh '''
+            set -e
+            cd MotioCI/api/CLI
+            TOKEN=$(cat ../token.txt)
+            
+        if [ -z "${OBJECT_PATH}" ]; then
+          echo "No OBJECT_PATH provided — deploying ALL items from project ${PROJECT_NAME}"
+          SEARCH_OPTION=""
+        else
+          echo "Discovering versioned items under: ${OBJECT_PATH}"
+          SEARCH_OPTION="--searchPath starts:${OBJECT_PATH}"
+        fi
+
+        echo "Discovering versioned item IDs under: ${OBJECT_PATH}"
+        python3 ci-cli.py --server="$MOTIO_SERVER" \
+          versionedItems ls \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" \
+          $SEARCH_OPTION \
+          --currentOnly True > items.out
+
+            # Extract IDs dynamically
+            grep "'id':" items.out | grep -v "instanceId" | grep -o "[0-9][0-9]*" | paste -sd, - > ids.txt || true
+            IDS=$(cat ids.txt || true)
+            if [ -z "$IDS" ]; then
+              echo "ERROR: No versioned items found in ${OBJECT_PATH}"
+              exit 1
+            fi
+
+            # Pre-deployment label
+            if [ "${AUTO_LABEL}" = "true" ]; then
+              PRE_LABEL="PreDeploy_${BUILD_NUMBER}_$(date +%Y%m%d_%H%M)"
+              echo "Creating Pre-Deployment Label: $PRE_LABEL"
+              python3 ci-cli.py --server="$MOTIO_SERVER" label create \
+                --xauthtoken "$TOKEN" \
+                --instanceName "${SOURCE_ENV}" \
+                --projectName "${PROJECT_NAME}" \
+                --name "$PRE_LABEL"
+            fi
+
+            VERSION_NAME="AutoLabel_${BUILD_NUMBER}_$(date +%Y%m%d_%H%M)"
+            echo "Creating Deployment Label: $VERSION_NAME with IDs [$IDS]"
+            python3 ci-cli.py --server="$MOTIO_SERVER" label create \
+              --xauthtoken "$TOKEN" \
+              --instanceName "${SOURCE_ENV}" \
+              --projectName "${PROJECT_NAME}" \
+              --name "$VERSION_NAME" \
+              --versionedItemIds "[$IDS]"
+
+            # Get label ID
+            python3 ci-cli.py --server="$MOTIO_SERVER" label ls \
+              --xauthtoken "$TOKEN" \
+              --instanceName "${SOURCE_ENV}" \
+              --projectName "${PROJECT_NAME}" \
+              --labelName "$VERSION_NAME" > label_info.out
+
+            LABEL_ID=$(python3 -c "import ast; data=open('label_info.out').read(); parsed=ast.literal_eval(data); print(parsed['data']['instances']['edges'][0]['node']['projects']['edges'][0]['node']['labels']['edges'][0]['node']['id'])" 2>/dev/null || echo "")
+            echo "$LABEL_ID" > ../label_id.txt
+            echo "Label $VERSION_NAME (ID: $LABEL_ID) created successfully."
+          '''
+        }
+      }
+    }
+  stage('Deploy') {
+      steps {
+        container('python') {
+          withCredentials([string(credentialsId: 'cognos-api-key-prd', variable: 'COGNOS_API_KEY_PRD')]) {
+            sh '''
+              set -e
+              cd MotioCI/api/CLI
+
+              # If rollback specified, skip label creation
+              if [ -n "${ROLLBACK_LABEL}" ]; then
+                echo "Using existing rollback label: ${ROLLBACK_LABEL}"
+                echo "0" > ../label_id.txt
+              fi
+
+              TOKEN=$(cat ../token.txt)
+              echo "Obtaining PROD CAMPassport..."
+              BASE="https://dhcsprodcognos.ca.analytics.ibm.com/api/v1"
+              echo "{\\"parameters\\":[{\\"name\\":\\"CAMAPILoginKey\\",\\"value\\":\\"$COGNOS_API_KEY_PRD\\"}]}" > login.json
+              curl -sS -X PUT "$BASE/session" -H "Content-Type: application/json" -d @login.json -o session.json
+              SESSION_KEY=$(python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))')
+              SESSION_KEY=$(echo "$SESSION_KEY" | sed 's/^CAM[ ]*//')
+              echo "✓ CAMPassport captured"
+
+              if [ -n "${ROLLBACK_LABEL}" ]; then
+                LABEL_NAME="${ROLLBACK_LABEL}"
+                echo "Promoting rollback label ${ROLLBACK_LABEL}"
+                DEPLOY_LABEL_NAME="Rollback_${BUILD_NUMBER}"
+              else
+                LABEL_ID=$(cat ../label_id.txt)
+                LABEL_NAME=""
+                DEPLOY_LABEL_NAME="PROMOTED_${BUILD_NUMBER}"
+              fi
+
+              echo "Deploying to ${TARGET_ENV}..."
+              python3 ci-cli.py --server="$MOTIO_SERVER" deploy \
+                --xauthtoken "$TOKEN" \
+                --sourceInstanceName "${SOURCE_ENV}" \
+                --targetInstanceName "${TARGET_ENV}" \
+                --projectName "${PROJECT_NAME}" \
+                ${LABEL_NAME:+--labelName "$LABEL_NAME"} \
+                ${LABEL_ID:+--labelId "$LABEL_ID"} \
+                --targetLabelName "$DEPLOY_LABEL_NAME" \
+                --camPassportId "$SESSION_KEY" > deploy.out 2>&1 || true
+
+              cat deploy.out
+              if grep -q '"errors"' deploy.out; then echo "Deployment failed"; exit 1; fi
+              echo "Deployment executed successfully."
+            '''
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "Pipeline execution finished."
+    }
+    success {
+      echo "MotioCI pipeline completed successfully."
+    }
+    failure {
+      echo "MotioCI pipeline failed."
+    }
+  }
+}
