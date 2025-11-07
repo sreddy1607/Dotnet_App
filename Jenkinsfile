@@ -97,13 +97,12 @@ spec:
   environment {
     GIT_BRANCH = "${BRANCH_NAME}"
   }
-
+  
   parameters {
-    choice(name: 'SOURCE_ENV', choices: ['DEV', 'SIT', 'UAT'], description: 'Source Environment')
-    choice(name: 'TARGET_ENV', choices: ['SIT', 'UAT', 'PROD'], description: 'Target Environment')
-    string(name: 'PROJECT_NAME', defaultValue: '', description: 'MotioCI Project')
-    string(name: 'LABEL_NAME', defaultValue: '', description: 'MotioCI Project')
-    string(name: 'OBJECT_PATH', defaultValue: '', description: 'Optional: Folder path to promote (leave blank for full project)')
+    choice(name: 'SOURCE_ENV', choices: ['DEV','SIT','UAT'], description: 'Source Environment')
+    choice(name: 'TARGET_ENV', choices: ['SIT','UAT','PROD'], description: 'Target Environment')
+    string(name: 'PROJECT_NAME', defaultValue: '', description: 'MotioCI Project Name')
+    string(name: 'OBJECT_PATH', defaultValue: '', description: 'Optional: Folder or Report path')
   }
   
   options {
@@ -119,13 +118,13 @@ spec:
           echo "Branch: ${env.GIT_BRANCH}"
           echo "Initializing MotioCI → Cognos pipeline..."
           echo """
-         
-          Source Env    : ${params.SOURCE_ENV}
-          Target Env    : ${params.TARGET_ENV}
-          Project Name  : ${params.PROJECT_NAME}
-          label name
-          Object Path   : ${params.OBJECT_PATH ?: 'FULL PROJECT'}
-          """
+        =====================================================
+        Source: ${params.SOURCE_ENV}
+        Target: ${params.TARGET_ENV}
+        Project: ${params.PROJECT_NAME}
+        Object Path: ${params.OBJECT_PATH ?: 'FULL PROJECT'}
+        =====================================================
+        """
         }
       }
     }
@@ -171,50 +170,35 @@ ENDJSON
         }
       }
     }
-stage('Create or Get Label') {
-      steps {
-        container('python') {
-          script {
-            if (params.LABEL_NAME?.trim()) {
-              echo "Using existing label: ${params.LABEL_NAME}"
-              sh "echo '${params.LABEL_NAME}' > label_id.txt"
-            } else {
-              echo "Creating label"
-              sh '''
-                set -e
-                TOKEN=$(cat token.txt)
-                LABEL_NAME="cognos_${BUILD_NUMBER}"
+stage('Validate Source Content') {
+  steps {
+    container('python') {
+      script {
+        if (params.OBJECT_PATH?.trim()) {
+          sh '''
+            set -e
+            cd MotioCI/api/CLI
+            TOKEN=$(cat ../../token.txt)
+            echo "Validating object path in source project..."
+            echo "Using searchPath=/content${OBJECT_PATH}"
 
-                if [ -z "${OBJECT_PATH}" ]; then
-                  echo "No folder path specified. Creating label for entire project..."
-                  python3 ci-cli.py \
-                    --server="${MOTIO_SERVER}" \
-                    label create \
-                    --projectName "${PROJECT_NAME}" \
-                    --instanceName "Cognos-${SOURCE_ENV}" \
-                    --labelName "${LABEL_NAME}" \
-                    --xauthtoken "$TOKEN" > label.out
-                else
-                  echo "Creating label for folder path: ${OBJECT_PATH}"
-                  python3 ci-cli.py \
-                    --server="${MOTIO_SERVER}" \
-                    label create \
-                    --projectName "${PROJECT_NAME}" \
-                    --instanceName "Cognos-${SOURCE_ENV}" \
-                    --labelName "${LABEL_NAME}" \
-                    --paths "${FOLDER_PATH}" \
-                    --xauthtoken "$TOKEN" > label.out
-                fi
+            python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" \
+              versionedItems ls --instanceName "Cognos-DEV/TEST" --projectName "$PROJECT_NAME" --searchPath="starts:/content/" --xauthtoken "$TOKEN" --currentOnly=True | grep -F "${OBJECT_PATH}" ||
+              {
+                echo "Object ${OBJECT_PATH} not found in source project.";
+                echo "Tip: Try checking the exact path in MotioCI UI (right-click → Properties).";
+                exit 1; }
 
-                grep -o '[0-9]*' label.out | tail -1 > label_id.txt
-              '''
-            }
-          }
+            echo "Object ${OBJECT_PATH} exists in source project; proceeding with label creation."
+          '''
+        } else {
+          echo "No OBJECT_PATH provided — deploying entire project (skipping object validation)."
         }
       }
     }
-
-    stage('CampassportId retrievel') {
+  }
+}
+    stage('Auth: Cognos API Session (PROD)') {
       steps {
         container('python') {
           withCredentials([string(credentialsId: 'cognos-api-key-prd', variable: 'COGNOS_API_KEY_PRD')]) {
@@ -261,79 +245,6 @@ JSON
             env[k] = v
           }
           echo "Captured Cognos PROD Passport (cleaned): ${env.PROD_CAMPASSPORT.take(15)}..."
-        }
-      }
-    }
-
-    stage('MotioCI Token Debug') {
-      steps {
-        container('python') {
-          sh '''
-            set -euo pipefail
-            cd MotioCI/api/CLI
-            TOKEN=$(cat ../token.txt)
-            echo "Testing token: ${TOKEN:0:6}... (len=${#TOKEN})"
-
-            echo "=== Listing instances ==="
-            python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" \
-              instance ls --xauthtoken "$TOKEN" || true
-
-            echo "=== Listing projects (DEV/TEST) ==="
-            python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" \
-              project ls --instanceName "Cognos-DEV/TEST" --xauthtoken "$TOKEN" || true
-
-            echo "=== Listing projects (PRD) ==="
-            python3 ci-cli.py --server="https://cgrptmcip01.cloud.cammis.ca.gov" \
-              project ls --instanceName "Cognos-PRD" --xauthtoken "$TOKEN" || true
-          '''
-        }
-      }
-    }
-
-    stage('MotioCI Deploy (DEV → PRD)') {
-      steps {
-        container('python') {
-          script {
-            def sessionKey = env.PROD_CAMPASSPORT?.trim()
-            if (!sessionKey) {
-              error "Missing Cognos PROD session key (PROD_CAMPASSPORT). Please check Cognos Auth stage."
-            }
-
-            sh """
-              set -euo pipefail
-              cd MotioCI/api/CLI
-
-              TOKEN=\$(cat ../token.txt)
-              SOURCE_LABEL_ID=57
-
-              echo "=== Starting Promotion from DEV/TEST → PRD ==="
-              echo "Using token: \${TOKEN:0:6}... (len=\${#TOKEN})"
-              echo "Promoting Label ID: \$SOURCE_LABEL_ID from DEV/TEST to PRD"
-
-              python3 ci-cli.py \\
-                --server="https://cgrptmcip01.cloud.cammis.ca.gov" \\
-                deploy \\
-                --xauthtoken "\$TOKEN" \\
-                --sourceInstanceId 3 \\
-                --targetInstanceId 1 \\
-                --projectName "Demo" \\
-                --labelName "\$LABEL_NAME" \\
-                --OBEJCTPATH
-                --targetLabelName "PROMOTED-\${BUILD_NUMBER}" \\
-                --camPassportId "${sessionKey}" > deploy.out 2>&1 || true
-
-              echo "=== Deploy Output (first 100 lines) ==="
-              sed -n '1,100p' deploy.out || true
-              echo "======================================="
-
-              if grep -q '"errors"' deploy.out; then
-                echo "MotioCI Deploy failed — see deploy.out above for details."
-                exit 1
-              else
-                echo "MotioCI Deploy stage completed successfully."
-              fi
-            """
-          }
         }
       }
     }
