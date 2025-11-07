@@ -175,7 +175,7 @@ pipeline {
               --xauthtoken "$TOKEN" \
               --instanceName "Cognos-DEV/TEST" \
               --projectName "Demo" \
-              --searchPath "starts:/Team Content/MotioCI Reports/Admin" > items.out
+              --searchPath "starts:/Team Content/MotioCI Reports/Testing/Test Results Detail" > items.out
           
             # Simple grep to get just ID numbers (avoid Python parsing)
             grep "'id':" items.out | grep -v "instanceId" | head -20 | grep -o "[0-9][0-9]*" | paste -sd, - > ids.txt
