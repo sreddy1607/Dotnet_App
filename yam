@@ -1,480 +1,1066 @@
-Error executing fallback script
-java.lang.RuntimeException: Return type of Groovy script must be a valid String, List, or Map
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.model.GroovyScript.resolveTypeAndSanitize(GroovyScript.java:251)
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.model.GroovyScript.eval(GroovyScript.java:202)
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.util.ScriptCallback.call(ScriptCallback.java:96)
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.AbstractScriptableParameter.eval(AbstractScriptableParameter.java:276)
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.AbstractScriptableParameter.getChoices(AbstractScriptableParameter.java:237)
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.AbstractScriptableParameter.getChoices(AbstractScriptableParameter.java:225)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at org.apache.commons.jexl.util.introspection.UberspectImpl$VelMethodImpl.invoke(UberspectImpl.java:258)
-	at org.apache.commons.jexl.parser.ASTMethod.execute(ASTMethod.java:104)
-	at org.apache.commons.jexl.parser.ASTReference.execute(ASTReference.java:83)
-	at org.apache.commons.jexl.parser.ASTReference.value(ASTReference.java:57)
-	at org.apache.commons.jexl.parser.ASTReferenceExpression.value(ASTReferenceExpression.java:51)
-	at org.apache.commons.jexl.ExpressionImpl.evaluate(ExpressionImpl.java:80)
-	at hudson.ExpressionFactory2$JexlExpression.evaluate(ExpressionFactory2.java:76)
-	at org.apache.commons.jelly.expression.ExpressionSupport.evaluateRecurse(ExpressionSupport.java:61)
-	at org.apache.commons.jelly.expression.ExpressionSupport.evaluateAsIterator(ExpressionSupport.java:94)
-	at org.apache.commons.jelly.tags.core.ForEachTag.doTag(ForEachTag.java:89)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.JellyViewScript.run(JellyViewScript.java:98)
-	at org.kohsuke.stapler.jelly.IncludeTag.doTag(IncludeTag.java:174)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.TagSupport.invokeBody(TagSupport.java:161)
-	at org.apache.commons.jelly.tags.core.WhenTag.doTag(WhenTag.java:46)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.TagSupport.invokeBody(TagSupport.java:161)
-	at org.apache.commons.jelly.tags.core.ChooseTag.doTag(ChooseTag.java:38)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.CallTagLibScript$1.run(CallTagLibScript.java:100)
-	at org.apache.commons.jelly.tags.define.InvokeBodyTag.doTag(InvokeBodyTag.java:91)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.TagSupport.invokeBody(TagSupport.java:161)
-	at org.apache.commons.jelly.tags.core.WhenTag.doTag(WhenTag.java:46)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.TagSupport.invokeBody(TagSupport.java:161)
-	at org.apache.commons.jelly.tags.core.ChooseTag.doTag(ChooseTag.java:38)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.CallTagLibScript.run(CallTagLibScript.java:121)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.JellyViewScript.run(JellyViewScript.java:98)
-	at org.kohsuke.stapler.jelly.IncludeTag.doTag(IncludeTag.java:174)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.JellyViewScript.run(JellyViewScript.java:98)
-	at org.kohsuke.stapler.jelly.IncludeTag.doTag(IncludeTag.java:174)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.TagSupport.invokeBody(TagSupport.java:161)
-	at org.apache.commons.jelly.tags.core.ForEachTag.doTag(ForEachTag.java:150)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.CallTagLibScript$1.run(CallTagLibScript.java:100)
-	at org.apache.commons.jelly.tags.define.InvokeBodyTag.doTag(InvokeBodyTag.java:91)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.CallTagLibScript.run(CallTagLibScript.java:121)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.CallTagLibScript$1.run(CallTagLibScript.java:100)
-	at org.apache.commons.jelly.tags.define.InvokeBodyTag.doTag(InvokeBodyTag.java:91)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$1.run(CoreTagLibrary.java:98)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.CallTagLibScript.run(CallTagLibScript.java:121)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.CallTagLibScript$1.run(CallTagLibScript.java:100)
-	at org.apache.commons.jelly.tags.define.InvokeBodyTag.doTag(InvokeBodyTag.java:91)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.CallTagLibScript$1.run(CallTagLibScript.java:100)
-	at org.apache.commons.jelly.tags.define.InvokeBodyTag.doTag(InvokeBodyTag.java:91)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.CallTagLibScript.run(CallTagLibScript.java:121)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.CallTagLibScript.run(CallTagLibScript.java:121)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.JellyViewScript.run(JellyViewScript.java:98)
-	at org.kohsuke.stapler.jelly.DefaultScriptInvoker.invokeScript(DefaultScriptInvoker.java:67)
-	at org.kohsuke.stapler.jelly.DefaultScriptInvoker.invokeScript(DefaultScriptInvoker.java:55)
-	at org.kohsuke.stapler.jelly.ScriptInvoker.execute(ScriptInvoker.java:62)
-	at org.kohsuke.stapler.jelly.ScriptInvoker.execute(ScriptInvoker.java:42)
-	at org.kohsuke.stapler.ScriptRequestDispatcher.forward(ScriptRequestDispatcher.java:102)
-	at jenkins.model.ParameterizedJobMixIn.doBuild(ParameterizedJobMixIn.java:211)
-	at jenkins.model.ParameterizedJobMixIn$ParameterizedJob.doBuild(ParameterizedJobMixIn.java:416)
-	at java.base/java.lang.invoke.MethodHandle.invokeWithArguments(MethodHandle.java:733)
-	at org.kohsuke.stapler.Function$MethodFunction.invoke(Function.java:484)
-	at org.kohsuke.stapler.Function$InstanceFunction.invoke(Function.java:497)
-	at org.kohsuke.stapler.Function.bindAndInvoke(Function.java:218)
-	at org.kohsuke.stapler.Function.bindAndInvokeAndServeResponse(Function.java:140)
-	at org.kohsuke.stapler.MetaClass$12.doDispatch(MetaClass.java:686)
-	at org.kohsuke.stapler.NameBasedDispatcher.dispatch(NameBasedDispatcher.java:61)
-	at org.kohsuke.stapler.Stapler.tryInvoke(Stapler.java:800)
-	at org.kohsuke.stapler.Stapler.invoke(Stapler.java:937)
-	at org.kohsuke.stapler.MetaClass$5.doDispatch(MetaClass.java:369)
-	at org.kohsuke.stapler.NameBasedDispatcher.dispatch(NameBasedDispatcher.java:61)
-	at org.kohsuke.stapler.Stapler.tryInvoke(Stapler.java:800)
-	at org.kohsuke.stapler.Stapler.invoke(Stapler.java:937)
-	at org.kohsuke.stapler.MetaClass$5.doDispatch(MetaClass.java:369)
-	at org.kohsuke.stapler.NameBasedDispatcher.dispatch(NameBasedDispatcher.java:61)
-	at org.kohsuke.stapler.Stapler.tryInvoke(Stapler.java:800)
-	at org.kohsuke.stapler.Stapler.invoke(Stapler.java:937)
-	at org.kohsuke.stapler.Stapler.invoke(Stapler.java:721)
-	at org.kohsuke.stapler.Stapler.service(Stapler.java:253)
-	at Jenkins Main ClassLoader//jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHolder.handle(ServletHolder.java:765)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$ChainEnd.doFilter(ServletHandler.java:1668)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:204)
-	at io.jenkins.servlet.FilterChainWrapper$2.doFilter(FilterChainWrapper.java:53)
-	at PluginClassLoader for openshift-login//org.openshift.jenkins.plugins.openshiftlogin.OpenShiftPermissionFilter.doFilter(OpenShiftPermissionFilter.java:233)
-	at io.jenkins.servlet.FilterWrapper$1.doFilter(FilterWrapper.java:42)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at PluginClassLoader for sse-gateway//org.jenkinsci.plugins.ssegateway.Endpoint$SSEListenChannelFilter.doFilter(Endpoint.java:248)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at PluginClassLoader for blueocean-web//io.jenkins.blueocean.ResourceCacheControl.doFilter(ResourceCacheControl.java:134)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at PluginClassLoader for blueocean-jwt//io.jenkins.blueocean.auth.jwt.impl.JwtAuthenticationFilter.doFilter(JwtAuthenticationFilter.java:60)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at PluginClassLoader for metrics//jenkins.metrics.impl.MetricsFilter.doFilter(MetricsFilter.java:125)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at jenkins.util.HttpServletFilter$1.doFilter(HttpServletFilter.java:77)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at hudson.util.PluginServletFilter.doFilter(PluginServletFilter.java:207)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at jenkins.ErrorAttributeFilter.doFilter(ErrorAttributeFilter.java:29)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at hudson.security.csrf.CrumbFilter.doFilter(CrumbFilter.java:118)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:94)
-	at jenkins.security.AcegiSecurityExceptionFilter.doFilter(AcegiSecurityExceptionFilter.java:52)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at hudson.security.UnwrapSecurityExceptionFilter.doFilter(UnwrapSecurityExceptionFilter.java:54)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter.doFilter(RememberMeAuthenticationFilter.java:114)
-	at org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter.doFilter(RememberMeAuthenticationFilter.java:105)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227)
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at jenkins.security.BasicHeaderProcessor.doFilter(BasicHeaderProcessor.java:98)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:117)
-	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:87)
-	at hudson.security.HttpSessionContextIntegrationFilter2.doFilter(HttpSessionContextIntegrationFilter2.java:63)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at hudson.security.ChainedServletFilter2.doFilter(ChainedServletFilter2.java:111)
-	at hudson.security.HudsonFilter.doFilter(HudsonFilter.java:173)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at org.kohsuke.stapler.UncaughtExceptionFilter.doFilter(UncaughtExceptionFilter.java:26)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at hudson.util.CharacterEncodingFilter.doFilter(CharacterEncodingFilter.java:86)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at org.kohsuke.stapler.DiagnosticThreadNameFilter.doFilter(DiagnosticThreadNameFilter.java:31)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at jenkins.security.SuspiciousRequestFilter.doFilter(SuspiciousRequestFilter.java:38)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler.doHandle(ServletHandler.java:526)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.handle(ScopedHandler.java:127)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.security.SecurityHandler.handle(SecurityHandler.java:574)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.HandlerWrapper.handle(HandlerWrapper.java:124)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.nextHandle(ScopedHandler.java:197)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.SessionHandler.doHandle(SessionHandler.java:612)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.nextHandle(ScopedHandler.java:195)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ContextHandler.doHandle(ContextHandler.java:1045)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.nextScope(ScopedHandler.java:164)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler.doScope(ServletHandler.java:483)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.nextScope(ScopedHandler.java:162)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.SessionHandler.doScope(SessionHandler.java:589)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.nextScope(ScopedHandler.java:162)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ContextHandler.doScope(ContextHandler.java:966)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.handle(ScopedHandler.java:125)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ContextHandler.handle(ContextHandler.java:1719)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.HttpChannel$RequestDispatchable.dispatch(HttpChannel.java:1564)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.HttpChannel.dispatch(HttpChannel.java:723)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.HttpChannel.handle(HttpChannel.java:511)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ContextHandler$CoreContextHandler$CoreToNestedHandler.handle(ContextHandler.java:2943)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.server.handler.ContextHandler.handle(ContextHandler.java:1064)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.server.handler.gzip.GzipHandler.handle(GzipHandler.java:611)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.server.Server.handle(Server.java:182)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.server.internal.HttpChannelState$HandlerInvoker.run(HttpChannelState.java:662)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.server.internal.HttpConnection.onFillable(HttpConnection.java:416)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:322)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:99)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.runTask(AdaptiveExecutionStrategy.java:480)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.consumeTask(AdaptiveExecutionStrategy.java:443)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.tryProduce(AdaptiveExecutionStrategy.java:293)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.run(AdaptiveExecutionStrategy.java:201)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:311)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:979)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1209)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1164)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
-
-Nov 12, 2025 7:14:17 PM SEVERE org.biouno.unochoice.AbstractScriptableParameter eval
-Error executing script for dynamic parameter
-java.lang.RuntimeException: Return type of Groovy script must be a valid String, List, or Map
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.model.GroovyScript.resolveTypeAndSanitize(GroovyScript.java:251)
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.model.GroovyScript.eval(GroovyScript.java:202)
-Caused: java.lang.RuntimeException: Failed to evaluate fallback script: Return type of Groovy script must be a valid String, List, or Map
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.model.GroovyScript.eval(GroovyScript.java:207)
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.util.ScriptCallback.call(ScriptCallback.java:96)
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.AbstractScriptableParameter.eval(AbstractScriptableParameter.java:276)
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.AbstractScriptableParameter.getChoices(AbstractScriptableParameter.java:237)
-	at PluginClassLoader for uno-choice//org.biouno.unochoice.AbstractScriptableParameter.getChoices(AbstractScriptableParameter.java:225)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at org.apache.commons.jexl.util.introspection.UberspectImpl$VelMethodImpl.invoke(UberspectImpl.java:258)
-	at org.apache.commons.jexl.parser.ASTMethod.execute(ASTMethod.java:104)
-	at org.apache.commons.jexl.parser.ASTReference.execute(ASTReference.java:83)
-	at org.apache.commons.jexl.parser.ASTReference.value(ASTReference.java:57)
-	at org.apache.commons.jexl.parser.ASTReferenceExpression.value(ASTReferenceExpression.java:51)
-	at org.apache.commons.jexl.ExpressionImpl.evaluate(ExpressionImpl.java:80)
-	at hudson.ExpressionFactory2$JexlExpression.evaluate(ExpressionFactory2.java:76)
-	at org.apache.commons.jelly.expression.ExpressionSupport.evaluateRecurse(ExpressionSupport.java:61)
-	at org.apache.commons.jelly.expression.ExpressionSupport.evaluateAsIterator(ExpressionSupport.java:94)
-	at org.apache.commons.jelly.tags.core.ForEachTag.doTag(ForEachTag.java:89)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.JellyViewScript.run(JellyViewScript.java:98)
-	at org.kohsuke.stapler.jelly.IncludeTag.doTag(IncludeTag.java:174)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.TagSupport.invokeBody(TagSupport.java:161)
-	at org.apache.commons.jelly.tags.core.WhenTag.doTag(WhenTag.java:46)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.TagSupport.invokeBody(TagSupport.java:161)
-	at org.apache.commons.jelly.tags.core.ChooseTag.doTag(ChooseTag.java:38)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.CallTagLibScript$1.run(CallTagLibScript.java:100)
-	at org.apache.commons.jelly.tags.define.InvokeBodyTag.doTag(InvokeBodyTag.java:91)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.TagSupport.invokeBody(TagSupport.java:161)
-	at org.apache.commons.jelly.tags.core.WhenTag.doTag(WhenTag.java:46)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.TagSupport.invokeBody(TagSupport.java:161)
-	at org.apache.commons.jelly.tags.core.ChooseTag.doTag(ChooseTag.java:38)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.CallTagLibScript.run(CallTagLibScript.java:121)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.JellyViewScript.run(JellyViewScript.java:98)
-	at org.kohsuke.stapler.jelly.IncludeTag.doTag(IncludeTag.java:174)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.JellyViewScript.run(JellyViewScript.java:98)
-	at org.kohsuke.stapler.jelly.IncludeTag.doTag(IncludeTag.java:174)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.TagSupport.invokeBody(TagSupport.java:161)
-	at org.apache.commons.jelly.tags.core.ForEachTag.doTag(ForEachTag.java:150)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.CallTagLibScript$1.run(CallTagLibScript.java:100)
-	at org.apache.commons.jelly.tags.define.InvokeBodyTag.doTag(InvokeBodyTag.java:91)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.CallTagLibScript.run(CallTagLibScript.java:121)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.CallTagLibScript$1.run(CallTagLibScript.java:100)
-	at org.apache.commons.jelly.tags.define.InvokeBodyTag.doTag(InvokeBodyTag.java:91)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$1.run(CoreTagLibrary.java:98)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.CallTagLibScript.run(CallTagLibScript.java:121)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.CallTagLibScript$1.run(CallTagLibScript.java:100)
-	at org.apache.commons.jelly.tags.define.InvokeBodyTag.doTag(InvokeBodyTag.java:91)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.ReallyStaticTagLibrary$1.run(ReallyStaticTagLibrary.java:102)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.kohsuke.stapler.jelly.CallTagLibScript$1.run(CallTagLibScript.java:100)
-	at org.apache.commons.jelly.tags.define.InvokeBodyTag.doTag(InvokeBodyTag.java:91)
-	at org.apache.commons.jelly.impl.TagScript.run(TagScript.java:271)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.CallTagLibScript.run(CallTagLibScript.java:121)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.CallTagLibScript.run(CallTagLibScript.java:121)
-	at org.apache.commons.jelly.impl.ScriptBlock.run(ScriptBlock.java:95)
-	at org.apache.commons.jelly.tags.core.CoreTagLibrary$2.run(CoreTagLibrary.java:105)
-	at org.kohsuke.stapler.jelly.JellyViewScript.run(JellyViewScript.java:98)
-	at org.kohsuke.stapler.jelly.DefaultScriptInvoker.invokeScript(DefaultScriptInvoker.java:67)
-	at org.kohsuke.stapler.jelly.DefaultScriptInvoker.invokeScript(DefaultScriptInvoker.java:55)
-	at org.kohsuke.stapler.jelly.ScriptInvoker.execute(ScriptInvoker.java:62)
-	at org.kohsuke.stapler.jelly.ScriptInvoker.execute(ScriptInvoker.java:42)
-	at org.kohsuke.stapler.ScriptRequestDispatcher.forward(ScriptRequestDispatcher.java:102)
-	at jenkins.model.ParameterizedJobMixIn.doBuild(ParameterizedJobMixIn.java:211)
-	at jenkins.model.ParameterizedJobMixIn$ParameterizedJob.doBuild(ParameterizedJobMixIn.java:416)
-	at java.base/java.lang.invoke.MethodHandle.invokeWithArguments(MethodHandle.java:733)
-	at org.kohsuke.stapler.Function$MethodFunction.invoke(Function.java:484)
-	at org.kohsuke.stapler.Function$InstanceFunction.invoke(Function.java:497)
-	at org.kohsuke.stapler.Function.bindAndInvoke(Function.java:218)
-	at org.kohsuke.stapler.Function.bindAndInvokeAndServeResponse(Function.java:140)
-	at org.kohsuke.stapler.MetaClass$12.doDispatch(MetaClass.java:686)
-	at org.kohsuke.stapler.NameBasedDispatcher.dispatch(NameBasedDispatcher.java:61)
-	at org.kohsuke.stapler.Stapler.tryInvoke(Stapler.java:800)
-	at org.kohsuke.stapler.Stapler.invoke(Stapler.java:937)
-	at org.kohsuke.stapler.MetaClass$5.doDispatch(MetaClass.java:369)
-	at org.kohsuke.stapler.NameBasedDispatcher.dispatch(NameBasedDispatcher.java:61)
-	at org.kohsuke.stapler.Stapler.tryInvoke(Stapler.java:800)
-	at org.kohsuke.stapler.Stapler.invoke(Stapler.java:937)
-	at org.kohsuke.stapler.MetaClass$5.doDispatch(MetaClass.java:369)
-	at org.kohsuke.stapler.NameBasedDispatcher.dispatch(NameBasedDispatcher.java:61)
-	at org.kohsuke.stapler.Stapler.tryInvoke(Stapler.java:800)
-	at org.kohsuke.stapler.Stapler.invoke(Stapler.java:937)
-	at org.kohsuke.stapler.Stapler.invoke(Stapler.java:721)
-	at org.kohsuke.stapler.Stapler.service(Stapler.java:253)
-	at Jenkins Main ClassLoader//jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHolder.handle(ServletHolder.java:765)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$ChainEnd.doFilter(ServletHandler.java:1668)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:204)
-	at io.jenkins.servlet.FilterChainWrapper$2.doFilter(FilterChainWrapper.java:53)
-	at PluginClassLoader for openshift-login//org.openshift.jenkins.plugins.openshiftlogin.OpenShiftPermissionFilter.doFilter(OpenShiftPermissionFilter.java:233)
-	at io.jenkins.servlet.FilterWrapper$1.doFilter(FilterWrapper.java:42)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at PluginClassLoader for sse-gateway//org.jenkinsci.plugins.ssegateway.Endpoint$SSEListenChannelFilter.doFilter(Endpoint.java:248)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at PluginClassLoader for blueocean-web//io.jenkins.blueocean.ResourceCacheControl.doFilter(ResourceCacheControl.java:134)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at PluginClassLoader for blueocean-jwt//io.jenkins.blueocean.auth.jwt.impl.JwtAuthenticationFilter.doFilter(JwtAuthenticationFilter.java:60)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at PluginClassLoader for metrics//jenkins.metrics.impl.MetricsFilter.doFilter(MetricsFilter.java:125)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at jenkins.util.HttpServletFilter$1.doFilter(HttpServletFilter.java:77)
-	at hudson.util.PluginServletFilter$1.doFilter(PluginServletFilter.java:201)
-	at hudson.util.PluginServletFilter.doFilter(PluginServletFilter.java:207)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at jenkins.ErrorAttributeFilter.doFilter(ErrorAttributeFilter.java:29)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at hudson.security.csrf.CrumbFilter.doFilter(CrumbFilter.java:118)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:94)
-	at jenkins.security.AcegiSecurityExceptionFilter.doFilter(AcegiSecurityExceptionFilter.java:52)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at hudson.security.UnwrapSecurityExceptionFilter.doFilter(UnwrapSecurityExceptionFilter.java:54)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter.doFilter(RememberMeAuthenticationFilter.java:114)
-	at org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter.doFilter(RememberMeAuthenticationFilter.java:105)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227)
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at jenkins.security.BasicHeaderProcessor.doFilter(BasicHeaderProcessor.java:98)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:117)
-	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:87)
-	at hudson.security.HttpSessionContextIntegrationFilter2.doFilter(HttpSessionContextIntegrationFilter2.java:63)
-	at hudson.security.ChainedServletFilter2$1.doFilter(ChainedServletFilter2.java:99)
-	at hudson.security.ChainedServletFilter2.doFilter(ChainedServletFilter2.java:111)
-	at hudson.security.HudsonFilter.doFilter(HudsonFilter.java:173)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at org.kohsuke.stapler.UncaughtExceptionFilter.doFilter(UncaughtExceptionFilter.java:26)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at hudson.util.CharacterEncodingFilter.doFilter(CharacterEncodingFilter.java:86)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at org.kohsuke.stapler.DiagnosticThreadNameFilter.doFilter(DiagnosticThreadNameFilter.java:31)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at jenkins.security.SuspiciousRequestFilter.doFilter(SuspiciousRequestFilter.java:38)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.FilterHolder.doFilter(FilterHolder.java:202)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1638)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler.doHandle(ServletHandler.java:526)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.handle(ScopedHandler.java:127)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.security.SecurityHandler.handle(SecurityHandler.java:574)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.HandlerWrapper.handle(HandlerWrapper.java:124)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.nextHandle(ScopedHandler.java:197)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.SessionHandler.doHandle(SessionHandler.java:612)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.nextHandle(ScopedHandler.java:195)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ContextHandler.doHandle(ContextHandler.java:1045)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.nextScope(ScopedHandler.java:164)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.servlet.ServletHandler.doScope(ServletHandler.java:483)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.nextScope(ScopedHandler.java:162)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.SessionHandler.doScope(SessionHandler.java:589)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.nextScope(ScopedHandler.java:162)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ContextHandler.doScope(ContextHandler.java:966)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ScopedHandler.handle(ScopedHandler.java:125)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ContextHandler.handle(ContextHandler.java:1719)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.HttpChannel$RequestDispatchable.dispatch(HttpChannel.java:1564)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.HttpChannel.dispatch(HttpChannel.java:723)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.HttpChannel.handle(HttpChannel.java:511)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.ee9.nested.ContextHandler$CoreContextHandler$CoreToNestedHandler.handle(ContextHandler.java:2943)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.server.handler.ContextHandler.handle(ContextHandler.java:1064)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.server.handler.gzip.GzipHandler.handle(GzipHandler.java:611)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.server.Server.handle(Server.java:182)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.server.internal.HttpChannelState$HandlerInvoker.run(HttpChannelState.java:662)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.server.internal.HttpConnection.onFillable(HttpConnection.java:416)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:322)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:99)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.runTask(AdaptiveExecutionStrategy.java:480)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.consumeTask(AdaptiveExecutionStrategy.java:443)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.tryProduce(AdaptiveExecutionStrategy.java:293)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.run(AdaptiveExecutionStrategy.java:201)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:311)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:979)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1209)
-	at Jenkins Main ClassLoader//org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1164)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
++ set -e
+08:48:05  + cd MotioCI/api/CLI
+08:48:05  ++ cat ../token.txt
+08:48:05  + TOKEN=ad73220c-04ce-49a3-ba0d-12cb3fab6deb
+08:48:05  + echo 'Discovering versioned item IDs under: /Team Content/MotioCI Reports/Testing/Test Results Detail'
+08:48:05  Discovering versioned item IDs under: /Team Content/MotioCI Reports/Testing/Test Results Detail
+08:48:05  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov versionedItems ls --xauthtoken ad73220c-04ce-49a3-ba0d-12cb3fab6deb --instanceName Cognos-DEV/TEST --projectName Demo --searchPath 'starts:/Team Content/MotioCI Reports/Testing/Test Results Detail'
+08:48:05  + grep ''\''id'\'':' items.out
+08:48:05  + grep -v instanceId
+08:48:05  + grep -o '[0-9][0-9]*'
+08:48:05  + paste -sd, -
+08:48:05  ++ cat ids.txt
+08:48:05  + IDS=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,18106,18107,18108,18109,18110,18111,18112,18113,18114,18115,18116,18117,18118,18119,18120,18121,18122,18123,18124,18125,18126,18127,18128,18129,18130,18131,18132,18133,18134,18135,18136,18137,18138,18139,18140,18141,18142,18143,18144,18145,18146,18147,18148,18149,18150,18151,18152,18153,18154,18155
+08:48:05  + '[' -z 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,18106,18107,18108,18109,18110,18111,18112,18113,18114,18115,18116,18117,18118,18119,18120,18121,18122,18123,18124,18125,18126,18127,18128,18129,18130,18131,18132,18133,18134,18135,18136,18137,18138,18139,18140,18141,18142,18143,18144,18145,18146,18147,18148,18149,18150,18151,18152,18153,18154,18155 ']'
+08:48:05  + cat items.out
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.540Z',
+08:48:05   'id': 1,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'package',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.587Z',
+08:48:05   'id': 2,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'folder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.613Z',
+08:48:05   'id': 3,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'folder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.687Z',
+08:48:05   'id': 4,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'folder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.710Z',
+08:48:05   'id': 5,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Motio Labs',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'folder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.737Z',
+08:48:05   'id': 6,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'folder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.747Z',
+08:48:05   'id': 7,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/MotioCI Reports DQM',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'packageConfiguration',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.770Z',
+08:48:05   'id': 8,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'folder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.793Z',
+08:48:05   'id': 9,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Promotion',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'folder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.817Z',
+08:48:05   'id': 10,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/Detail',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'folder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.903Z',
+08:48:05   'id': 11,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/UX',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'folder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.927Z',
+08:48:05   'id': 12,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/Components',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'folder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:38.937Z',
+08:48:05   'id': 13,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/[].[securityViews].[MotioCI '
+08:48:05                 'Reports]',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'modelView',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:39.383Z',
+08:48:05   'id': 14,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/MotioCI Hidden Objects',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:39.407Z',
+08:48:05   'id': 15,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control/Cognos Item '
+08:48:05                 'References',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:39.427Z',
+08:48:05   'id': 16,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/MotioCI Timeline',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:39.450Z',
+08:48:05   'id': 17,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/Defect Tracking',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:39.483Z',
+08:48:05   'id': 18,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/FM Complete '
+08:48:05                 'Reference',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.193Z',
+08:48:05   'id': 19,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/FM Query Items '
+08:48:05                 'Detail',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.217Z',
+08:48:05   'id': 20,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Data Item Lookup - '
+08:48:05                 'Target',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.230Z',
+08:48:05   'id': 21,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/Active Worker Processes',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.247Z',
+08:48:05   'id': 22,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/Activity Trend by Type',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.267Z',
+08:48:05   'id': 23,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Jobs Documentation',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.590Z',
+08:48:05   'id': 24,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Report '
+08:48:05                 'Documentation',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.607Z',
+08:48:05   'id': 25,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Data Item Lookup',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.620Z',
+08:48:05   'id': 26,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Report '
+08:48:05                 'Descriptions',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.637Z',
+08:48:05   'id': 27,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/MotioCI Timeline Trends',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.650Z',
+08:48:05   'id': 28,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Policies '
+08:48:05                 'Documentation',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.940Z',
+08:48:05   'id': 29,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control/Commit '
+08:48:05                 'Statistics',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.963Z',
+08:48:05   'id': 30,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Motio Labs/Reports Instance '
+08:48:05                 'Comparison',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:40.983Z',
+08:48:05   'id': 31,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/Dispatcher Properties '
+08:48:05                 'Comparison',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.003Z',
+08:48:05   'id': 32,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/Dispatcher Assertion '
+08:48:05                 'Status by Week',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.020Z',
+08:48:05   'id': 33,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Membership Stability '
+08:48:05                 'Assertion Status Trend',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.307Z',
+08:48:05   'id': 34,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/Reduction',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.323Z',
+08:48:05   'id': 35,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Motio Labs/Report Execution Time '
+08:48:05                 'Normalized',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.340Z',
+08:48:05   'id': 36,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control/Cognos Activity '
+08:48:05                 'by User and Action Type Summary',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.350Z',
+08:48:05   'id': 37,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/Most Active Users',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.363Z',
+08:48:05   'id': 38,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/User Logon Trend',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.693Z',
+08:48:05   'id': 39,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/Inventory Summary',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.723Z',
+08:48:05   'id': 40,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Versioned Items with '
+08:48:05                 'Test Results',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.737Z',
+08:48:05   'id': 41,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control/Cognos Item '
+08:48:05                 'Version Information',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.750Z',
+08:48:05   'id': 42,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control/Cognos Item Size '
+08:48:05                 'by Type',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:41.763Z',
+08:48:05   'id': 43,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Promotion/Label Contents '
+08:48:05                 'Comparison',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:42.107Z',
+08:48:05   'id': 44,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Test Results Instance '
+08:48:05                 'Comparison by Project Summary',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:42.120Z',
+08:48:05   'id': 45,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Reports with Increased '
+08:48:05                 'Execution Time',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:42.137Z',
+08:48:05   'id': 46,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Test Results Detail',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:42.150Z',
+08:48:05   'id': 47,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Report Execution Time '
+08:48:05                 'Output Type Comparison',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:42.163Z',
+08:48:05   'id': 48,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Test Case Categories',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:42.440Z',
+08:48:05   'id': 49,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Promotion/Promoted Labels',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 0,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-11T18:20:42.457Z',
+08:48:05   'id': 50,
+08:48:05   'instanceId': 1,
+08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Promotion/Promotion Results',
+08:48:05   'revisionType': 'MINOR',
+08:48:05   'type': 'report',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.033Z',
+08:48:05   'id': 18106,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'root',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.050Z',
+08:48:05   'id': 18107,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'adminFolder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.093Z',
+08:48:05   'id': 18108,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/IBM_Cognos_Samples',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.123Z',
+08:48:05   'id': 18109,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/IBM_Cognos_Samples_DQ_Legacy',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.137Z',
+08:48:05   'id': 18110,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Relative dates',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.153Z',
+08:48:05   'id': 18111,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/New Consistency Check',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'contentTask',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.173Z',
+08:48:05   'id': 18112,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/My First Deployment Export',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.247Z',
+08:48:05   'id': 18113,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Samples_for_Install_11_1_1',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.260Z',
+08:48:05   'id': 18114,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Dennis Test',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.277Z',
+08:48:05   'id': 18115,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Deployment Report Testing',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.293Z',
+08:48:05   'id': 18116,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Samples_for_Install_11_1_2',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.307Z',
+08:48:05   'id': 18117,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/AdhocSecurityPackage_04282017_07292019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.317Z',
+08:48:05   'id': 18118,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/AdhocSecurityPackage_04282017',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.337Z',
+08:48:05   'id': 18119,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Samples_for_Install_11_1_3',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.350Z',
+08:48:05   'id': 18120,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Report_Adhoc_Pkg_12012015',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.360Z',
+08:48:05   'id': 18121,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Operational Reports Packages_12142016',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.373Z',
+08:48:05   'id': 18122,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/COINS_08292019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.383Z',
+08:48:05   'id': 18123,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Report_Adhoc_Pkg_12012015_test',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.393Z',
+08:48:05   'id': 18124,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/AdhocSecurityPackage_04282017_test',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.427Z',
+08:48:05   'id': 18125,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/COBRA',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.483Z',
+08:48:05   'id': 18126,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/SLA_Reporting_09032019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.497Z',
+08:48:05   'id': 18127,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/SLA_Reporting_09042019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.507Z',
+08:48:05   'id': 18128,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/COBRA_09042019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.520Z',
+08:48:05   'id': 18129,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/COBRA_09052019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:29.530Z',
+08:48:05   'id': 18130,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/SLA_Reporting_09042019_0912',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.320Z',
+08:48:05   'id': 18131,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Test_09122019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.330Z',
+08:48:05   'id': 18132,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/SLA_Reporting',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.340Z',
+08:48:05   'id': 18133,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/SLA_Reporting_09162019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.353Z',
+08:48:05   'id': 18134,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/SLA_09-17-2019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.363Z',
+08:48:05   'id': 18135,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/HPE22-23 Report_09172019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.373Z',
+08:48:05   'id': 18136,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/MCC-R-031_09202019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.383Z',
+08:48:05   'id': 18137,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/COBRA_09202019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.393Z',
+08:48:05   'id': 18138,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/AdhocAndOPRReports_09252019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.403Z',
+08:48:05   'id': 18139,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/AdhocAndOPRReports_09252019_1',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.413Z',
+08:48:05   'id': 18140,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/COBRAReports_09272019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.420Z',
+08:48:05   'id': 18141,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Deply',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'adminFolder',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.430Z',
+08:48:05   'id': 18142,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Deply/PETSandPOSReports_09282019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.440Z',
+08:48:05   'id': 18143,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Deply/SLA_Reporting_SIT',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.450Z',
+08:48:05   'id': 18144,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/SLA_Reporting_SIT',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.460Z',
+08:48:05   'id': 18145,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/coins_1016',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.470Z',
+08:48:05   'id': 18146,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/SLAReporting_CMM-SLA-300-dev_uat_23102019',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.477Z',
+08:48:05   'id': 18147,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Test Namespaces for consistancy',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'contentTask',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.487Z',
+08:48:05   'id': 18148,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Deply/Samples_for_Install_11_1_5',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.500Z',
+08:48:05   'id': 18149,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Samples_for_Install_11_1_5',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'importDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.510Z',
+08:48:05   'id': 18150,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/Templates',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.520Z',
+08:48:05   'id': 18151,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/cc',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'contentTask',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.530Z',
+08:48:05   'id': 18152,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/SDN20021_10232020',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.540Z',
+08:48:05   'id': 18153,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/COINS_Sample_DevtoTest_12092020',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.553Z',
+08:48:05   'id': 18154,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/DplyTest_12102020',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  {'clientMajor': 1,
+08:48:05   'comment': 'Initial Version ',
+08:48:05   'dateTime': '2025-02-12T22:27:30.567Z',
+08:48:05   'id': 18155,
+08:48:05   'instanceId': 3,
+08:48:05   'prettyPath': '/Administration/SDN 20023_Cognos_Export_Package',
+08:48:05   'revisionType': 'MAJOR',
+08:48:05   'type': 'exportDeployment',
+08:48:05   'version': 1}
+08:48:05  
+08:48:05  + '[' true = true ']'
+08:48:05  ++ date +%Y%m%d_%H%M
+08:48:05  + PRE_LABEL=PreDeploy_73_20251117_1648
+08:48:05  + echo 'Creating Pre-Deployment Label: PreDeploy_73_20251117_1648'
+08:48:05  Creating Pre-Deployment Label: PreDeploy_73_20251117_1648
+08:48:05  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label create --xauthtoken ad73220c-04ce-49a3-ba0d-12cb3fab6deb --instanceName Cognos-DEV/TEST --projectName Demo --name PreDeploy_73_20251117_1648
+08:48:06  DEBUG: Creating label with project_id=17, label_name=PreDeploy_73_20251117_1648
+08:48:06  DEBUG: Variables: {'projectId': 17, 'name': 'PreDeploy_73_20251117_1648', 'versionedItemSource': {'ids': []}}
+08:48:06  DEBUG: Create label response status: 200
+08:48:06  DEBUG: Create label response text: {"data":{"createLabel":{"name":"PreDeploy_73_20251117_1648","description":null,"id":168}}}
+08:48:06  DEBUG: Successfully created label with ID: 168
+08:48:06  Label Created!
+08:48:06  ++ date +%Y%m%d_%H%M
+08:48:06  + VERSION_NAME=AutoLabel_73_20251117_1648
+08:48:06  + echo 'Creating Deployment Label: AutoLabel_73_20251117_1648 with IDs [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,18106,18107,18108,18109,18110,18111,18112,18113,18114,18115,18116,18117,18118,18119,18120,18121,18122,18123,18124,18125,18126,18127,18128,18129,18130,18131,18132,18133,18134,18135,18136,18137,18138,18139,18140,18141,18142,18143,18144,18145,18146,18147,18148,18149,18150,18151,18152,18153,18154,18155]'
+08:48:06  Creating Deployment Label: AutoLabel_73_20251117_1648 with IDs [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,18106,18107,18108,18109,18110,18111,18112,18113,18114,18115,18116,18117,18118,18119,18120,18121,18122,18123,18124,18125,18126,18127,18128,18129,18130,18131,18132,18133,18134,18135,18136,18137,18138,18139,18140,18141,18142,18143,18144,18145,18146,18147,18148,18149,18150,18151,18152,18153,18154,18155]
+08:48:06  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label create --xauthtoken ad73220c-04ce-49a3-ba0d-12cb3fab6deb --instanceName Cognos-DEV/TEST --projectName Demo --name AutoLabel_73_20251117_1648 --versionedItemIds '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,18106,18107,18108,18109,18110,18111,18112,18113,18114,18115,18116,18117,18118,18119,18120,18121,18122,18123,18124,18125,18126,18127,18128,18129,18130,18131,18132,18133,18134,18135,18136,18137,18138,18139,18140,18141,18142,18143,18144,18145,18146,18147,18148,18149,18150,18151,18152,18153,18154,18155]'
+08:48:06  DEBUG: Creating label with project_id=17, label_name=AutoLabel_73_20251117_1648
+08:48:06  DEBUG: Variables: {'projectId': 17, 'name': 'AutoLabel_73_20251117_1648', 'versionedItemSource': {'ids': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 18106, 18107, 18108, 18109, 18110, 18111, 18112, 18113, 18114, 18115, 18116, 18117, 18118, 18119, 18120, 18121, 18122, 18123, 18124, 18125, 18126, 18127, 18128, 18129, 18130, 18131, 18132, 18133, 18134, 18135, 18136, 18137, 18138, 18139, 18140, 18141, 18142, 18143, 18144, 18145, 18146, 18147, 18148, 18149, 18150, 18151, 18152, 18153, 18154, 18155]}}
+08:48:06  DEBUG: Create label response status: 200
+08:48:06  DEBUG: Create label response text: {"data":{"createLabel":{"name":"AutoLabel_73_20251117_1648","description":null,"id":169}}}
+08:48:06  DEBUG: Successfully created label with ID: 169
+08:48:06  Label Created!
+08:48:06  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken ad73220c-04ce-49a3-ba0d-12cb3fab6deb --instanceName Cognos-DEV/TEST --projectName Demo --labelName AutoLabel_73_20251117_1648
+08:48:06  ++ python3 -c 'import ast; data=open('\''label_info.out'\'').read(); parsed=ast.literal_eval(data); print(parsed['\''data'\'']['\''instances'\'']['\''edges'\''][0]['\''node'\'']['\''projects'\'']['\''edges'\''][0]['\''node'\'']['\''labels'\'']['\''edges'\''][0]['\''node'\'']['\''id'\''])'
+08:48:06  + LABEL_ID=169
+08:48:06  + echo 169
+08:48:06  + echo 'Label AutoLabel_73_20251117_1648 (ID: 169) created successfully.'
+08:48:06  Label AutoLabel_73_20251117_1648 (ID: 169) created successfully.
