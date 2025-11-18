@@ -1,1066 +1,329 @@
-+ set -e
-08:48:05  + cd MotioCI/api/CLI
-08:48:05  ++ cat ../token.txt
-08:48:05  + TOKEN=ad73220c-04ce-49a3-ba0d-12cb3fab6deb
-08:48:05  + echo 'Discovering versioned item IDs under: /Team Content/MotioCI Reports/Testing/Test Results Detail'
-08:48:05  Discovering versioned item IDs under: /Team Content/MotioCI Reports/Testing/Test Results Detail
-08:48:05  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov versionedItems ls --xauthtoken ad73220c-04ce-49a3-ba0d-12cb3fab6deb --instanceName Cognos-DEV/TEST --projectName Demo --searchPath 'starts:/Team Content/MotioCI Reports/Testing/Test Results Detail'
-08:48:05  + grep ''\''id'\'':' items.out
-08:48:05  + grep -v instanceId
-08:48:05  + grep -o '[0-9][0-9]*'
-08:48:05  + paste -sd, -
-08:48:05  ++ cat ids.txt
-08:48:05  + IDS=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,18106,18107,18108,18109,18110,18111,18112,18113,18114,18115,18116,18117,18118,18119,18120,18121,18122,18123,18124,18125,18126,18127,18128,18129,18130,18131,18132,18133,18134,18135,18136,18137,18138,18139,18140,18141,18142,18143,18144,18145,18146,18147,18148,18149,18150,18151,18152,18153,18154,18155
-08:48:05  + '[' -z 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,18106,18107,18108,18109,18110,18111,18112,18113,18114,18115,18116,18117,18118,18119,18120,18121,18122,18123,18124,18125,18126,18127,18128,18129,18130,18131,18132,18133,18134,18135,18136,18137,18138,18139,18140,18141,18142,18143,18144,18145,18146,18147,18148,18149,18150,18151,18152,18153,18154,18155 ']'
-08:48:05  + cat items.out
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.540Z',
-08:48:05   'id': 1,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'package',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.587Z',
-08:48:05   'id': 2,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'folder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.613Z',
-08:48:05   'id': 3,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'folder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.687Z',
-08:48:05   'id': 4,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'folder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.710Z',
-08:48:05   'id': 5,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Motio Labs',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'folder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.737Z',
-08:48:05   'id': 6,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'folder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.747Z',
-08:48:05   'id': 7,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/MotioCI Reports DQM',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'packageConfiguration',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.770Z',
-08:48:05   'id': 8,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'folder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.793Z',
-08:48:05   'id': 9,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Promotion',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'folder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.817Z',
-08:48:05   'id': 10,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/Detail',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'folder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.903Z',
-08:48:05   'id': 11,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/UX',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'folder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.927Z',
-08:48:05   'id': 12,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/Components',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'folder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:38.937Z',
-08:48:05   'id': 13,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/[].[securityViews].[MotioCI '
-08:48:05                 'Reports]',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'modelView',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:39.383Z',
-08:48:05   'id': 14,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/MotioCI Hidden Objects',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:39.407Z',
-08:48:05   'id': 15,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control/Cognos Item '
-08:48:05                 'References',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:39.427Z',
-08:48:05   'id': 16,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/MotioCI Timeline',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:39.450Z',
-08:48:05   'id': 17,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/Defect Tracking',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:39.483Z',
-08:48:05   'id': 18,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/FM Complete '
-08:48:05                 'Reference',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.193Z',
-08:48:05   'id': 19,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/FM Query Items '
-08:48:05                 'Detail',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.217Z',
-08:48:05   'id': 20,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Data Item Lookup - '
-08:48:05                 'Target',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.230Z',
-08:48:05   'id': 21,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/Active Worker Processes',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.247Z',
-08:48:05   'id': 22,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/Activity Trend by Type',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.267Z',
-08:48:05   'id': 23,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Jobs Documentation',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.590Z',
-08:48:05   'id': 24,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Report '
-08:48:05                 'Documentation',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.607Z',
-08:48:05   'id': 25,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Data Item Lookup',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.620Z',
-08:48:05   'id': 26,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Report '
-08:48:05                 'Descriptions',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.637Z',
-08:48:05   'id': 27,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/MotioCI Timeline Trends',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.650Z',
-08:48:05   'id': 28,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Documentation/Policies '
-08:48:05                 'Documentation',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.940Z',
-08:48:05   'id': 29,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control/Commit '
-08:48:05                 'Statistics',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.963Z',
-08:48:05   'id': 30,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Motio Labs/Reports Instance '
-08:48:05                 'Comparison',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:40.983Z',
-08:48:05   'id': 31,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/Dispatcher Properties '
-08:48:05                 'Comparison',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.003Z',
-08:48:05   'id': 32,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Admin/Dispatcher Assertion '
-08:48:05                 'Status by Week',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.020Z',
-08:48:05   'id': 33,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Membership Stability '
-08:48:05                 'Assertion Status Trend',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.307Z',
-08:48:05   'id': 34,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/Reduction',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.323Z',
-08:48:05   'id': 35,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Motio Labs/Report Execution Time '
-08:48:05                 'Normalized',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.340Z',
-08:48:05   'id': 36,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control/Cognos Activity '
-08:48:05                 'by User and Action Type Summary',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.350Z',
-08:48:05   'id': 37,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/Most Active Users',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.363Z',
-08:48:05   'id': 38,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/User Logon Trend',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.693Z',
-08:48:05   'id': 39,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Inventory/Inventory Summary',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.723Z',
-08:48:05   'id': 40,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Versioned Items with '
-08:48:05                 'Test Results',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.737Z',
-08:48:05   'id': 41,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control/Cognos Item '
-08:48:05                 'Version Information',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.750Z',
-08:48:05   'id': 42,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Version Control/Cognos Item Size '
-08:48:05                 'by Type',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:41.763Z',
-08:48:05   'id': 43,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Promotion/Label Contents '
-08:48:05                 'Comparison',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:42.107Z',
-08:48:05   'id': 44,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Test Results Instance '
-08:48:05                 'Comparison by Project Summary',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:42.120Z',
-08:48:05   'id': 45,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Reports with Increased '
-08:48:05                 'Execution Time',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:42.137Z',
-08:48:05   'id': 46,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Test Results Detail',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:42.150Z',
-08:48:05   'id': 47,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Report Execution Time '
-08:48:05                 'Output Type Comparison',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:42.163Z',
-08:48:05   'id': 48,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Testing/Test Case Categories',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:42.440Z',
-08:48:05   'id': 49,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Promotion/Promoted Labels',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 0,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-11T18:20:42.457Z',
-08:48:05   'id': 50,
-08:48:05   'instanceId': 1,
-08:48:05   'prettyPath': '/Team Content/MotioCI Reports/Promotion/Promotion Results',
-08:48:05   'revisionType': 'MINOR',
-08:48:05   'type': 'report',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.033Z',
-08:48:05   'id': 18106,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'root',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.050Z',
-08:48:05   'id': 18107,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'adminFolder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.093Z',
-08:48:05   'id': 18108,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/IBM_Cognos_Samples',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.123Z',
-08:48:05   'id': 18109,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/IBM_Cognos_Samples_DQ_Legacy',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.137Z',
-08:48:05   'id': 18110,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Relative dates',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.153Z',
-08:48:05   'id': 18111,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/New Consistency Check',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'contentTask',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.173Z',
-08:48:05   'id': 18112,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/My First Deployment Export',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.247Z',
-08:48:05   'id': 18113,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Samples_for_Install_11_1_1',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.260Z',
-08:48:05   'id': 18114,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Dennis Test',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.277Z',
-08:48:05   'id': 18115,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Deployment Report Testing',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.293Z',
-08:48:05   'id': 18116,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Samples_for_Install_11_1_2',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.307Z',
-08:48:05   'id': 18117,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/AdhocSecurityPackage_04282017_07292019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.317Z',
-08:48:05   'id': 18118,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/AdhocSecurityPackage_04282017',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.337Z',
-08:48:05   'id': 18119,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Samples_for_Install_11_1_3',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.350Z',
-08:48:05   'id': 18120,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Report_Adhoc_Pkg_12012015',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.360Z',
-08:48:05   'id': 18121,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Operational Reports Packages_12142016',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.373Z',
-08:48:05   'id': 18122,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/COINS_08292019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.383Z',
-08:48:05   'id': 18123,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Report_Adhoc_Pkg_12012015_test',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.393Z',
-08:48:05   'id': 18124,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/AdhocSecurityPackage_04282017_test',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.427Z',
-08:48:05   'id': 18125,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/COBRA',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.483Z',
-08:48:05   'id': 18126,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/SLA_Reporting_09032019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.497Z',
-08:48:05   'id': 18127,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/SLA_Reporting_09042019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.507Z',
-08:48:05   'id': 18128,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/COBRA_09042019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.520Z',
-08:48:05   'id': 18129,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/COBRA_09052019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:29.530Z',
-08:48:05   'id': 18130,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/SLA_Reporting_09042019_0912',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.320Z',
-08:48:05   'id': 18131,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Test_09122019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.330Z',
-08:48:05   'id': 18132,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/SLA_Reporting',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.340Z',
-08:48:05   'id': 18133,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/SLA_Reporting_09162019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.353Z',
-08:48:05   'id': 18134,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/SLA_09-17-2019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.363Z',
-08:48:05   'id': 18135,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/HPE22-23 Report_09172019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.373Z',
-08:48:05   'id': 18136,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/MCC-R-031_09202019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.383Z',
-08:48:05   'id': 18137,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/COBRA_09202019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.393Z',
-08:48:05   'id': 18138,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/AdhocAndOPRReports_09252019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.403Z',
-08:48:05   'id': 18139,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/AdhocAndOPRReports_09252019_1',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.413Z',
-08:48:05   'id': 18140,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/COBRAReports_09272019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.420Z',
-08:48:05   'id': 18141,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Deply',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'adminFolder',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.430Z',
-08:48:05   'id': 18142,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Deply/PETSandPOSReports_09282019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.440Z',
-08:48:05   'id': 18143,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Deply/SLA_Reporting_SIT',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.450Z',
-08:48:05   'id': 18144,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/SLA_Reporting_SIT',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.460Z',
-08:48:05   'id': 18145,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/coins_1016',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.470Z',
-08:48:05   'id': 18146,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/SLAReporting_CMM-SLA-300-dev_uat_23102019',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.477Z',
-08:48:05   'id': 18147,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Test Namespaces for consistancy',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'contentTask',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.487Z',
-08:48:05   'id': 18148,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Deply/Samples_for_Install_11_1_5',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.500Z',
-08:48:05   'id': 18149,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Samples_for_Install_11_1_5',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'importDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.510Z',
-08:48:05   'id': 18150,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/Templates',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.520Z',
-08:48:05   'id': 18151,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/cc',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'contentTask',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.530Z',
-08:48:05   'id': 18152,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/SDN20021_10232020',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.540Z',
-08:48:05   'id': 18153,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/COINS_Sample_DevtoTest_12092020',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.553Z',
-08:48:05   'id': 18154,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/DplyTest_12102020',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  {'clientMajor': 1,
-08:48:05   'comment': 'Initial Version ',
-08:48:05   'dateTime': '2025-02-12T22:27:30.567Z',
-08:48:05   'id': 18155,
-08:48:05   'instanceId': 3,
-08:48:05   'prettyPath': '/Administration/SDN 20023_Cognos_Export_Package',
-08:48:05   'revisionType': 'MAJOR',
-08:48:05   'type': 'exportDeployment',
-08:48:05   'version': 1}
-08:48:05  
-08:48:05  + '[' true = true ']'
-08:48:05  ++ date +%Y%m%d_%H%M
-08:48:05  + PRE_LABEL=PreDeploy_73_20251117_1648
-08:48:05  + echo 'Creating Pre-Deployment Label: PreDeploy_73_20251117_1648'
-08:48:05  Creating Pre-Deployment Label: PreDeploy_73_20251117_1648
-08:48:05  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label create --xauthtoken ad73220c-04ce-49a3-ba0d-12cb3fab6deb --instanceName Cognos-DEV/TEST --projectName Demo --name PreDeploy_73_20251117_1648
-08:48:06  DEBUG: Creating label with project_id=17, label_name=PreDeploy_73_20251117_1648
-08:48:06  DEBUG: Variables: {'projectId': 17, 'name': 'PreDeploy_73_20251117_1648', 'versionedItemSource': {'ids': []}}
-08:48:06  DEBUG: Create label response status: 200
-08:48:06  DEBUG: Create label response text: {"data":{"createLabel":{"name":"PreDeploy_73_20251117_1648","description":null,"id":168}}}
-08:48:06  DEBUG: Successfully created label with ID: 168
-08:48:06  Label Created!
-08:48:06  ++ date +%Y%m%d_%H%M
-08:48:06  + VERSION_NAME=AutoLabel_73_20251117_1648
-08:48:06  + echo 'Creating Deployment Label: AutoLabel_73_20251117_1648 with IDs [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,18106,18107,18108,18109,18110,18111,18112,18113,18114,18115,18116,18117,18118,18119,18120,18121,18122,18123,18124,18125,18126,18127,18128,18129,18130,18131,18132,18133,18134,18135,18136,18137,18138,18139,18140,18141,18142,18143,18144,18145,18146,18147,18148,18149,18150,18151,18152,18153,18154,18155]'
-08:48:06  Creating Deployment Label: AutoLabel_73_20251117_1648 with IDs [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,18106,18107,18108,18109,18110,18111,18112,18113,18114,18115,18116,18117,18118,18119,18120,18121,18122,18123,18124,18125,18126,18127,18128,18129,18130,18131,18132,18133,18134,18135,18136,18137,18138,18139,18140,18141,18142,18143,18144,18145,18146,18147,18148,18149,18150,18151,18152,18153,18154,18155]
-08:48:06  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label create --xauthtoken ad73220c-04ce-49a3-ba0d-12cb3fab6deb --instanceName Cognos-DEV/TEST --projectName Demo --name AutoLabel_73_20251117_1648 --versionedItemIds '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,18106,18107,18108,18109,18110,18111,18112,18113,18114,18115,18116,18117,18118,18119,18120,18121,18122,18123,18124,18125,18126,18127,18128,18129,18130,18131,18132,18133,18134,18135,18136,18137,18138,18139,18140,18141,18142,18143,18144,18145,18146,18147,18148,18149,18150,18151,18152,18153,18154,18155]'
-08:48:06  DEBUG: Creating label with project_id=17, label_name=AutoLabel_73_20251117_1648
-08:48:06  DEBUG: Variables: {'projectId': 17, 'name': 'AutoLabel_73_20251117_1648', 'versionedItemSource': {'ids': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 18106, 18107, 18108, 18109, 18110, 18111, 18112, 18113, 18114, 18115, 18116, 18117, 18118, 18119, 18120, 18121, 18122, 18123, 18124, 18125, 18126, 18127, 18128, 18129, 18130, 18131, 18132, 18133, 18134, 18135, 18136, 18137, 18138, 18139, 18140, 18141, 18142, 18143, 18144, 18145, 18146, 18147, 18148, 18149, 18150, 18151, 18152, 18153, 18154, 18155]}}
-08:48:06  DEBUG: Create label response status: 200
-08:48:06  DEBUG: Create label response text: {"data":{"createLabel":{"name":"AutoLabel_73_20251117_1648","description":null,"id":169}}}
-08:48:06  DEBUG: Successfully created label with ID: 169
-08:48:06  Label Created!
-08:48:06  + python3 ci-cli.py --server=https://cgrptmcip01.cloud.cammis.ca.gov label ls --xauthtoken ad73220c-04ce-49a3-ba0d-12cb3fab6deb --instanceName Cognos-DEV/TEST --projectName Demo --labelName AutoLabel_73_20251117_1648
-08:48:06  ++ python3 -c 'import ast; data=open('\''label_info.out'\'').read(); parsed=ast.literal_eval(data); print(parsed['\''data'\'']['\''instances'\'']['\''edges'\''][0]['\''node'\'']['\''projects'\'']['\''edges'\''][0]['\''node'\'']['\''labels'\'']['\''edges'\''][0]['\''node'\'']['\''id'\''])'
-08:48:06  + LABEL_ID=169
-08:48:06  + echo 169
-08:48:06  + echo 'Label AutoLabel_73_20251117_1648 (ID: 169) created successfully.'
-08:48:06  Label AutoLabel_73_20251117_1648 (ID: 169) created successfully.
+/*
+=======================================================================================
+MotioCI → Cognos Automated Deployment Pipeline
+Maintained by: DevOps Team
+Purpose: Automate Cognos content promotion from DEV/TEST to PRD using MotioCI CLI.
+=======================================================================================
+*/
+
+def branch = env.BRANCH_NAME ?: "DEV"
+def namespace = env.NAMESPACE ?: "dev"
+def cloudName = env.CLOUD_NAME == "openshift" ? "openshift" : "kubernetes"
+def workingDir = "/home/jenkins/agent"
+
+APP_NAME = "combined-devops-cognos-deployments"
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  volumes:
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - name: varlibcontainers
+      emptyDir: {}
+    - name: jenkins-trusted-ca-bundle
+      configMap:
+        name: jenkins-trusted-ca-bundle
+        defaultMode: 420
+        optional: true
+  containers:
+    - name: jnlp
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+
+    - name: node
+      image: registry.access.redhat.com/ubi8/nodejs-16:latest
+      tty: true
+      command: ["/bin/bash"]
+      workingDir: ${workingDir}
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: ${workingDir}
+        - name: BRANCH
+          value: ${branch}
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+
+    - name: python
+      image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.2.0
+      tty: true
+      command: ["/bin/bash"]
+      workingDir: ${workingDir}
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: ${workingDir}
+        - name: BRANCH
+          value: ${branch}
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+"""
+    }
+  }
+
+  environment {
+    GIT_BRANCH = "${BRANCH_NAME}"
+    MOTIO_SERVER = "https://cgrptmcip01.cloud.cammis.ca.gov"
+  }
+  
+  parameters {
+    choice(name: 'SOURCE_ENV', choices: ['Cognos-DEV/TEST'], description: 'Source Cognos environment')
+    choice(name: 'TARGET_ENV', choices: ['Cognos-PRD'], description: 'Target Cognos environment')
+    string(name: 'PROJECT_NAME', defaultValue: '', description: 'MotioCI project name')
+    string(name: 'OBJECT_PATH', defaultValue: '', description: 'Folder/report path to promote')
+    booleanParam(name: 'AUTO_LABEL', defaultValue: true, description: 'Create Pre/Post deployment labels automatically')
+    string(name: 'ROLLBACK_LABEL', defaultValue: '', description: 'Optional: enter label name to redeploy instead of creating new one')
+  }
+  
+  options {
+    disableConcurrentBuilds()
+    timestamps()
+  }
+
+  stages {
+
+    stage('Initialize') {
+      steps {
+        script {
+          echo "Branch: ${env.GIT_BRANCH}"
+          
+                  echo """
+                  ================================================
+                  MotioCI → Cognos Deployment Pipeline (Enhanced)
+                  ================================================
+                  Source: ${params.SOURCE_ENV}
+                  Target: ${params.TARGET_ENV}
+                  Project: ${params.PROJECT_NAME}
+                  Object Path: ${params.OBJECT_PATH}
+                  Rollback Label: ${params.ROLLBACK_LABEL ?: "N/A"}
+                  ================================================
+                  """
+        }
+      }
+    }
+    
+    stage('MotioCI Login') {
+      steps {
+        withCredentials([
+          file(credentialsId: 'cognos-credentials', variable: 'CREDENTIALS_FILE')
+        ]) {
+          container('python') {
+            sh '''
+              set -euo pipefail
+              cd MotioCI/api/CLI
+
+              echo "Installing MotioCI CLI dependencies..."
+              python3 -m pip install --user -r requirements.txt
+
+              echo "Logging in to MotioCI with stored credentials file..."
+              python3 ci-cli.py --server="$MOTIO_SERVER" \
+                login --credentialsFile "$CREDENTIALS_FILE" > login.out 2>&1 || true
+
+              # Extract auth token from login output
+              awk 'match($0,/(Auth[[:space:]]*[Tt]oken|x-auth_token|xauthtoken)[[:space:]]*[:=][[:space:]]*([A-Za-z0-9._-]+)/,m){print m[2]}' login.out | tail -n1 > login.token || true
+
+              TOKEN=$(cat login.token 2>/dev/null || true)
+              echo "MotioCI token captured (length: ${#TOKEN})"
+             
+              if [ -z "$TOKEN" ] || [ "${#TOKEN}" -lt 10 ]; then
+                echo "ERROR: Failed to capture valid auth token!"
+                echo "Login output:"
+                cat login.out
+                exit 1
+              fi
+             
+              echo "$TOKEN" > ../token.txt
+              echo "Login successful"
+            '''
+          }
+        }
+      }
+    }
+
+stage('Prepare deployment') {
+  when { expression { return !params.ROLLBACK_LABEL?.trim() } }
+  steps {
+    container('python') {
+      sh '''
+        set -e
+        cd MotioCI/api/CLI
+
+        TOKEN=$(cat ../token.txt)
+        echo "Using MotioCI token (length: ${#TOKEN})"
+
+        if [ -z "${OBJECT_PATH}" ]; then
+          echo "ERROR: OBJECT_PATH not provided!"
+          exit 1
+        fi
+        echo "OBJECT_PATH: ${OBJECT_PATH}"
+
+        echo "Discovering versioned items in project ${PROJECT_NAME} ..."
+        python3 ci-cli.py --server="$MOTIO_SERVER" \
+          versionedItems ls \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" > items_full.out
+
+        echo "Total items listed (raw): $(grep -c \"'id':\" items_full.out || true)"
+
+        echo "Filtering for path: ${OBJECT_PATH}"
+        grep -A8 "prettyPath.: '${OBJECT_PATH}'" items_full.out > items.out || true
+
+
+        grep "'id':" items.out | grep -v "instanceId" | grep -o "[0-9][0-9]*" | paste -sd, - > ids.txt || true
+        IDS=$(cat ids.txt || true)
+
+        if [ -z "$IDS" ]; then
+          echo "ERROR: No versioned items found exactly at ${OBJECT_PATH}"
+          echo "Hint: Check if object is versioned or spelling of path."
+          exit 1
+        fi
+
+        echo "Matched IDs: $IDS"
+        ID_COUNT=$(echo $IDS | tr ',' '\\n' | wc -l | tr -d ' ')
+        echo "Number of matching items: $ID_COUNT"
+
+        echo "Matched object path(s):"
+        grep "prettyPath" items.out
+
+
+        if [ "${AUTO_LABEL}" = "true" ]; then
+          PRE_LABEL="PreDeploy_${BUILD_NUMBER}_$(date +%Y%m%d_%H%M)"
+          echo "Creating Pre-Deployment Label: $PRE_LABEL"
+          python3 ci-cli.py --server="$MOTIO_SERVER" label create \
+            --xauthtoken "$TOKEN" \
+            --instanceName "${SOURCE_ENV}" \
+            --projectName "${PROJECT_NAME}" \
+            --name "$PRE_LABEL"
+        fi
+
+        VERSION_NAME="AutoLabel_${BUILD_NUMBER}_$(date +%Y%m%d_%H%M)"
+        echo "Creating Deployment Label: $VERSION_NAME with IDs [$IDS]"
+        python3 ci-cli.py --server="$MOTIO_SERVER" label create \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" \
+          --name "$VERSION_NAME" \
+          --versionedItemIds "[$IDS]"
+
+        python3 ci-cli.py --server="$MOTIO_SERVER" label ls \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" \
+          --labelName "$VERSION_NAME" > label_info.out
+
+        LABEL_ID=$(python3 -c "import ast; data=open('label_info.out').read(); parsed=ast.literal_eval(data); print(parsed['data']['instances']['edges'][0]['node']['projects']['edges'][0]['node']['labels']['edges'][0]['node']['id'])" 2>/dev/null || echo "")
+        echo "$LABEL_ID" > ../label_id.txt
+        echo "Label $VERSION_NAME (ID: $LABEL_ID) created successfully."
+
+        echo "Verifying label contents ..."
+        python3 ci-cli.py --server="$MOTIO_SERVER" label ls \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" \
+          --labelName "$VERSION_NAME" > label_verify.out
+        grep "prettyPath" label_verify.out || echo "(no paths found)"
+      '''
+    }
+  }
+}
+    
+  stage('Retrieve CAMPassport & Deploy') {
+      steps {
+        container('python') {
+          withCredentials([string(credentialsId: 'cognos-api-key-prd', variable: 'COGNOS_API_KEY_PRD')]) {
+            sh '''
+              set -e
+              cd MotioCI/api/CLI
+
+              # If rollback specified, skip label creation
+              if [ -n "${ROLLBACK_LABEL}" ]; then
+                echo "Using existing rollback label: ${ROLLBACK_LABEL}"
+                echo "0" > ../label_id.txt
+              fi
+
+              TOKEN=$(cat ../token.txt)
+              echo "Obtaining PROD CAMPassport..."
+              BASE="https://dhcsprodcognos.ca.analytics.ibm.com/api/v1"
+              echo "{\\"parameters\\":[{\\"name\\":\\"CAMAPILoginKey\\",\\"value\\":\\"$COGNOS_API_KEY_PRD\\"}]}" > login.json
+              curl -sS -X PUT "$BASE/session" -H "Content-Type: application/json" -d @login.json -o session.json
+              SESSION_KEY=$(python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))')
+              SESSION_KEY=$(echo "$SESSION_KEY" | sed 's/^CAM[ ]*//')
+              echo "✓ CAMPassport captured"
+
+              if [ -n "${ROLLBACK_LABEL}" ]; then
+                LABEL_NAME="${ROLLBACK_LABEL}"
+                echo "Promoting rollback label ${ROLLBACK_LABEL}"
+                DEPLOY_LABEL_NAME="Rollback_${BUILD_NUMBER}"
+              else
+                LABEL_ID=$(cat ../label_id.txt)
+                LABEL_NAME=""
+                DEPLOY_LABEL_NAME="PROMOTED_${BUILD_NUMBER}"
+              fi
+
+              echo "Deploying to ${TARGET_ENV}..."
+              python3 ci-cli.py --server="$MOTIO_SERVER" deploy \
+                --xauthtoken "$TOKEN" \
+                --sourceInstanceName "${SOURCE_ENV}" \
+                --targetInstanceName "${TARGET_ENV}" \
+                --projectName "${PROJECT_NAME}" \
+                ${LABEL_NAME:+--labelName "$LABEL_NAME"} \
+                ${LABEL_ID:+--labelId "$LABEL_ID"} \
+                --targetLabelName "$DEPLOY_LABEL_NAME" \
+                --camPassportId "$SESSION_KEY" > deploy.out 2>&1 || true
+
+              cat deploy.out
+              if grep -q '"errors"' deploy.out; then echo "Deployment failed"; exit 1; fi
+              echo "Deployment executed successfully."
+            '''
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "Pipeline execution finished."
+    }
+    success {
+      echo "MotioCI pipeline completed successfully."
+    }
+    failure {
+      echo "MotioCI pipeline failed."
+    }
+  }
+}
