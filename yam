@@ -261,7 +261,7 @@ stage('Prepare deployment') {
   }
 }
     
-  stage('Retrieve CAMPassport & Deploy') {
+  stage('Deploy') {
       steps {
         container('python') {
           withCredentials([string(credentialsId: 'cognos-api-key-prd', variable: 'COGNOS_API_KEY_PRD')]) {
