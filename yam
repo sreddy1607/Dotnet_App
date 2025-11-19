@@ -1,181 +1,70 @@
-stage("initialize") {
-      steps {
-        container(name: "node") {
-          script {
-            properties([
-              parameters([
-                  [
-                    $class: 'ChoiceParameter',
-                    choiceType: 'PT_SINGLE_SELECT',
-                    // filterLength: 1,
-                    // filterable: false,
-                    name: 'SOURCE_BRANCHNAME',
-                    script: [
-                        $class: 'GroovyScript',
-                        fallbackScript: [
-                            classpath: [],
-                            sandbox: true,
-                            script:
-                                "return ['error']"
-                        ],
-                        script: [
-                            classpath: [],
-                            sandbox: true,
-                            script: """
-                                return["${env.BRANCH_NAME}"]
-                            """
-                        ]
-                    ]
-                  ],
-                  [   $class: 'ChoiceParameter',
-                      choiceType: 'PT_SINGLE_SELECT',
-                      name: 'TARGET_ENVIRONMENT',
-                      script: [
-                          $class: 'GroovyScript',
-                          fallbackScript: [
-                              classpath: [],
-                              sandbox: true,
-                              script:
-                                  "return['Could not get the environments']"
-                          ],
-                          script: [
-                              classpath: [],
-                              sandbox: true,
-                              script: """
-                                 if ('${env.BRANCH_NAME}'.contains('sandbox')){
-                                     return['sandbox:selected']
-                                    }
-                                 else if('${env.BRANCH_NAME}'.contains('master')){
-                                     return['dev:selected']
-                                    }
-                                """
-                          ]
-                      ]
-                  ],
-                  [     $class: 'ChoiceParameter',
-                        choiceType: 'PT_CHECKBOX',
-                        name: 'OPENSHIFT_NAMESPACES',
-                        script:
-                            [$class: 'GroovyScript',
-                            fallbackScript: [
-                                    classpath: [],
-                                    sandbox: true,
-                                    script:
-                                        "return['Could not get The namespaces']"
-                                    ],
-                            script: [
-                                    classpath: [],
-                                    sandbox: true,
-                                    script: """
-                                        if ('${env.BRANCH_NAME}'.contains('sandbox')){
-                                            return['${env.BRANCH_NAME}:selected']
-                                            }
-                                        else if('${env.BRANCH_NAME}'.equals('master')){
-                                            return['dev:selected']
-                                            }
-                                        """
-                              ]
-                      ]
-                  ],
-                choice(name: 'RELEASE_TYPE', choices: ['PATCH','MINOR','MAJOR'], description: 'Enter Release type'),
-                booleanParam(name: 'USE_GIT_TAG', defaultValue: false, description: 'Use the selected git tag instead of LATEST commit'),
-                gitParameter(name: 'GIT_TAG', defaultValue: 'provider-portal-app_deployed_in_dev_dev_from_master', description: 'git tag', type: 'PT_TAG', sortMode: 'DESCENDING_SMART'),
-                string(name: 'RELEASE',defaultValue: 'enter release name (Release-1.2.3)', description: 'Enter release name (overrides default config)'),
-                string(name: 'GIT_SHA',defaultValue: 'enter git sha(8+ chars)', description: 'enter git sha that you want to deploy')
-              ])
-            ])
+stage('Prepare deployment') {
+  when { expression { return !params.ROLLBACK_LABEL?.trim() } }
+  steps {
+    container('python') {
+      sh '''
+        set -e
+        cd MotioCI/api/CLI
 
-            env_stage_name = "initialize"
-            env_step_name = "checkout"
+        TOKEN=$(cat ../token.txt)
+        echo "Using MotioCI token (length: ${#TOKEN})"
 
-            deleteDir()
+        if [ -z "${OBJECT_PATH}" ]; then
+          echo "ERROR: OBJECT_PATH not provided!"
+          exit 1
+        fi
+        echo "OBJECT_PATH: ${OBJECT_PATH}"
 
-            echo 'checkout source  and get the commit id'
-            env_current_git_commit = checkout(scm).GIT_COMMIT
+        echo "Discovering versioned items in project ${PROJECT_NAME} ..."
+        python3 ci-cli.py --server="$MOTIO_SERVER" \
+          versionedItems ls \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" > items_full.out
 
-            //env_git_repo_url = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
-            env_git_repo_url = scm.userRemoteConfigs[0].url
-            echo "Git repo URL: ${env_git_repo_url}"
-            echo 'Loading properties file'
-            env_step_name = "load properties"
-            // load the pipeline properties
-            load("devops/jenkins/Jenkinsfile.properties")
+        echo "Total items listed (raw): $(grep -c \"'id':\" items_full.out || true)"
 
-            echo "The cluster subdomain is ${env_cluster_subdomain}"
+        echo "Filtering for path: ${OBJECT_PATH}"
+        grep -A8 "prettyPath.: '${OBJECT_PATH}'" items_full.out > items.out || true
 
-            env_step_name = "set global variables"
-            echo 'initialize slack channels and tokens'
-            initSlackChannels()
 
-            echo 'set branch name'
-			      echo 'BRANCH_NAME: --- ${BRANCH_NAME}'
-            env_git_branch_name = BRANCH_NAME
-            echo 'Source branch'
-            echo params.SOURCE_BRANCHNAME
-            echo 'Target enviroment'
-            echo params.TARGET_ENVIRONMENT
-            echo 'openshift namespaces'
-            echo params.OPENSHIFT_NAMESPACES
+        grep "'id':" items.out | grep -v "instanceId" | grep -o "[0-9][0-9]*" | paste -sd, - > ids.txt || true
+        IDS=$(cat ids.txt || true)
 
-            echo ' capture the selected jenkins node and use it for every thing in the pipeline'
-            env_selected_jenkins_node=NODE_NAME
+        if [ -z "$IDS" ]; then
+          echo "ERROR: No versioned items found exactly at ${OBJECT_PATH}"
+          echo "Hint: Check if object is versioned or spelling of path."
+          exit 1
+        fi
 
-            env_git_tag_name = params.GIT_TAG
+        echo "Matched IDs: $IDS"
+        ID_COUNT=$(echo $IDS | tr ',' '\\n' | wc -l | tr -d ' ')
+        echo "Number of matching items: $ID_COUNT"
 
-            // override PO acceptance of build
-            // by default, PO always checks the build in qa
+        echo "Matched object path(s):"
+        grep "prettyPath" items.out
 
-            //set default image name space
-            //change it to SANDBOX_IMAGE_SPACE if it's a feature branch
-            env_image_namespace=NON_SANDBOX_IMAGE_SPACE
+        VERSION_NAME="AutoLabel_${BUILD_NUMBER}_$(date +%Y%m%d_%H%M)"
+        echo "Creating Deployment Label: $VERSION_NAME with IDs [$IDS]"
+        python3 ci-cli.py --server="$MOTIO_SERVER" label create \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" \
+          --name "$VERSION_NAME" \
+          --versionedItemIds "[$IDS]"
 
-            //set branch type (master, develop,feature?)
-            BRANCHES.each {key, value ->
-                if ( value.branches.contains(env_git_branch_name) || env_git_branch_name.contains(key))
-                    env_git_branch_type=key
-            }
-            if ( ! params.TARGET_ENVIRONMENT.contains("Choose") ){
-                 KUBE_ENVS[params.TARGET_ENVIRONMENT].namespaces = params.OPENSHIFT_NAMESPACES.tokenize(",")
-                 BRANCHES[env_git_branch_type].stages = params.TARGET_ENVIRONMENT.tokenize(",")
-              }
+        python3 ci-cli.py --server="$MOTIO_SERVER" label ls \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" \
+          --labelName "$VERSION_NAME" > label_info.out
 
-            //override release name
-            if ( ! params.RELEASE.contains("enter") )
-                RELEASE_NAME=params.RELEASE
-                // Release type - MAJOR/MINOR/PATCh
-                env_release_type=params.RELEASE_TYPE
-
-            // do we want to deploy a specific commit?
-            if ( ! params.GIT_SHA.contains("enter") ) {
-                env_step_name = "checkout non-latest"
-                // if you choose a sha to deploy, shouldn't need to build again
-                env_skip_build="true"
-                env_current_git_commit=params.GIT_SHA
-
-                //get ready to check out the commit for the sha
-				    name_value=env_current_git_commit
-
-                    //override earlier checked out source
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: "${name_value}"]],
-                        doGenerateSubmoduleConfigurations: false,
-                        extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: true]],
-                        submoduleCfg: [],
-                        userRemoteConfigs: [[credentialsId: "${SSH_AGENT_GIT_ID}", url: "${env_git_repo_url}"]]
-                    ])
-                }
-
-            // get the short version of commit
-            env_current_git_commit="${env_current_git_commit[0..7]}"
-
-            //include commit id in build name
-            currentBuild.displayName = "#${BUILD_NUMBER} --- ${env_current_git_commit}"
-
-            //set the values for the initial environment for deployment and tests
-            setupForNextStage(g_stage_index,env_git_branch_type)
-            slackNotification("pipeline","${APP_NAME}-${env_git_branch_name}: <${BUILD_URL}console|build #${BUILD_NUMBER}> started.","#439FE0","false")
-          } //END script
-        } //END container node
-      } //END steps
-    } //END stage
+        LABEL_ID=$(python3 -c "import ast; data=open('label_info.out').read(); parsed=ast.literal_eval(data); print(parsed['data']['instances']['edges'][0]['node']['projects']['edges'][0]['node']['labels']['edges'][0]['node']['id'])" 2>/dev/null || echo "")
+        echo "$LABEL_ID" > ../label_id.txt
+        echo "Label $VERSION_NAME (ID: $LABEL_ID) created successfully."
+        
+      '''
+    }
+  }
+}
+    
