@@ -1,15 +1,110 @@
- environment {
+/*
+=======================================================================================
+MotioCI → Cognos Automated Deployment Pipeline
+Maintained by: DevOps Team
+Purpose: Automate Cognos content promotion from DEV/TEST to PRD using MotioCI CLI.
+=======================================================================================
+*/
+
+def branch = env.BRANCH_NAME ?: "DEV"
+def namespace = env.NAMESPACE ?: "dev"
+def cloudName = env.CLOUD_NAME == "openshift" ? "openshift" : "kubernetes"
+def workingDir = "/home/jenkins/agent"
+
+APP_NAME = "combined-devops-cognos-deployments"
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  volumes:
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - name: varlibcontainers
+      emptyDir: {}
+    - name: jenkins-trusted-ca-bundle
+      configMap:
+        name: jenkins-trusted-ca-bundle
+        defaultMode: 420
+        optional: true
+  containers:
+    - name: jnlp
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+
+    - name: node
+      image: registry.access.redhat.com/ubi8/nodejs-16:latest
+      tty: true
+      command: ["/bin/bash"]
+      workingDir: ${workingDir}
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: ${workingDir}
+        - name: BRANCH
+          value: ${branch}
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+
+    - name: python
+      image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.2.0
+      tty: true
+      command: ["/bin/bash"]
+      workingDir: ${workingDir}
+      securityContext:
+        privileged: true
+      envFrom:
+        - configMapRef:
+            name: jenkins-agent-env
+            optional: true
+      env:
+        - name: HOME
+          value: ${workingDir}
+        - name: BRANCH
+          value: ${branch}
+        - name: GIT_SSL_CAINFO
+          value: "/etc/pki/tls/certs/ca-bundle.crt"
+      volumeMounts:
+        - name: jenkins-trusted-ca-bundle
+          mountPath: /etc/pki/tls/certs
+"""
+    }
+  }
+
+  environment {
     GIT_BRANCH = "${BRANCH_NAME}"
     MOTIO_SERVER = "https://cgrptmcip01.cloud.cammis.ca.gov"
   }
   
   parameters {
-    choice(name: 'SOURCE_ENV', choices: ['Cognos-DEV/TEST'], description: 'Source Cognos environment')
-    choice(name: 'TARGET_ENV', choices: ['Cognos-PRD'], description: 'Target Cognos environment')
-    string(name: 'PROJECT_NAME', defaultValue: '', description: 'Source_env project name')
-    string(name: 'OBJECT_PATH', defaultValue: '', description: 'Folder/report path to promote')
-    booleanParam(name: 'AUTO_LABEL', defaultValue: true, description: 'Create deployment labels automatically')
-    string(name: 'ROLLBACK_LABEL', defaultValue: '', description: 'Optional: enter label name to redeploy instead of creating new one')
+    choice(name: 'SOURCE_ENV', choices: ['Cognos-DEV/TEST', 'Cognos-SIT', 'Cognos-UAT'], description: 'Select the Cognos source environment.')
+    choice(name: 'TARGET_ENV', choices: ['Cognos-SIT', 'Cognos-UAT', 'Cognos-PRD'], description: 'Select the target Cognos environment.')
+    string(name: 'PROJECT_NAME', defaultValue: '', description: 'MotioCI project name (manual entry if not auto-listed).')
+    string(name: 'OBJECT_PATH', defaultValue: '', description: 'Cognos path to promote (leave empty to deploy whole project).')
+    string(name: 'ROLLBACK_LABEL', defaultValue: '', description: 'Optional: enter label to redeploy.')
   }
   
   options {
@@ -72,7 +167,211 @@
               echo "$TOKEN" > ../token.txt
               echo "Login successful"
             '''
+                        // === Dynamic discovery: projects and folders ===
+            script {
+              echo "🔍 Fetching available MotioCI projects for ${params.SOURCE_ENV}..."
+
+              sh '''
+                set -e
+                cd MotioCI/api/CLI
+                python3 ci-cli.py --server="$MOTIO_SERVER" project ls \
+                  --xauthtoken "$(cat ../token.txt)" \
+                  --instanceName "${SOURCE_ENV}" > ../projects.json
+
+                grep -o "'name': '[^']*'" ../projects.json | cut -d"'" -f4 | sort | uniq > ../projects.txt
+              '''
+
+              def projects = readFile('MotioCI/projects.txt').split('\n').findAll { it?.trim() }
+              echo "✅ Found ${projects.size()} projects."
+
+              // Dynamically update PROJECT_NAME choices for next run
+              def job = Jenkins.instance.getItemByFullName(env.JOB_NAME)
+              def prop = job.getProperty(ParametersDefinitionProperty)
+              def newParams = [
+                new ChoiceParameterDefinition('PROJECT_NAME', projects as String[], 'Select MotioCI Project')
+              ]
+              prop.parameterDefinitions.removeAll { it.name == 'PROJECT_NAME' }
+              prop.parameterDefinitions.addAll(newParams)
+              job.save()
+              echo "PROJECT_NAME dropdown updated for next build."
+
+              // Optional: also fetch folders for current project
+              if (params.PROJECT_NAME?.trim()) {
+                echo "Fetching folders for project ${params.PROJECT_NAME}..."
+                sh '''
+                  cd MotioCI/api/CLI
+                  python3 ci-cli.py --server="$MOTIO_SERVER" versionedItems ls \
+                    --xauthtoken "$(cat ../token.txt)" \
+                    --instanceName "${SOURCE_ENV}" \
+                    --projectName "${PROJECT_NAME}" > ../folders.json
+                  grep "prettyPath" ../folders.json | cut -d"'" -f4 | sort | uniq > ../folders.txt
+                '''
+                def folders = readFile('MotioCI/folders.txt').split('\n').findAll { it?.trim() }
+                echo "Found ${folders.size()} folder paths."
+                prop.parameterDefinitions.removeAll { it.name == 'OBJECT_PATH' }
+                prop.parameterDefinitions.add(new ChoiceParameterDefinition('OBJECT_PATH', folders as String[], 'Select folder or report path'))
+                job.save()
+                echo "OBJECT_PATH dropdown updated for next build."
+              } else {
+                echo "Skipping folder discovery (no project selected yet)."
+              }
           }
         }
       }
     }
+
+stage('Prepare deployment') {
+  when { expression { return !params.ROLLBACK_LABEL?.trim() } }
+  steps {
+    container('python') {
+      sh '''
+        set -e
+        cd MotioCI/api/CLI
+
+        TOKEN=$(cat ../token.txt)
+        echo "Using MotioCI token (length: ${#TOKEN})"
+
+        echo "Project: ${PROJECT_NAME}"
+        echo "Object Path: ${OBJECT_PATH:-<none>}"
+
+        # List all versioned items for the project
+        echo "Discovering versioned items in project ${PROJECT_NAME}..."
+        python3 ci-cli.py --server="$MOTIO_SERVER" \
+          versionedItems ls \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" > items_full.out
+
+        echo "Total items listed (raw): $(grep -c \"'id':\" items_full.out || true)"
+
+        # ------------------------------------------------------------
+        # Determine which IDs to label (whole project vs. specific path)
+        # ------------------------------------------------------------
+        if [ -z "${OBJECT_PATH}" ]; then
+          echo "No OBJECT_PATH provided — deploying the entire project ${PROJECT_NAME}"
+          grep "'id':" items_full.out | grep -v "instanceId" | grep -o "[0-9][0-9]*" \
+            | paste -sd, - > ids.txt || true
+        else
+          echo "Filtering for path: ${OBJECT_PATH}"
+          grep -A8 "prettyPath.: '${OBJECT_PATH}'" items_full.out > items.out || true
+          grep "'id':" items.out | grep -v "instanceId" | grep -o "[0-9][0-9]*" \
+            | paste -sd, - > ids.txt || true
+        fi
+
+        IDS=$(cat ids.txt || true)
+
+        if [ -z "$IDS" ]; then
+          echo "ERROR: No versioned items found for selection."
+          echo "Hint: Check if the object is versioned or the path is correct."
+          exit 1
+        fi
+
+        ID_COUNT=$(echo $IDS | tr ',' '\\n' | wc -l | tr -d ' ')
+        echo "Found ${ID_COUNT} versioned item(s)."
+        echo "Matched IDs: $IDS"
+
+        # ------------------------------------------------------------
+        # Create Deployment label for identified IDs
+        # ------------------------------------------------------------
+        VERSION_NAME="AutoLabel_${BUILD_NUMBER}_$(date +%Y%m%d_%H%M)"
+        echo "Creating Deployment Label: $VERSION_NAME with IDs [$IDS]"
+        python3 ci-cli.py --server="$MOTIO_SERVER" label create \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" \
+          --name "$VERSION_NAME" \
+          --versionedItemIds "[$IDS]"
+
+        # ------------------------------------------------------------
+        # Fetch and store Label ID
+        # ------------------------------------------------------------
+        python3 ci-cli.py --server="$MOTIO_SERVER" label ls \
+          --xauthtoken "$TOKEN" \
+          --instanceName "${SOURCE_ENV}" \
+          --projectName "${PROJECT_NAME}" \
+          --labelName "$VERSION_NAME" > label_info.out
+
+        LABEL_ID=$(python3 -c "import ast; data=open('label_info.out').read(); \
+          parsed=ast.literal_eval(data); \
+          print(parsed['data']['instances']['edges'][0]['node']['projects']['edges'][0]['node']['labels']['edges'][0]['node']['id'])" \
+          2>/dev/null || echo "")
+
+        if [ -z "$LABEL_ID" ]; then
+          echo "ERROR: Unable to retrieve label ID!"
+          exit 1
+        fi
+
+        echo "$LABEL_ID" > ../label_id.txt
+        echo "Label $VERSION_NAME (ID: $LABEL_ID) created successfully."
+
+      '''
+    }
+  }
+}
+    
+  stage('Deploy') {
+      steps {
+        container('python') {
+          withCredentials([string(credentialsId: 'cognos-api-key-prd', variable: 'COGNOS_API_KEY_PRD')]) {
+            sh '''
+              set -e
+              cd MotioCI/api/CLI
+
+              # If rollback specified, skip label creation
+              if [ -n "${ROLLBACK_LABEL}" ]; then
+                echo "Using existing rollback label: ${ROLLBACK_LABEL}"
+                echo "0" > ../label_id.txt
+              fi
+
+              TOKEN=$(cat ../token.txt)
+              echo "Obtaining PROD CAMPassport..."
+              BASE="https://dhcsprodcognos.ca.analytics.ibm.com/api/v1"
+              echo "{\\"parameters\\":[{\\"name\\":\\"CAMAPILoginKey\\",\\"value\\":\\"$COGNOS_API_KEY_PRD\\"}]}" > login.json
+              curl -sS -X PUT "$BASE/session" -H "Content-Type: application/json" -d @login.json -o session.json
+              SESSION_KEY=$(python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))')
+              SESSION_KEY=$(echo "$SESSION_KEY" | sed 's/^CAM[ ]*//')
+              echo "✓ CAMPassport captured"
+
+              if [ -n "${ROLLBACK_LABEL}" ]; then
+                LABEL_NAME="${ROLLBACK_LABEL}"
+                echo "Promoting rollback label ${ROLLBACK_LABEL}"
+                DEPLOY_LABEL_NAME="Rollback_${BUILD_NUMBER}"
+              else
+                LABEL_ID=$(cat ../label_id.txt)
+                LABEL_NAME=""
+                DEPLOY_LABEL_NAME="PROMOTED_${BUILD_NUMBER}"
+              fi
+
+              echo "Deploying to ${TARGET_ENV}..."
+              python3 ci-cli.py --server="$MOTIO_SERVER" deploy \
+                --xauthtoken "$TOKEN" \
+                --sourceInstanceName "${SOURCE_ENV}" \
+                --targetInstanceName "${TARGET_ENV}" \
+                --projectName "${PROJECT_NAME}" \
+                ${LABEL_NAME:+--labelName "$LABEL_NAME"} \
+                ${LABEL_ID:+--labelId "$LABEL_ID"} \
+                --targetLabelName "$DEPLOY_LABEL_NAME" \
+                --camPassportId "$SESSION_KEY" > deploy.out 2>&1 || true
+
+              cat deploy.out
+              if grep -q '"errors"' deploy.out; then echo "Deployment failed"; exit 1; fi
+              echo "Deployment executed successfully."
+            '''
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "Pipeline execution finished."
+    }
+    success {
+      echo "MotioCI pipeline completed successfully."
+    }
+    failure {
+      echo "MotioCI pipeline failed."
+    }
+  }
+}
