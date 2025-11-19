@@ -167,7 +167,7 @@ spec:
               echo "$TOKEN" > ../token.txt
               echo "Login successful"
             '''
-                        // === Dynamic discovery: projects and folders ===
+                        // === Dynamic: projects and folders ===
             script {
               echo "🔍 Fetching available MotioCI projects for ${params.SOURCE_ENV}..."
 
@@ -179,9 +179,10 @@ spec:
                   --instanceName "${SOURCE_ENV}" > ../projects.json
 
                 grep -o "'name': '[^']*'" ../projects.json | cut -d"'" -f4 | sort | uniq > ../projects.txt
+                cp ../projects.txt ../../projects.txt
               '''
 
-              def projects = readFile('MotioCI/projects.txt').split('\n').findAll { it?.trim() }
+              def projects = sh(script:"cat MotioCI/projects.txt", returnStdout: true).trim()split('\n')
               echo "✅ Found ${projects.size()} projects."
 
               // Dynamically update PROJECT_NAME choices for next run
@@ -205,8 +206,9 @@ spec:
                     --instanceName "${SOURCE_ENV}" \
                     --projectName "${PROJECT_NAME}" > ../folders.json
                   grep "prettyPath" ../folders.json | cut -d"'" -f4 | sort | uniq > ../folders.txt
+                  cp ../folders.txt ../../folders.txt
                 '''
-                def folders = readFile('MotioCI/folders.txt').split('\n').findAll { it?.trim() }
+                def folders = sh(script:"cat MotioCI/folders.txt", returnStdout: true).trim()split('\n')
                 echo "Found ${folders.size()} folder paths."
                 prop.parameterDefinitions.removeAll { it.name == 'OBJECT_PATH' }
                 prop.parameterDefinitions.add(new ChoiceParameterDefinition('OBJECT_PATH', folders as String[], 'Select folder or report path'))
@@ -219,7 +221,7 @@ spec:
         }
       }
     }
-
+}
 stage('Prepare deployment') {
   when { expression { return !params.ROLLBACK_LABEL?.trim() } }
   steps {
