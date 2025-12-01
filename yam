@@ -1,364 +1,306 @@
 /*
 =======================================================================================
-MotioCI → Cognos Automated Deployment Pipeline
-Maintained by: DevOps Team
-Purpose: Automate Cognos content promotion from DEV/TEST to PRD using MotioCI CLI.
+This file is being updated constantly by the DevOps team to introduce new enhancements
+based on the template.  If you have suggestions for improvement,
+please contact the DevOps team so that we can incorporate the changes into the
+template.  In the meantime, if you have made changes here or don't want this file to be
+updated, please indicate so at the beginning of this file.
 =======================================================================================
 */
 
-def branch = env.BRANCH_NAME ?: "DEV"
-def namespace = env.NAMESPACE ?: "dev"
-def cloudName = env.CLOUD_NAME == "openshift" ? "openshift" : "kubernetes"
+def branch = env.BRANCH_NAME ?: "Dev"
 def workingDir = "/home/jenkins/agent"
-
-APP_NAME = "combined-devops-cognos-deployments"
 
 pipeline {
   agent {
     kubernetes {
       yaml """
-apiVersion: v1
-kind: Pod
-spec:
-  serviceAccountName: jenkins
-  volumes:
-    - name: dockersock
-      hostPath:
-        path: /var/run/docker.sock
-    - name: varlibcontainers
-      emptyDir: {}
-    - name: jenkins-trusted-ca-bundle
-      configMap:
-        name: jenkins-trusted-ca-bundle
-        defaultMode: 420
-        optional: true
-  containers:
-    - name: jnlp
-      securityContext:
-        privileged: true
-      envFrom:
-        - configMapRef:
-            name: jenkins-agent-env
-            optional: true
-      env:
-        - name: GIT_SSL_CAINFO
-          value: "/etc/pki/tls/certs/ca-bundle.crt"
-      volumeMounts:
-        - name: jenkins-trusted-ca-bundle
-          mountPath: /etc/pki/tls/certs
-
-    - name: node
-      image: registry.access.redhat.com/ubi8/nodejs-16:latest
-      tty: true
-      command: ["/bin/bash"]
-      workingDir: ${workingDir}
-      securityContext:
-        privileged: true
-      envFrom:
-        - configMapRef:
-            name: jenkins-agent-env
-            optional: true
-      env:
-        - name: HOME
-          value: ${workingDir}
-        - name: BRANCH
-          value: ${branch}
-        - name: GIT_SSL_CAINFO
-          value: "/etc/pki/tls/certs/ca-bundle.crt"
-      volumeMounts:
-        - name: jenkins-trusted-ca-bundle
-          mountPath: /etc/pki/tls/certs
-
-    - name: python
-      image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.2.0
-      tty: true
-      command: ["/bin/bash"]
-      workingDir: ${workingDir}
-      securityContext:
-        privileged: true
-      envFrom:
-        - configMapRef:
-            name: jenkins-agent-env
-            optional: true
-      env:
-        - name: HOME
-          value: ${workingDir}
-        - name: BRANCH
-          value: ${branch}
-        - name: GIT_SSL_CAINFO
-          value: "/etc/pki/tls/certs/ca-bundle.crt"
-      volumeMounts:
-        - name: jenkins-trusted-ca-bundle
-          mountPath: /etc/pki/tls/certs
-"""
+        apiVersion: v1
+        kind: Pod
+        spec:
+          serviceAccountName: jenkins
+          volumes:
+            - name: dockersock
+              hostPath:
+                path: /var/run/docker.sock
+            - emptyDir: {}
+              name: varlibcontainers
+            - name: jenkins-trusted-ca-bundle
+              configMap:
+                name: jenkins-trusted-ca-bundle
+                defaultMode: 420
+                optional: true
+          containers:
+            - name: dotnet
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammismspapp:1.0.34
+              tty: true
+              command: ["/bin/bash"]
+              securityContext:
+                privileged: true
+              workingDir: ${workingDir}
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+            - name: jnlp
+              securityContext:
+                privileged: true
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+            - name: node
+              image: registry.access.redhat.com/ubi8/nodejs-18:latest
+              tty: true
+              command: ["/bin/bash"]
+              securityContext:
+                privileged: true
+              workingDir: ${workingDir}
+              securityContext:
+                privileged: true
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+            - name: aws-boto3
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.0.1
+              tty: true
+              command: ["/bin/bash"]
+              workingDir: ${workingDir}
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+      """
     }
+  }
+
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+    timeout(time:5 , unit: 'HOURS')
+    skipDefaultCheckout()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
   }
 
   environment {
-    GIT_BRANCH = "${BRANCH_NAME}"
-    MOTIO_SERVER = "https://cgrptmcip01.cloud.cammis.ca.gov"
-  }
-  
-  parameters {
-    choice(name: 'SOURCE_ENV', choices: ['Cognos-DEV/TEST', 'Cognos-SIT', 'Cognos-UAT'], description: 'Select the Cognos source environment.')
-    choice(name: 'TARGET_ENV', choices: ['Cognos-SIT', 'Cognos-UAT', 'Cognos-PRD'], description: 'Select the target Cognos environment.')
-    string(name: 'PROJECT_NAME', defaultValue: '', description: 'MotioCI project name (manual entry if not auto-listed).')
-    string(name: 'OBJECT_PATH', defaultValue: '', description: 'Cognos path to promote (leave empty to deploy whole project).')
-    string(name: 'ROLLBACK_LABEL', defaultValue: '', description: 'Optional: enter label to redeploy.')
-  }
-  
-  options {
-    disableConcurrentBuilds()
-    timestamps()
+    env_current_git_commit=""
+    env_accesskey=""
+    env_secretkey=""
+    env_tag_name=""
+    env_deploy_env=""
+    env_skip_deploy="true"
+    env_DEPLOY_ENVIRONMENT="false"
+    env_DEPLOY_FILES="true"
+    env_DEPLOY_CONFIG="false"
+    env_release_type=""
   }
 
   stages {
-
-    stage('Initialize') {
-      steps {
-        script {
-          echo "Branch: ${env.GIT_BRANCH}"
-          
-                  echo """
-                  ================================================
-                  MotioCI → Cognos Deployment Pipeline (Enhanced)
-                  ================================================
-                  Source: ${params.SOURCE_ENV}
-                  Target: ${params.TARGET_ENV}
-                  Project: ${params.PROJECT_NAME}
-                  Object Path: ${params.OBJECT_PATH}
-                  Rollback Label: ${params.ROLLBACK_LABEL ?: "N/A"}
-                  ================================================
-                  """
-        }
-      }
-    }
-    
-    stage('MotioCI Login') {
-      steps {
-        withCredentials([
-          file(credentialsId: 'cognos-credentials', variable: 'CREDENTIALS_FILE')
-        ]) {
-          container('python') {
-            sh '''
-              set -euo pipefail
-              cd MotioCI/api/CLI
-
-              echo "Installing MotioCI CLI dependencies..."
-              python3 -m pip install --user -r requirements.txt
-
-              echo "Logging in to MotioCI with stored credentials file..."
-              python3 ci-cli.py --server="$MOTIO_SERVER" \
-                login --credentialsFile "$CREDENTIALS_FILE" > login.out 2>&1 || true
-
-              # Extract auth token from login output
-              awk 'match($0,/(Auth[[:space:]]*[Tt]oken|x-auth_token|xauthtoken)[[:space:]]*[:=][[:space:]]*([A-Za-z0-9._-]+)/,m){print m[2]}' login.out | tail -n1 > login.token || true
-
-              TOKEN=$(cat login.token 2>/dev/null || true)
-              echo "MotioCI token captured (length: ${#TOKEN})"
-             
-              if [ -z "$TOKEN" ] || [ "${#TOKEN}" -lt 10 ]; then
-                echo "ERROR: Failed to capture valid auth token!"
-                echo "Login output:"
-                cat login.out
-                exit 1
-              fi
-             
-              echo "$TOKEN" > ../token.txt
-              echo "Login successful"
-            '''
-                        // === Dynamic: projects and folders ===
+   stage("Initialize") {
+    steps {
+        container(name: "node") {
             script {
-              echo "🔍 Fetching available MotioCI projects for ${params.SOURCE_ENV}..."
+                properties([
+                    parameters([
+                        choice(name: 'RELEASE_TYPE', choices: ['PATCH', 'MINOR', 'MAJOR'], description: 'Enter Release type'),
+                        booleanParam(name: 'USE_GIT_TAG', defaultValue: false, description: 'Use the selected git tag instead of LATEST commit'),
+                        gitParameter(name: 'GIT_TAG', defaultValue: 'tar-surge-app_from_dev', description: 'Git tag to deploy', type: 'PT_TAG'),
+                        string(name: 'GIT_SHA', defaultValue: 'enter git sha(8+ chars)', description: 'Enter git SHA to deploy')
+                    ])
+                ])
 
-              sh '''
-                set -e
-                cd MotioCI/api/CLI
-                python3 ci-cli.py --server="$MOTIO_SERVER" project ls \
-                  --xauthtoken "$(cat ../token.txt)" \
-                  --instanceName "${SOURCE_ENV}" > ../projects.json
+                deleteDir()
 
-                grep -o "'name': '[^']*'" ../projects.json | cut -d"'" -f4 | sort | uniq > ../projects.txt
-                cp ../projects.txt ../../projects.txt
-              '''
+                echo 'Checking out source and retrieving commit ID...'
+                env_current_git_commit = checkout(scm).GIT_COMMIT
 
-              def projects = sh(script:"cat MotioCI/projects.txt", returnStdout: true).trim()split('\n')
-              echo "✅ Found ${projects.size()} projects."
+                // Get the short version of the commit hash
+                env_current_git_commit = "${env_current_git_commit[0..7]}"
 
-              // Dynamically update PROJECT_NAME choices for next run
-              def job = Jenkins.instance.getItemByFullName(env.JOB_NAME)
-              def prop = job.getProperty(ParametersDefinitionProperty)
-              def newParams = [
-                new ChoiceParameterDefinition('PROJECT_NAME', projects as String[], 'Select MotioCI Project')
-              ]
-              prop.parameterDefinitions.removeAll { it.name == 'PROJECT_NAME' }
-              prop.parameterDefinitions.addAll(newParams)
-              job.save()
-              echo "PROJECT_NAME dropdown updated for next build."
+                env_deploy_env = "DEV"
+                echo "Current deployment environment: ${env_deploy_env}"
+				env_tag_name = "${branch}_${BUILD_NUMBER}_${env_current_git_commit}"
 
-              // Optional: also fetch folders for current project
-              if (params.PROJECT_NAME?.trim()) {
-                echo "Fetching folders for project ${params.PROJECT_NAME}..."
-                sh '''
-                  cd MotioCI/api/CLI
-                  python3 ci-cli.py --server="$MOTIO_SERVER" versionedItems ls \
-                    --xauthtoken "$(cat ../token.txt)" \
-                    --instanceName "${SOURCE_ENV}" \
-                    --projectName "${PROJECT_NAME}" > ../folders.json
-                  grep "prettyPath" ../folders.json | cut -d"'" -f4 | sort | uniq > ../folders.txt
-                  cp ../folders.txt ../../folders.txt
-                '''
-                def folders = sh(script:"cat MotioCI/folders.txt", returnStdout: true).trim()split('\n')
-                echo "Found ${folders.size()} folder paths."
-                prop.parameterDefinitions.removeAll { it.name == 'OBJECT_PATH' }
-                prop.parameterDefinitions.add(new ChoiceParameterDefinition('OBJECT_PATH', folders as String[], 'Select folder or report path'))
-                job.save()
-                echo "OBJECT_PATH dropdown updated for next build."
-              } else {
-                echo "Skipping folder discovery (no project selected yet)."
-              }
+            if (params.USE_GIT_TAG == true) {
+              env_current_git_commit = params.GIT_TAG
+            }
+
+            if ( ! params.GIT_SHA.contains("enter") ) {
+              env_current_git_commit = params.GIT_SHA
+            }
+
+            echo "Tag to be applied is: ${env_tag_name}"
+            echo "Tag will be applied to: ${env_current_git_commit}"
+		            def repositories = [
+                        [name: 'tar-surge-client', branch: 'master', url: 'https://github.com/ca-mmis/tar-surge-client.git'],
+                        [name: 'tar-surge-app', branch: 'master', url: 'https://github.com/ca-mmis/tar-surge-app.git']
+                    ]
+
+                    repositories.each { repo ->
+                        dir(repo.name) {
+                            git branch: repo.branch, credentialsId: 'github-key', url: repo.url
+                        }
+                    }  
+                }
+            }
+        }
+    }
+
+   stage('Build') {
+      steps {
+        container("dotnet") {
+          script {
+            sh '''
+              echo "Building thick client..."
+              mkdir -p devops/codedeploy/SurgeUpdate
+              dotnet publish tar-surge-client/Cammis.Surge.Client.sln \
+                -o build_output -c Release -r win-x64 --self-contained true /p:EnableWindowsTargeting=true
+			'''
+            
+            // Extract EXE version
+            def exeversion = "3.4.${buildnumber}"
+
+            // Write Version.TXT + overlay configs
+            sh """
+              echo '${exeVersion}' > devops/codedeploy/SurgeUpdate/Version.TXT
+              cp -r build_output/* devops/codedeploy/SurgeUpdate/
+              
+              # Note: nested path is correct because  repo has tar-surge-client/tar-surge-client/config
+              cp tar-surge-client/Config/${env_deploy_env}/* devops/codedeploy/SurgeUpdate/
+              
+              cd devops/codedeploy
+              zip -r SurgeUpdate_${env_deploy_env}.ZIP SurgeUpdate
+            """
           }
         }
       }
     }
-}
-stage('Prepare deployment') {
-  when { expression { return !params.ROLLBACK_LABEL?.trim() } }
-  steps {
-    container('python') {
-      sh '''
-        set -e
-        cd MotioCI/api/CLI
 
-        TOKEN=$(cat ../token.txt)
-        echo "Using MotioCI token (length: ${#TOKEN})"
-
-        echo "Project: ${PROJECT_NAME}"
-        echo "Object Path: ${OBJECT_PATH:-<none>}"
-
-        # List all versioned items for the project
-        echo "Discovering versioned items in project ${PROJECT_NAME}..."
-        python3 ci-cli.py --server="$MOTIO_SERVER" \
-          versionedItems ls \
-          --xauthtoken "$TOKEN" \
-          --instanceName "${SOURCE_ENV}" \
-          --projectName "${PROJECT_NAME}" > items_full.out
-
-        echo "Total items listed (raw): $(grep -c \"'id':\" items_full.out || true)"
-
-        # ------------------------------------------------------------
-        # Determine which IDs to label (whole project vs. specific path)
-        # ------------------------------------------------------------
-        if [ -z "${OBJECT_PATH}" ]; then
-          echo "No OBJECT_PATH provided — deploying the entire project ${PROJECT_NAME}"
-          grep "'id':" items_full.out | grep -v "instanceId" | grep -o "[0-9][0-9]*" \
-            | paste -sd, - > ids.txt || true
-        else
-          echo "Filtering for path: ${OBJECT_PATH}"
-          grep -A8 "prettyPath.: '${OBJECT_PATH}'" items_full.out > items.out || true
-          grep "'id':" items.out | grep -v "instanceId" | grep -o "[0-9][0-9]*" \
-            | paste -sd, - > ids.txt || true
-        fi
-
-        IDS=$(cat ids.txt || true)
-
-        if [ -z "$IDS" ]; then
-          echo "ERROR: No versioned items found for selection."
-          echo "Hint: Check if the object is versioned or the path is correct."
-          exit 1
-        fi
-
-        ID_COUNT=$(echo $IDS | tr ',' '\\n' | wc -l | tr -d ' ')
-        echo "Found ${ID_COUNT} versioned item(s)."
-        echo "Matched IDs: $IDS"
-
-        # ------------------------------------------------------------
-        # Create Deployment label for identified IDs
-        # ------------------------------------------------------------
-        VERSION_NAME="AutoLabel_${BUILD_NUMBER}_$(date +%Y%m%d_%H%M)"
-        echo "Creating Deployment Label: $VERSION_NAME with IDs [$IDS]"
-        python3 ci-cli.py --server="$MOTIO_SERVER" label create \
-          --xauthtoken "$TOKEN" \
-          --instanceName "${SOURCE_ENV}" \
-          --projectName "${PROJECT_NAME}" \
-          --name "$VERSION_NAME" \
-          --versionedItemIds "[$IDS]"
-
-        # ------------------------------------------------------------
-        # Fetch and store Label ID
-        # ------------------------------------------------------------
-        python3 ci-cli.py --server="$MOTIO_SERVER" label ls \
-          --xauthtoken "$TOKEN" \
-          --instanceName "${SOURCE_ENV}" \
-          --projectName "${PROJECT_NAME}" \
-          --labelName "$VERSION_NAME" > label_info.out
-
-        LABEL_ID=$(python3 -c "import ast; data=open('label_info.out').read(); \
-          parsed=ast.literal_eval(data); \
-          print(parsed['data']['instances']['edges'][0]['node']['projects']['edges'][0]['node']['labels']['edges'][0]['node']['id'])" \
-          2>/dev/null || echo "")
-
-        if [ -z "$LABEL_ID" ]; then
-          echo "ERROR: Unable to retrieve label ID!"
-          exit 1
-        fi
-
-        echo "$LABEL_ID" > ../label_id.txt
-        echo "Label $VERSION_NAME (ID: $LABEL_ID) created successfully."
-
-      '''
-    }
-  }
-}
-    
-  stage('Deploy') {
+	stage('Sonar Scan') {
+      when {
+        expression {
+          env_DEPLOY_FILES == "true"
+        }
+      }
       steps {
-        container('python') {
-          withCredentials([string(credentialsId: 'cognos-api-key-prd', variable: 'COGNOS_API_KEY_PRD')]) {
-            sh '''
-              set -e
-              cd MotioCI/api/CLI
+        container(name: "dotnet") {
+          script {
+            sh """#!/bin/bash
+		      set +e
+                      echo 'Sonar Scan Stage....\n\n'
+                
+		      cd  tar-surge-client/Cammis.Surge.Client
+	              dotnet tool install dotnet-sonarscanner --global
+		      export PATH="$PATH:/home/jenkins/agent/.dotnet/tools"
+		      dotnet sonarscanner begin /key:"tar-surge-client" /d:sonar.host.url="http://sonarqube-tools.apps.bld.cammis.medi-cal.ca.gov"
+                      dotnet publish /p:EnableWindowsTargeting=true
+                      dotnet sonarscanner end   
+              """
+          }
+        }
+      }
+    }
+	  
+  
+    stage('Deploy') {
+      steps {
+        lock(resource: 'codedeploy-ec2-lock') {
+          container("aws-boto3") {
+            script {
+              echo "Deploy Using AWS CodeDeploy..."
+              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr-ecs', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              step([$class: 'AWSCodeDeployPublisher',
+                  applicationName: "tar-surge-app-${env_deploy_env}",
+                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                  credentials: 'awsAccessKey',
+                  deploymentConfig: "tar-surge-app-${env_deploy_env}-config",
+                  deploymentGroupAppspec: false,
+                  deploymentGroupName: "tar-surge-app-${env_deploy_env}-INPLACE-deployment-group",
+                  deploymentMethod: 'deploy',
+                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                  region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
+                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+              }
+            }
+          }
+        }
 
-              # If rollback specified, skip label creation
-              if [ -n "${ROLLBACK_LABEL}" ]; then
-                echo "Using existing rollback label: ${ROLLBACK_LABEL}"
-                echo "0" > ../label_id.txt
-              fi
+        // Push artifacts into deployment repos
+        container("jnlp") {
+          lock(resource: 'deployments-github-repo', inversePrecedence: false) {
+            dir("${WORKSPACE}/deployrepo") {
+              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                sh """
+                  set -e
+                  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client-deployment.git --depth=1
+                  git config --global user.email "jenkins@cammis.com"
+                  git config --global user.name "jenkins"
 
-              TOKEN=$(cat ../token.txt)
-              echo "Obtaining PROD CAMPassport..."
-              BASE="https://dhcsprodcognos.ca.analytics.ibm.com/api/v1"
-              echo "{\\"parameters\\":[{\\"name\\":\\"CAMAPILoginKey\\",\\"value\\":\\"$COGNOS_API_KEY_PRD\\"}]}" > login.json
-              curl -sS -X PUT "$BASE/session" -H "Content-Type: application/json" -d @login.json -o session.json
-              SESSION_KEY=$(python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))')
-              SESSION_KEY=$(echo "$SESSION_KEY" | sed 's/^CAM[ ]*//')
-              echo "✓ CAMPassport captured"
+                  cd tar-surge-client-deployment
+                  git checkout master
+                  git pull
 
-              if [ -n "${ROLLBACK_LABEL}" ]; then
-                LABEL_NAME="${ROLLBACK_LABEL}"
-                echo "Promoting rollback label ${ROLLBACK_LABEL}"
-                DEPLOY_LABEL_NAME="Rollback_${BUILD_NUMBER}"
-              else
-                LABEL_ID=$(cat ../label_id.txt)
-                LABEL_NAME=""
-                DEPLOY_LABEL_NAME="PROMOTED_${BUILD_NUMBER}"
-              fi
+                  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate_DEV.ZIP tar-surge-client/
+                  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/Version.TXT tar-surge-client/
 
-              echo "Deploying to ${TARGET_ENV}..."
-              python3 ci-cli.py --server="$MOTIO_SERVER" deploy \
-                --xauthtoken "$TOKEN" \
-                --sourceInstanceName "${SOURCE_ENV}" \
-                --targetInstanceName "${TARGET_ENV}" \
-                --projectName "${PROJECT_NAME}" \
-                ${LABEL_NAME:+--labelName "$LABEL_NAME"} \
-                ${LABEL_ID:+--labelId "$LABEL_ID"} \
-                --targetLabelName "$DEPLOY_LABEL_NAME" \
-                --camPassportId "$SESSION_KEY" > deploy.out 2>&1 || true
+                  if [[ -n \$(git status --porcelain) ]]; then
+                    git add .
+                    git commit -m "Automated commit - Deploying SurgeUpdate artifacts"
+                    git push origin master
+                  fi
 
-              cat deploy.out
-              if grep -q '"errors"' deploy.out; then echo "Deployment failed"; exit 1; fi
-              echo "Deployment executed successfully."
-            '''
+                  git tag -f -a "${env_tag_name}" -m "Deploying Thickclient - Tag ${env_tag_name}"
+                  git push origin "${env_tag_name}" --force
+                """
+
+                sh """
+                  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
+                  cd deployments-combined-devops
+                  git checkout master
+                  git pull
+
+                  rm -rf tar-surge-client/dev/surgeupdate/*
+                  cp -a ${WORKSPACE}/devops/codedeploy/SurgeUpdate/. tar-surge-client/dev/surgeupdate/
+
+                  git add .
+                  git commit -m "Updated build artifacts for tar-surge-client build ${env_tag_name}" || true
+                  git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
+                """
+              }
+            }
           }
         }
       }
@@ -366,14 +308,9 @@ stage('Prepare deployment') {
   }
 
   post {
-    always {
-      echo "Pipeline execution finished."
-    }
-    success {
-      echo "MotioCI pipeline completed successfully."
-    }
-    failure {
-      echo "MotioCI pipeline failed."
-    }
+    always { echo "Build Process complete." }
+    success { echo "Build and Deploy succeeded." }
+    failure { echo "Build or Deploy failed." }
+    aborted { echo "Build aborted." }
   }
 }
