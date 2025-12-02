@@ -8,8 +8,17 @@ updated, please indicate so at the beginning of this file.
 =======================================================================================
 */
 
-def branch = env.BRANCH_NAME ?: "Dev"
+def branch = env.BRANCH_NAME ?: "master"
 def workingDir = "/home/jenkins/agent"
+
+def DEPLOY_FROM_ENV = [
+    "dev":"N/A",
+    "sit":"dev",
+    "uat":"sit",
+    "prd":"uat"
+  ]
+
+def SURGE_ENV
 
 pipeline {
   agent {
@@ -67,8 +76,6 @@ pipeline {
               securityContext:
                 privileged: true
               workingDir: ${workingDir}
-              securityContext:
-                privileged: true
               envFrom:
                 - configMapRef:
                     name: jenkins-agent-env
@@ -106,269 +113,169 @@ pipeline {
     }
   }
 
-  options {
+options {
     timestamps()
     disableConcurrentBuilds()
-    timeout(time:5 , unit: 'HOURS')
+    timeout(time: 3, unit: 'HOURS')
     skipDefaultCheckout()
     buildDiscarder(logRotator(numToKeepStr: '20'))
   }
 
   environment {
-    env_current_git_commit=""
-    env_accesskey=""
-    env_secretkey=""
-    env_tag_name=""
-    env_deploy_env=""
-    env_skip_deploy="true"
-    env_DEPLOY_ENVIRONMENT="false"
-    env_DEPLOY_FILES="true"
-    env_DEPLOY_CONFIG="false"
-    env_release_type=""
+    env_promotion_to_environment = ""
+    env_promotion_from_environment = ""
   }
 
   stages {
-   stage("initialize") {
+    stage("Initialize") {
       steps {
-        container(name: "node") {
+        container("node") {
           script {
-
             properties([
               parameters([
-                choice(name: 'RELEASE_TYPE', choices: ['PATCH','MINOR','MAJOR'], description: 'Enter Release type'),
-                booleanParam(name: 'USE_GIT_TAG', defaultValue: false, description: 'Use the selected git tag instead of LATEST commit'),
-                gitParameter(name: 'GIT_TAG', defaultValue: 'tar-surge-client_from_dev', description: 'git tag', type: 'PT_TAG'),
-                string(name: 'GIT_SHA',defaultValue: 'enter git sha(8+ chars)', description: 'enter git sha that you want to deploy') 
+                choice(name: 'PROMOTE_TO_ENV', choices: ['sit','uat','prd'], description: 'Target environment to promote to')
               ])
             ])
 
+            env_promotion_to_environment = params.PROMOTE_TO_ENV
+            env_promotion_from_environment=DEPLOY_FROM_ENV["${env_promotion_to_environment}"]
+
             deleteDir()
 
-            env_release_type = params.RELEASE_TYPE
-            echo 'checkout source  and get the commit id'
-            env_current_git_commit = checkout(scm).GIT_COMMIT
+            checkout(scm).GIT_COMMIT
 
-            // get the short version of commit
-            env_current_git_commit="${env_current_git_commit[0..7]}"
+            echo "Promoting to environment: ${env_promotion_to_environment}"
+            echo "Promoting from environment: ${env_promotion_from_environment}"
+          }
+        }
+      }
+    }
 
-            env_deploy_env = "DEV"
-
-            echo "Current deployment environment is ${env_deploy_env}"
-
-            env_tag_name = "${branch}_${BUILD_NUMBER}_${env_current_git_commit}"
-
-            if (params.USE_GIT_TAG == true) {
-              env_current_git_commit = params.GIT_TAG
-            }
-
-            if ( ! params.GIT_SHA.contains("enter") ) {
-              env_current_git_commit = params.GIT_SHA
-            }
-
-            echo "Tag to be applied is: ${env_tag_name}"
-            echo "Tag will be applied to: ${env_current_git_commit}"
-            
-            def repositories = [
-                        [name: 'tar-surge-client', branch: 'master', url: 'https://github.com/ca-mmis/tar-surge-client.git'],
-                        [name: 'tar-surge-app', branch: 'master', url: 'https://github.com/ca-mmis/tar-surge-app.git']
-                    ]
-
-                    repositories.each { repo ->
-                        dir(repo.name) {
-                            git branch: repo.branch, credentialsId: 'github-key', url: repo.url
-                        }
-                    } 
-
-            if ( ( params.GIT_SHA.contains("enter")) && (params.USE_GIT_TAG == false)) {
-              // use latest commit to build and deploy to DEV
-              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
-                sh """#!/bin/bash
-                  git config --global --add safe.directory '*'
-                  git config --system --add safe.directory '*' 
-                  echo "The commit hash from the latest git current commit is ${env_current_git_commit}"
-                  echo "The current build number is: ${BUILD_NUMBER}"
-                  echo "The current branch is: ${branch}"
-                  tagMessage="${env_tag_name}"
-                  git checkout \${branch}
-                  echo "Checked out ${branch}"
-                  git config  --global user.email "jenkins@cammis.com"
-                  git config  --global user.name "jenkins"
-                  echo "The tagMessage is \$tagMessage"
-                  echo "About to fetch"
-                  git fetch --quiet --tags https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client.git
-                  echo "About to tag commit with build and branch"
-                  git tag -f -a "\$tagMessage" -m "tag build" ${env_current_git_commit}
-                  echo "About to push tag"
-                  git push -f https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client.git \$tagMessage
-                  echo "Push is done"
-                  echo "Checking out selected commit"
-                  git checkout ${env_current_git_commit}
-                  git show --stat ${env_current_git_commit} > commit-changes.txt
-                  echo "START OF FILES CHANGED"
-                  cat commit-changes.txt
-                  echo "END OF FILES CHANGED"
-                  echo "Checkout out ${env_current_git_commit}"
-                  """
-              }
-            } else if ( (params.USE_GIT_TAG == true) || ( ! params.GIT_SHA.contains("enter")) ) {
-  			      // using a git tag or git sha, ${env_current_git_commit}" is now the commit tag selected or git sha entered
-              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
-                sh """#!/bin/bash
-                  echo "Checking out SHA or TAG: ${env_current_git_commit}"
-                  git config --global --add safe.directory '*'
-                  git config --system --add safe.directory '*' 
-                  git checkout \${env_current_git_commit}
-                  echo "Since this is a previous commit, need to rebuild everything"
-                  echo "Cammis.Surge.Client" > commit-changes.txt
-                  echo "Cammis.Surge.RPM.App" >> commit-changes.txt
-                  echo "Cammis.Surge.SharedClient" >> commit-changes.txt
-                  cat commit-changes.txt
-                  echo "Checked out ${env_current_git_commit}"
-                  """
-              }
-            } 
-          } //END script
-        } //END container node
-      } //END steps
-    } //END stage
-
-stage('Build') {
+    stage("Build") {
       steps {
-        container("dotnet") {
+        container("node") {
           script {
-            sh '''
-              echo "Building thick client..."
-              mkdir -p devops/codedeploy/SurgeUpdate
-              dotnet publish tar-surge-client/Cammis.Surge.Client.sln \
-                -o build_output -c Release -r win-x64 --self-contained true /p:EnableWindowsTargeting=true
-			'''
-            
-            // Extract EXE version
-            def exeVersion = "0.0.${BUILD_NUMBER}"
-
-            // Write Version.TXT + overlay configs
             sh """
-              echo '${exeVersion}' > devops/codedeploy/SurgeUpdate/Version.TXT
-              cp -r build_output/* devops/codedeploy/SurgeUpdate/
-              
-              # Note: nested path is correct because  repo has tar-surge-client/tar-surge-client/config
-              cp tar-surge-client/Config/${env_deploy_env}/* devops/codedeploy/SurgeUpdate/
-              
-              cd devops/codedeploy
-              zip -r SurgeUpdate_${env_deploy_env}.ZIP SurgeUpdate
+              set -e
+              # Clone deployments-combined-devops repo
+              git clone https://github.com/ca-mmis/deployments-combined-devops.git
+              cd deployments-combined-devops
+              git checkout master
+              git pull
+
+              mkdir -p ../devops/codedeploy/SurgeUpdate
+
+              # Unzip DEV SurgeUpdate package
+              unzip tar-surge-client/dev/SurgeUpdate_DEV.ZIP -d tmp/SurgeUpdate
+
+              # Overlay configs for target env
+              cp ../Config/${env_promotion_to_environment.toUpperCase()}/* tmp/SurgeUpdate/
+
+              # Re-zip with target env name
+              cd tmp
+              zip -r ../devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP SurgeUpdate
+              cd ..
+
+              # Copy Version.TXT from DEV
+              cp tar-surge-client/dev/Version.TXT ../devops/codedeploy/SurgeUpdate/
             """
           }
         }
       }
     }
 
-stage('Sonar Scan') {
-      when {
-        expression {
-          env_DEPLOY_FILES == "true"
-        }
-      }
+    stage("prepare deployment") {
       steps {
-        container(name: "dotnet") {
+        container("aws-boto3") {
           script {
-            sh """#!/bin/bash
-		      set +e
-                      echo 'Sonar Scan Stage....\n\n'
-                
-		              cd  tar-surge-client/Cammis.Surge.Client
-	                  dotnet tool install dotnet-sonarscanner --global
-		              export PATH="$PATH:/home/jenkins/agent/.dotnet/tools"
-		              dotnet sonarscanner begin /key:"tar-surge-client" /d:sonar.host.url="http://sonarqube-tools.apps.bld.cammis.medi-cal.ca.gov"
-                      dotnet publish /p:EnableWindowsTargeting=true
-                      dotnet sonarscanner end   
-              """
-          }
-        }
-      }
-    }
+            lock(resource: 'tar-surge-client-deployment', inversePrecedence: false) {
+              dir("${WORKSPACE}/deploytarget") {
+                withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                  sh """
+                    set -e
+                    echo "Cloning tar-surge-client-deployment..."
+                    git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client-deployment.git
+                    cd tar-surge-client-deployment
+                    git config --global user.email "jenkins@cammis.com"
+                    git config --global user.name "jenkins"
+                    git checkout master
+                    git pull
 
-    stage('prepare deployment') {
-            steps {
-                container(name: "node") {
-					lock(resource: 'deployments-github-repo', inversePrecedence: false) {
-                    dir("${WORKSPACE}/deployrepo") {
-                    withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
-                         sh """
-                  set -e
-                  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client-deployment.git --depth=1
-                  git config --global user.email "jenkins@cammis.com"
-                  git config --global user.name "jenkins"
+                    ZIP_NAME=SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP
+                    echo "Updating deployment repo with \$ZIP_NAME..."
+                    rm -f tar-surge-client/\$ZIP_NAME
+                    cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/\$ZIP_NAME tar-surge-client/
 
-                  cd tar-surge-client-deployment
-                  git checkout master
-                  git pull
-
-                  mkdir -p ${WORKSPACE}/deployrepo/tar-surge-client-deployment/tar-surge-client/SurgeAutoupdate
-                  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate_DEV.ZIP tar-surge-client/SurgeAutoupdate
-                  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/Version.TXT tar-surge-client/SurgeAutoupdate
-
-                  if [[ -n \$(git status --porcelain) ]]; then
-                    git add .
-                    git commit -m "Automated commit - Deploying SurgeUpdate artifacts"
+                    git add tar-surge-client/\$ZIP_NAME
+                    git commit -m "Deploy \$ZIP_NAME from ${env_promotion_to_environment} promotion" || true
                     git push origin master
-                  fi
 
-                  git tag -f -a "${env_tag_name}" -m "Deploying Thickclient - Tag ${env_tag_name}"
-                  git push origin "${env_tag_name}" --force
-                """
-
-                sh """
-                  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
-                  cd deployments-combined-devops
-                  git checkout master
-                  git pull
-				  
-                  mkdir -p ${WORKSPACE}/deployrepo/deployments-combined-devops/SurgeAutoupdate/dev/SurgeUpdate
-                  rm -rf SurgeAutoupdate/dev/SurgeUpdate/*
-                  cp -a ${WORKSPACE}/devops/codedeploy/SurgeUpdate/. SurgeAutoupdate/dev/SurgeUpdate/
-
-                  git add .
-                  git commit -m "Updated build artifacts for tar-surge-client build ${env_tag_name}" || true
-                  git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
-                """
-					 }
-					}
-                  }
+                    commitId=\$(git rev-parse --short=8 HEAD)
+                    dateTime=\$(git show -s --format=%cd --date=format:%Y-%m-%d_%H-%M-%S \$commitId)
+                    commitTag="Deployed_to_${env_promotion_to_environment}_\${commitId}_\$dateTime"
+                    git tag -f -a "\$commitTag" -m "Deployment tag for \$ZIP_NAME" "\$commitId"
+                    git push origin master --tags
+                  """
                 }
-            }
-        }
-	  
- stage('Deploy') {
-      steps {
-        lock(resource: 'codedeploy-ec2-lock') {
-          container("aws-boto3") {
-            script {
-              echo "Deploy Using AWS CodeDeploy..."
-              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr-ecs', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-              step([$class: 'AWSCodeDeployPublisher',
-                  applicationName: "tar-surge-app-${env_deploy_env}",
-                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
-                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
-                  credentials: 'awsAccessKey',
-                  deploymentConfig: "tar-surge-app-${env_deploy_env}-config",
-                  deploymentGroupAppspec: false,
-                  deploymentGroupName: "tar-surge-app-${env_deploy_env}-INPLACE-deployment-group",
-                  deploymentMethod: 'deploy',
-                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
-                  region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
-                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
               }
             }
           }
         }
       }
     }
+         
+ stage('Deploy') {
+      steps {
+        container(name: "aws-boto3") {
+          script {
+            echo "Deploy Using AWS CodeDeploy"
+
+            SURGE_ENV = "${env_promotion_to_environment}".toUpperCase()
+
+            echo "Here is the environment to go to: ${SURGE_ENV}"
+
+            echo "Deploying to Non-DR"
+
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              step([$class: 'AWSCodeDeployPublisher',
+                  applicationName: "tar-surge-app-${SURGE_ENV}",
+                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                  credentials: 'awsAccessKey',
+                  deploymentConfig: "tar-surge-app-${SURGE_ENV}-config",
+                  deploymentGroupAppspec: false,
+                  deploymentGroupName: "tar-surge-app-${SURGE_ENV}-INPLACE-deployment-group",
+                  deploymentMethod: 'deploy',
+                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                  region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
+                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+            }
+
+            echo "Deploying to DR"
+
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              step([$class: 'AWSCodeDeployPublisher',
+                  applicationName: "tar-surge-app-${SURGE_ENV}-DR",
+                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                  credentials: 'awsAccessKey',
+                  deploymentConfig: "tar-surge-app-${SURGE_ENV}-DR-config",
+                  deploymentGroupAppspec: false,
+                  deploymentGroupName: "tar-surge-app-${SURGE_ENV}-DR-INPLACE-deployment-group",
+                  deploymentMethod: 'deploy',
+                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                  region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
+                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+            }
+          } // end of script
+        } // end of container
+      } // end of steps
+    } // end of Deploy stage
   }
 
   post {
-    always { echo "Build Process complete." }
-    success { echo "Build and Deploy succeeded." }
-    failure { echo "Build or Deploy failed." }
-    aborted { echo "Build aborted." }
+    always { echo "Promotion pipeline complete." }
+    success { echo "Promotion succeeded." }
+    failure { echo "Promotion failed." }
   }
 }
