@@ -20,7 +20,6 @@ def DEPLOY_FROM_ENV = [
 
 def SURGE_ENV
 
-
 pipeline {
   agent {
     kubernetes {
@@ -77,8 +76,6 @@ pipeline {
               securityContext:
                 privileged: true
               workingDir: ${workingDir}
-              securityContext:
-                privileged: true
               envFrom:
                 - configMapRef:
                     name: jenkins-agent-env
@@ -116,33 +113,27 @@ pipeline {
     }
   }
 
-  options {
+options {
     timestamps()
     disableConcurrentBuilds()
-    timeout(time:5 , unit: 'HOURS')
+    timeout(time: 3, unit: 'HOURS')
     skipDefaultCheckout()
     buildDiscarder(logRotator(numToKeepStr: '20'))
   }
 
   environment {
-    env_current_git_commit=""
-    env_accesskey=""
-    env_secretkey=""
-    env_tag_name=""
-    env_deploy_env=""
-    env_promotion_to_environment=""
-    env_promotion_from_environment=""
+    env_promotion_to_environment = ""
+    env_promotion_from_environment = ""
   }
 
   stages {
-    stage("initialize") {
+    stage("Initialize") {
       steps {
-        container(name: "node") {
+        container("node") {
           script {
-
             properties([
               parameters([
-                choice(name: 'PROMOTE_TO_ENV', choices: ['sit','uat','prd'], description: 'Where to promote to?')
+                choice(name: 'PROMOTE_TO_ENV', choices: ['sit','uat','prd'], description: 'Target environment to promote to')
               ])
             ])
 
@@ -155,69 +146,110 @@ pipeline {
 
             echo "Promoting to environment: ${env_promotion_to_environment}"
             echo "Promoting from environment: ${env_promotion_from_environment}"
-          } //END script
-        } //END container node
-      } //END steps
-    } //END stage
+          }
+        }
+      }
+    }
 
-    stage('Prepare Deployment') {
+ stage("Build") {
       steps {
-        container(name: "aws-boto3") {
+        container("node") {
           script {
-            container(name: "jnlp") {
-              lock(resource: 'deployments-github-repo',inversePrecedence: false ) {
-              dir("${WORKSPACE}/deployrepo"){
-                  withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
-                    sh """
-                      pwd
-                      git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
-                      git config  --global user.email "jenkins@cammis.com"
-                      git config  --global user.name "jenkins"
-                      cd deployments-combined-devops
-                      git checkout master
-                      git pull
-                      mkdir -p tar-surge-app/${env_promotion_to_environment}
-                      touch tar-surge-app/${env_promotion_to_environment}/tempfile
-                      rm -r tar-surge-app/${env_promotion_to_environment}/*
-                      cp -a tar-surge-app/${env_promotion_from_environment}/. tar-surge-app/${env_promotion_to_environment}/
-                      git add -Av
+            sh """
+              set -e
+              echo "Preparing promotion package..."
+              git clone https://github.com/ca-mmis/deployments-combined-devops.git
+              cd deployments-combined-devops
+              git checkout master
+              git pull
 
-                      if ! git diff-index --quiet HEAD; then
-                        git commit -m "Promotion of tar-surge-app from ${env_promotion_from_environment} to ${env_promotion_to_environment}"
-                        commitId=\""\$(git rev-parse --short=8 HEAD)"\"
-                        echo "The commit ID is: \$commitId"
-                        dateTime=\""\$(git show -s --format=%cd --date=format:%Y-%m-%d_%H-%M-%S \$commitId)"\"
-                        commitTag="Promote_tar-surge-app_to_${env_promotion_to_environment}_\${commitId}_\$dateTime"
-                        echo "The commit tag will be: \$commitTag"
-                        git tag -f -a \"\$commitTag\" -m "tag promotion" \"\$commitId\"
-                        git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
-                        git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git "\$commitTag"
+              mkdir -p ../devops/codedeploy/SurgeUpdate
 
-                      else
-                        echo "Nothing changes to commit to deployment repository, still will deploy..."
-                      fi
-                    """
-                  } //end withCredentials
-                } //end dir
-              } //end lock
-            }  //end container
-          } // end of script
-        } // end of container
-      } // end of steps
-    }  // end of Prepare Deployment Stage
+              echo "Extracting source package from ${env_promotion_from_environment.toUpperCase()}..."
+              unzip -o tar-surge-client/${env_promotion_from_environment}/SurgeUpdate_${env_promotion_from_environment.toUpperCase()}.ZIP -d tmp/SurgeUpdate
 
-    stage('Deploy') {
+              echo "Overlaying configs for ${env_promotion_to_environment.toUpperCase()}..."
+              cp ../tar-surge-client/config/${env_promotion_to_environment.toUpperCase()}/* tmp/SurgeUpdate/
+
+              echo "Repackaging as SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP"
+              cd tmp
+              zip -r ../devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP SurgeUpdate
+              cd ..
+              cp tar-surge-client/${env_promotion_from_environment}/Version.TXT ../devops/codedeploy/SurgeUpdate/
+
+              echo "Promotion build complete."
+            """
+          }
+        }
+      }
+    }
+
+    stage("prepare deployment") {
+      steps {
+        container("aws-boto3") {
+          script {
+            lock(resource: 'deployments-github-repo', inversePrecedence: false) {
+              dir("${WORKSPACE}/deploytarget") {
+                withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+
+                  // ---- Push to tar-surge-client-deployment ----
+                  sh """
+                    set -e
+                    echo "Updating tar-surge-client-deployment repo..."
+                    git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client-deployment.git
+                    cd tar-surge-client-deployment
+                    git config --global user.email "jenkins@cammis.com"
+                    git config --global user.name "jenkins"
+                    git checkout master
+                    git pull
+
+                    ZIP_NAME=SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP
+                    echo "Copying new package..."
+                    rm -f tar-surge-client/\$ZIP_NAME
+                    cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/\$ZIP_NAME tar-surge-client/
+                    cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/Version.TXT tar-surge-client/
+
+                    git add tar-surge-client/
+                    git commit -m "Promoted SURGE Client from ${env_promotion_from_environment} to ${env_promotion_to_environment}" || true
+                    git push origin master
+
+                    commitId=\$(git rev-parse --short=8 HEAD)
+                    dateTime=\$(git show -s --format=%cd --date=format:%Y-%m-%d_%H-%M-%S \$commitId)
+                    commitTag="Promote_SurgeUpdate_to_${env_promotion_to_environment}_\${commitId}_\$dateTime"
+                    git tag -f -a "\$commitTag" -m "Promotion tag for \$ZIP_NAME" "\$commitId"
+                    git push origin master --tags
+                  """
+
+                  // ---- Push to deployments-combined-devops ----
+                  sh """
+                    echo "Updating deployments-combined-devops repo..."
+                    git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
+                    cd deployments-combined-devops
+                    git checkout master
+                    git pull
+
+                    mkdir -p tar-surge-client/${env_promotion_to_environment}
+                    rm -rf tar-surge-client/${env_promotion_to_environment}/*
+                    cp -a ${WORKSPACE}/devops/codedeploy/SurgeUpdate/. tar-surge-client/${env_promotion_to_environment}/
+
+                    git add .
+                    git commit -m "Promoted SURGE Client from ${env_promotion_from_environment} to ${env_promotion_to_environment}" || true
+                    git push origin master
+                  """
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+         
+ stage('Deploy') {
       steps {
         container(name: "aws-boto3") {
           script {
             echo "Deploy Using AWS CodeDeploy"
 
-            // Need to copy files from env_promotion_to_environment back into the devops/codedeploy directory to then deploy
-
-            sh """
-              cp -a ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/dev/. ${WORKSPACE}/devops/codedeploy/
-              sed -i "s,{DEPLOY_FILES},true," ${WORKSPACE}/devops/codedeploy/after-install.bat
-            """
             SURGE_ENV = "${env_promotion_to_environment}".toUpperCase()
 
             echo "Here is the environment to go to: ${SURGE_ENV}"
@@ -259,33 +291,11 @@ pipeline {
         } // end of container
       } // end of steps
     } // end of Deploy stage
-  } // end of stages
+  }
 
-  //pipeline post actions
   post {
-    always {
-        echo "Build Process complete."
-    } // always
-
-    success {
-        echo "Build Process was success."
-    } //success
-
-    unstable {
-        echo "Build is unstable."
-    } // unstable
-
-    aborted {
-        echo "Pipeline aborted."
-    } // aborted
-
-    failure {
-        echo "Build encountered failures ."
-    } // failure
-
-    changed {
-        echo "Build content was changed."
-    } // changed
-
-  } // post
+    always { echo "Promotion pipeline complete." }
+    success { echo "Promotion succeeded." }
+    failure { echo "Promotion failed." }
+  }
 }
