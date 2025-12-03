@@ -4,3 +4,25 @@
 13:10:34  appsettings.json
 13:10:34  icon.ico
 13:10:34  nlog.config
+
+
+
+  stage('Build') {
+    steps {
+      container("dotnet") {
+        script {
+          sh '''
+            echo "Building thick client..."
+            mkdir -p devops/codedeploy/SurgeUpdate
+            dotnet publish tar-surge-client/Cammis.Surge.Client.sln \
+              -o build_output -c Release -r win-x64 --self-contained true /p:EnableWindowsTargeting=true
+          '''
+        
+        // Copy build + configs
+          sh """
+            cp -r build_output/* devops/codedeploy/SurgeUpdate/
+            cp tar-surge-client/Config/${env_deploy_env}/* devops/codedeploy/SurgeUpdate/
+          
+            cd devops/codedeploy
+            zip -r SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeUpdate
+          """
