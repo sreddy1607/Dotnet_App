@@ -283,7 +283,43 @@ stage('Sonar Scan') {
         }
       }
     }
-	  
+    stage('prepare deployment') {
+            steps {
+                container(name: "node") {
+					lock(resource: 'deployments-github-repo', inversePrecedence: false) {
+                    dir("${WORKSPACE}/deployrepo") {
+                    withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+		        
+				sh """
+                  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
+                  git config  --global user.email "jenkins@cammis.com"
+                  git config  --global user.name "jenkins"
+
+                  cd deployments-combined-devops
+                  git checkout master
+                  git pull
+
+				  # Prepare folders
+					  mkdir -p ${WORKSPACE}/deployrepo/deployments-combined-devops/SurgeAutoupdate/dev/SurgeUpdate
+					  rm -rf SurgeAutoupdate/dev/SurgeUpdate/*
+
+						
+					  echo "Copying ZIP to deployed combined repo"
+					  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeAutoupdate/dev/SurgeUpdate/
+					
+					  # Commit and push
+					  git add .
+					  git commit -m "Updated build artifacts for tar-surge-client build ${env_tag_name}" || true
+					  git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
+					  
+                """
+					 }
+					}
+                  }
+                }
+            }
+        }
+	  	  
  stage('Deploy') {
       steps {
         lock(resource: 'codedeploy-ec2-lock') {
@@ -308,40 +344,10 @@ stage('Sonar Scan') {
           }
         }
         container(name: "jnlp") {
-          lock(resource: 'deployments-github-repo',inversePrecedence: false ) {
+          lock(resource: 'Thickclient-deploy',inversePrecedence: false ) {
            dir("${WORKSPACE}/deployrepo"){
               withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
-                sh """
-                  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
-                  git config  --global user.email "jenkins@cammis.com"
-                  git config  --global user.name "jenkins"
-
-                  cd deployments-combined-devops
-                  git checkout master
-                  git pull
-
-				  # Prepare folders
-					  mkdir -p ${WORKSPACE}/deployrepo/deployments-combined-devops/SurgeAutoupdate/dev/SurgeUpdate
-					  rm -rf SurgeAutoupdate/dev/SurgeUpdate/*
-
-					 echo "Removing BAT script from SurgeUpdate before zipping..."
-					  rm -f ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeInstall_${env_deploy_env}.bat || true
-						
-					  echo "Recreating ZIP again without BAT script..."
-					  cd ${WORKSPACE}/devops/codedeploy
-					  rm -f SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP
-					  zip -r SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeUpdate
-						
-					  echo "Copying ZIP to deployed combined repo"
-					  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeAutoupdate/dev/SurgeUpdate/
-					
-					  # Commit and push
-					  git add .
-					  git commit -m "Updated build artifacts for tar-surge-client build ${env_tag_name}" || true
-					  git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
-					  
-                """
-
+                
                 sh """
                   # Clone tar-surge-client-deployment repo
 		              git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client-deployment.git --depth=1
