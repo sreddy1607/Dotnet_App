@@ -163,29 +163,33 @@ options {
               git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
               git config  --global user.email "jenkins@cammis.com"
               git config  --global user.name "jenkins"
-              pwd
+              
+              cd tar-surge-client
+              mkdir -p devops/codedeploy/SurgeUpdate
+              cd ..
+              
               cd deployments-combined-devops
               git checkout master
               git pull
               
-              mkdir -p tmp/SurgeUpdate
-              mkdir -p ../devops/codedeploy/SurgeUpdate
               
               
               echo "Extracting source package from ${env_promotion_from_environment.toUpperCase()}..."
-              unzip -o SurgeAutoupdate/${env_promotion_from_environment}/SurgeUpdate/SurgeUpdate_${env_promotion_from_environment.toUpperCase()}.ZIP -d tmp/SurgeUpdate
+              unzip -o SurgeAutoupdate/${env_promotion_from_environment}/SurgeUpdate/SurgeUpdate_${env_promotion_from_environment.toUpperCase()}.ZIP -d ${WORKSPACE}/deployrepo/tar-surge-client/devops/codedeploy/SurgeUpdate
               
               echo "Overlaying configs for ${env_promotion_to_environment.toUpperCase()}..."
-              cp ${WORKSPACE}/deployrepo/tar-surge-client/Config/${env_promotion_to_environment.toUpperCase()}/* tmp/SurgeUpdate/
-
-              echo "Repackaging as SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP"
-              cd tmp
-              zip -r ../devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP SurgeUpdate
+              cp ${WORKSPACE}/deployrepo/tar-surge-client/Config/${env_promotion_to_environment.toUpperCase()}/* ${WORKSPACE}/deployrepo/tar-surge-client/devops/codedeploy/SurgeUpdate
               cd ..
+              cd tar-surge-client
+              echo "Repackaging as SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP"
+              rm -f devops/codedeploy/SurgeUpdate/SurgeInstall_${env_promotion_from_environment.toUpperCase()}.bat || true
+              zip -r devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP devops/codedeploy/SurgeUpdate
+              cd ..
+              cd deployments-combined-devops
               mkdir -p SurgeAutoupdate/${env_promotion_to_environment}
               mkdir -p SurgeAutoupdate/${env_promotion_to_environment}/SurgeUpdate
                     rm -rf SurgeAutoupdate/${env_promotion_to_environment}/SurgeUpdate/*
-                    cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP SurgeAutoupdate/${env_promotion_to_environment}/SurgeUpdate/
+                    cp ${WORKSPACE}/deployrepo/tar-surge-client/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_promotion_to_environment.toUpperCase()}.ZIP SurgeAutoupdate/${env_promotion_to_environment}/SurgeUpdate/
 
               echo "Promotion build complete."
             """
@@ -220,7 +224,7 @@ options {
                   deploymentMethod: 'deploy',
                   excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
                   region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
-                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+                  subdirectory: 'tar-surge-client/devops/codedeploy', versionFileName: '', waitForCompletion: true])
             }
 
             echo "Deploying to DR"
@@ -237,7 +241,7 @@ options {
                   deploymentMethod: 'deploy',
                   excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
                   region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
-                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+                  subdirectory: 'tar-surge-client/devops/codedeploy', versionFileName: '', waitForCompletion: true])
             }
           } // end of script
         } // end of container
