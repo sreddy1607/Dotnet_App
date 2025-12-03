@@ -243,8 +243,6 @@ pipeline {
               -o build_output -c Release -r win-x64 --self-contained true /p:EnableWindowsTargeting=true
           '''
         
-          def exeVersion = "0.0.${BUILD_NUMBER}"
-        
         // Copy build + configs
           sh """
             cp -r build_output/* devops/codedeploy/SurgeUpdate/
@@ -344,7 +342,7 @@ stage('Sonar Scan') {
           }
         }
         container(name: "jnlp") {
-          lock(resource: 'Thickclient-deploy',inversePrecedence: false ) {
+          lock(resource: 'deployments-github-repo',inversePrecedence: false ) {
            dir("${WORKSPACE}/deployrepo"){
               withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
                 
@@ -356,6 +354,14 @@ stage('Sonar Scan') {
 		              git pull
 	              
 		              mkdir -p ${WORKSPACE}/deployrepo/tar-surge-client-deployment/tar-surge-client/SurgeAutoupdate
+
+					  echo "Removing BAT script from SurgeUpdate before zipping..."
+					  rm -f ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeInstall_${env_deploy_env}.bat || true
+					  rm -f ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP	
+					  echo "Recreating ZIP again without BAT script..."
+					  
+					  zip -r ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeUpdate
+						
 						
 					  echo "Copying ZIP and BAT script separately..."
 		              
