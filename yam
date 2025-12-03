@@ -1,126 +1,377 @@
-2025-12-02 22:57:46 LifecycleEvent - BeforeInstall
-2025-12-02 22:57:46 Script - \before-install.bat
-2025-12-02 22:57:46 [stdout]
-2025-12-02 22:57:46 [stdout]C:\Windows\System32>REM Install Internet Information Server (IIS).  
-2025-12-02 22:57:46 [stdout]
-2025-12-02 22:57:46 [stdout]C:\Windows\System32>c:\Windows\Sysnative\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command Import-Module -Name ServerManager 
-2025-12-02 22:57:47 [stdout]
-2025-12-02 22:57:47 [stdout]C:\Windows\System32>c:\Windows\Sysnative\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command Install-WindowsFeature Web-Server 
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]Success Restart Needed Exit Code      Feature Result                               
-2025-12-02 22:57:48 [stdout]------- -------------- ---------      --------------                               
-2025-12-02 22:57:48 [stdout]True    No             NoChangeNeeded {}                                           
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]C:\Windows\System32>REM Backup existing configuration for IIS 
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]C:\Windows\System32>C:\Windows\System32\inetsrv\appcmd.exe add backup 
-2025-12-02 22:57:48 [stdout]BACKUP object "20251202T225748" added
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]C:\Windows\System32>REM Ensure that api directory is empty before deploying files 
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]C:\Windows\System32>DEL /S /Q D:\tar-surge-Api-staging\Apiservices\* 
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]C:\Windows\System32>DEL /S /Q D:\tar-surge-Api-staging\serverconfig\* 
-2025-12-02 22:57:48 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1
-2025-12-02 22:57:48 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\index.html
-2025-12-02 22:57:48 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\batchapi.d\conf.yaml
-2025-12-02 22:57:48 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\deploy.d\conf.yaml
-2025-12-02 22:57:48 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\dragnet.d\conf.yaml
-2025-12-02 22:57:48 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\iis.d\conf.yaml
-2025-12-02 22:57:48 [stdout]Deleted file - D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\surgeapi.d\conf.yaml
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]C:\Windows\System32>DEL /S /Q D:\tar-surge-Api-staging\environment\* 
-2025-12-02 22:57:48 [stdout]Deleted file - D:\tar-surge-Api-staging\environment\deploy-environment.ps1
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]C:\Windows\System32>DEL /S /Q D:\tar-surge-Api-staging\scripts\* 
-2025-12-02 22:57:48 [stdout]Deleted file - D:\tar-surge-Api-staging\scripts\deploy-files.ps1
-2025-12-02 22:57:48 [stdout]
-2025-12-02 22:57:48 [stdout]C:\Windows\System32>exit 0 
-2025-12-02 22:57:49 LifecycleEvent - AfterInstall
-2025-12-02 22:57:49 Script - \after-install.bat
-2025-12-02 22:57:49 [stdout]"CONFIG will be deployed"
-2025-12-02 22:57:50 [stdout]WARNING: Restarting script in 64-bit Windows PowerShell...
-2025-12-02 22:57:51 [stdout]Ensuring required directories exist...
-2025-12-02 22:57:51 [stdout]Stopping 'Apiservices'
-2025-12-02 22:57:51 [stdout]Shutting down Apiservices
-2025-12-02 22:57:52 [stdout]Stopping Application Pool 'Apiservices'
-2025-12-02 22:57:52 [stdout]Shutting down Apiservices
-2025-12-02 22:57:54 [stdout]Removing site: Apiservices
-2025-12-02 22:57:54 [stderr]Get-WebAppPool : The term 'Get-WebAppPool' is not recognized as the name of a cmdlet, function, script file, or 
-2025-12-02 22:57:54 [stderr]operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try 
-2025-12-02 22:57:54 [stderr]again.
-2025-12-02 22:57:54 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:71 char:1
-2025-12-02 22:57:54 [stderr]+ Get-WebAppPool | ForEach-Object {
-2025-12-02 22:57:54 [stderr]+ ~~~~~~~~~~~~~~
-2025-12-02 22:57:54 [stderr]    + CategoryInfo          : ObjectNotFound: (Get-WebAppPool:String) [], CommandNotFoundException
-2025-12-02 22:57:54 [stderr]    + FullyQualifiedErrorId : CommandNotFoundException
-2025-12-02 22:57:54 [stderr] 
-2025-12-02 22:57:54 [stdout]Creating IIS site 'Apiservices' and assigning to App Pool 'Apiservices'
-2025-12-02 22:57:54 [stdout]
-2025-12-02 22:57:54 [stdout]Name             ID   State      Physical Path                  Bindings                                               
-2025-12-02 22:57:54 [stdout]----             --   -----      -------------                  --------                                               
-2025-12-02 22:57:54 [stdout]Apiservices      1    Started    D:\inetpub\ApiServices         http *:80:                                             
-2025-12-02 22:57:54 [stdout]Removing default binding on *:80
-2025-12-02 22:57:54 [stdout]Configuring web bindings for 'Apiservices'
-2025-12-02 22:57:54 [stdout]Setting logging directory for 'Apiservices'
-2025-12-02 22:57:55 [stdout]Creating Application Pool 'Apiservices'
-2025-12-02 22:57:55 [stderr]New-WebAppPool : Destination element already exists, please use "force" parameter to override.
-2025-12-02 22:57:55 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:95 char:1
-2025-12-02 22:57:55 [stderr]+ New-WebAppPool -Name $AppPoolName
-2025-12-02 22:57:55 [stderr]+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-2025-12-02 22:57:55 [stderr]    + CategoryInfo          : InvalidArgument: (:) [New-WebAppPool], ArgumentException
-2025-12-02 22:57:55 [stderr]    + FullyQualifiedErrorId : Destination element already exists, please use "force" parameter to override.,Microsoft. 
-2025-12-02 22:57:55 [stderr]   IIs.PowerShell.Provider.NewAppPoolCommand
-2025-12-02 22:57:55 [stderr] 
-2025-12-02 22:57:55 [stdout]Setting Apiservices to No Managed Code
-2025-12-02 22:57:56 [stdout]Configuring IIS recycle schedule for AppPool 'Apiservices' at 08:15
-2025-12-02 22:57:56 [stderr]Clear-WebConfigurationSection : The term 'Clear-WebConfigurationSection' is not recognized as the name of a cmdlet, 
-2025-12-02 22:57:56 [stderr]function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the 
-2025-12-02 22:57:56 [stderr]path is correct and try again.
-2025-12-02 22:57:56 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:105 char:1
-2025-12-02 22:57:56 [stderr]+ Clear-WebConfigurationSection -pspath 'MACHINE/WEBROOT/APPHOST' `
-2025-12-02 22:57:56 [stderr]+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-2025-12-02 22:57:56 [stderr]    + CategoryInfo          : ObjectNotFound: (Clear-WebConfigurationSection:String) [], CommandNotFoundException
-2025-12-02 22:57:56 [stderr]    + FullyQualifiedErrorId : CommandNotFoundException
-2025-12-02 22:57:56 [stderr] 
-2025-12-02 22:57:56 [stderr]Add-WebConfigurationProperty : Filename: 
-2025-12-02 22:57:56 [stderr]Error: Cannot add duplicate collection entry of type 'add' with unique key attribute 'value' set to '08:15:00'
-2025-12-02 22:57:56 [stderr]At D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1:109 char:1
-2025-12-02 22:57:56 [stderr]+ Add-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' `
-2025-12-02 22:57:56 [stderr]+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-2025-12-02 22:57:56 [stderr]    + CategoryInfo          : NotSpecified: (:) [Add-WebConfigurationProperty], COMException
-2025-12-02 22:57:56 [stderr]    + FullyQualifiedErrorId : System.Runtime.InteropServices.COMException,Microsoft.IIs.PowerShell.Provider.AddConfigu 
-2025-12-02 22:57:56 [stderr]   rationPropertyCommand
-2025-12-02 22:57:56 [stderr] 
-2025-12-02 22:57:56 [stdout]Recycle Scheduled Successfully at 08:15
-2025-12-02 22:57:56 [stdout]Found zConnect certificate: CN=MMIS SURGE ZOSCONNECT DEV CLIENT, OU=Department of Health, O=State of California, L=Sacramento, S=California, C=US
-2025-12-02 22:57:56 [stdout]IIS AppPool\Apiservices already has read access to zConnect cert
-2025-12-02 22:57:56 [stdout]Disabling regular time interval recycling for Apiservices
-2025-12-02 22:57:56 [stdout]Setting 'Load User Profile' to True for Apiservices
-2025-12-02 22:57:59 [stdout]Pushing the index.html file out
-2025-12-02 22:57:59 [stdout]Installing/Updating Datadog Configuration
-2025-12-02 22:57:59 [stdout]D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\batchapi.d\conf.yaml
-2025-12-02 22:57:59 [stdout]D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\deploy.d\conf.yaml
-2025-12-02 22:57:59 [stdout]D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\dragnet.d\conf.yaml
-2025-12-02 22:57:59 [stdout]D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\iis.d\conf.yaml
-2025-12-02 22:57:59 [stdout]D:\tar-surge-Api-staging\serverconfig\datadog\conf.d\surgeapi.d\conf.yaml
-2025-12-02 22:57:59 [stdout]5 File(s) copied
-2025-12-02 22:57:59 [stdout]
-2025-12-02 22:57:59 [stdout]Adding ddagentuser to C:\ProgramData\Amazon\CodeDeploy\deployment-logs so Datadog can read the CodeDeploy log file
-2025-12-02 22:57:59 [stdout]
-2025-12-02 22:57:59 [stdout]Restarting the Datadog agent service
-2025-12-02 22:58:01 [stdout]Resetting IIS to ensure everything is restarted
-2025-12-02 22:58:06 [stdout]
-2025-12-02 22:58:06 [stdout]Attempting stop...
-2025-12-02 22:58:06 [stdout]
-2025-12-02 22:58:06 [stdout]Internet services successfully stopped
-2025-12-02 22:58:06 [stdout]
-2025-12-02 22:58:06 [stdout]Attempting start...
-2025-12-02 22:58:06 [stdout]
-2025-12-02 22:58:06 [stdout]Internet services successfully restarted
-2025-12-02 22:58:06 [stdout]
-2025-12-02 22:58:06 [stdout]Configuration Deploy Complete
-2025-12-02 22:58:06 [stdout]
-2025-12-02 22:58:06 [stdout]
+/*
+=======================================================================================
+This file is being updated constantly by the DevOps team to introduce new enhancements
+based on the template.  If you have suggestions for improvement,
+please contact the DevOps team so that we can incorporate the changes into the
+template.  In the meantime, if you have made changes here or don't want this file to be
+updated, please indicate so at the beginning of this file.
+=======================================================================================
+*/
+
+def branch = env.BRANCH_NAME ?: "Dev"
+def workingDir = "/home/jenkins/agent"
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+        apiVersion: v1
+        kind: Pod
+        spec:
+          serviceAccountName: jenkins
+          volumes:
+            - name: dockersock
+              hostPath:
+                path: /var/run/docker.sock
+            - emptyDir: {}
+              name: varlibcontainers
+            - name: jenkins-trusted-ca-bundle
+              configMap:
+                name: jenkins-trusted-ca-bundle
+                defaultMode: 420
+                optional: true
+          containers:
+            - name: dotnet
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammismspapp:1.0.34
+              tty: true
+              command: ["/bin/bash"]
+              securityContext:
+                privileged: true
+              workingDir: ${workingDir}
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+            - name: jnlp
+              securityContext:
+                privileged: true
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+            - name: node
+              image: registry.access.redhat.com/ubi8/nodejs-18:latest
+              tty: true
+              command: ["/bin/bash"]
+              securityContext:
+                privileged: true
+              workingDir: ${workingDir}
+              securityContext:
+                privileged: true
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+            - name: aws-boto3
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.0.1
+              tty: true
+              command: ["/bin/bash"]
+              workingDir: ${workingDir}
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+      """
+    }
+  }
+
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+    timeout(time:5 , unit: 'HOURS')
+    skipDefaultCheckout()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+  }
+
+  environment {
+    env_current_git_commit=""
+    env_accesskey=""
+    env_secretkey=""
+    env_tag_name=""
+    env_deploy_env=""
+    env_skip_deploy="true"
+    env_DEPLOY_ENVIRONMENT="false"
+    env_DEPLOY_FILES="true"
+    env_DEPLOY_CONFIG="false"
+    env_release_type=""
+  }
+
+  stages {
+   stage("Initialize") {
+      steps {
+        container(name: "node") {
+          script {
+
+            properties([
+              parameters([
+                choice(name: 'RELEASE_TYPE', choices: ['PATCH','MINOR','MAJOR'], description: 'Enter Release type'),
+                booleanParam(name: 'USE_GIT_TAG', defaultValue: false, description: 'Use the selected git tag instead of LATEST commit'),
+                gitParameter(name: 'GIT_TAG', defaultValue: 'tar-surge-client_from_dev', description: 'git tag', type: 'PT_TAG'),
+                string(name: 'GIT_SHA',defaultValue: 'enter git sha(8+ chars)', description: 'enter git sha that you want to deploy') 
+              ])
+            ])
+
+            deleteDir()
+
+            env_release_type = params.RELEASE_TYPE
+            echo 'checkout source  and get the commit id'
+            env_current_git_commit = checkout(scm).GIT_COMMIT
+
+            // get the short version of commit
+            env_current_git_commit="${env_current_git_commit[0..7]}"
+
+            env_deploy_env = "DEV"
+
+            echo "Current deployment environment is ${env_deploy_env}"
+
+            env_tag_name = "${branch}_${BUILD_NUMBER}_${env_current_git_commit}"
+
+            if (params.USE_GIT_TAG == true) {
+              env_current_git_commit = params.GIT_TAG
+            }
+
+            if ( ! params.GIT_SHA.contains("enter") ) {
+              env_current_git_commit = params.GIT_SHA
+            }
+
+            echo "Tag to be applied is: ${env_tag_name}"
+            echo "Tag will be applied to: ${env_current_git_commit}"
+            
+            def repositories = [
+                        [name: 'tar-surge-client', branch: 'master', url: 'https://github.com/ca-mmis/tar-surge-client.git'],
+                        [name: 'tar-surge-app', branch: 'master', url: 'https://github.com/ca-mmis/tar-surge-app.git']
+                    ]
+
+                    repositories.each { repo ->
+                        dir(repo.name) {
+                            git branch: repo.branch, credentialsId: 'github-key', url: repo.url
+                        }
+                    } 
+
+            if ( ( params.GIT_SHA.contains("enter")) && (params.USE_GIT_TAG == false)) {
+              // use latest commit to build and deploy to DEV
+              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                sh """#!/bin/bash
+                  git config --global --add safe.directory '*'
+                  git config --system --add safe.directory '*' 
+                  echo "The commit hash from the latest git current commit is ${env_current_git_commit}"
+                  echo "The current build number is: ${BUILD_NUMBER}"
+                  echo "The current branch is: ${branch}"
+                  tagMessage="${env_tag_name}"
+                  git checkout \${branch}
+                  echo "Checked out ${branch}"
+                  git config  --global user.email "jenkins@cammis.com"
+                  git config  --global user.name "jenkins"
+                  echo "The tagMessage is \$tagMessage"
+                  echo "About to fetch"
+                  git fetch --quiet --tags https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client.git
+                  echo "About to tag commit with build and branch"
+                  git tag -f -a "\$tagMessage" -m "tag build" ${env_current_git_commit}
+                  echo "About to push tag"
+                  git push -f https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client.git \$tagMessage
+                  echo "Push is done"
+                  echo "Checking out selected commit"
+                  git checkout ${env_current_git_commit}
+                  git show --stat ${env_current_git_commit} > commit-changes.txt
+                  echo "START OF FILES CHANGED"
+                  cat commit-changes.txt
+                  echo "END OF FILES CHANGED"
+                  echo "Checkout out ${env_current_git_commit}"
+                  """
+              }
+            } else if ( (params.USE_GIT_TAG == true) || ( ! params.GIT_SHA.contains("enter")) ) {
+  			      // using a git tag or git sha, ${env_current_git_commit}" is now the commit tag selected or git sha entered
+              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                sh """#!/bin/bash
+                  echo "Checking out SHA or TAG: ${env_current_git_commit}"
+                  git config --global --add safe.directory '*'
+                  git config --system --add safe.directory '*' 
+                  git checkout \${env_current_git_commit}
+                  echo "Since this is a previous commit, need to rebuild everything"
+                  echo "Cammis.Surge.Client" > commit-changes.txt
+                  echo "Cammis.Surge.RPM.App" >> commit-changes.txt
+                  echo "Cammis.Surge.SharedClient" >> commit-changes.txt
+                  cat commit-changes.txt
+                  echo "Checked out ${env_current_git_commit}"
+                  """
+              }
+            } 
+          } //END script
+        } //END container node
+      } //END steps
+    } //END stage
+
+  stage('Build') {
+    steps {
+      container("dotnet") {
+        script {
+          sh '''
+            echo "Building thick client..."
+            mkdir -p devops/codedeploy/SurgeUpdate
+            dotnet publish tar-surge-client/Cammis.Surge.Client.sln \
+              -o build_output -c Release -r win-x64 --self-contained true /p:EnableWindowsTargeting=true
+          '''
+        
+          def exeVersion = "0.0.${BUILD_NUMBER}"
+        
+        // Copy build + configs
+          sh """
+            cp -r build_output/* devops/codedeploy/SurgeUpdate/
+            cp tar-surge-client/Config/${env_deploy_env}/* devops/codedeploy/SurgeUpdate/
+          
+            cd devops/codedeploy
+            zip -r SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeUpdate
+          """
+        }
+      }
+    }
+  }
+
+
+stage('Sonar Scan') {
+      when {
+        expression {
+          env_DEPLOY_FILES == "true"
+        }
+      }
+      steps {
+        container(name: "dotnet") {
+          script {
+            sh """#!/bin/bash
+		      set +e
+                      echo 'Sonar Scan Stage....\n\n'
+                
+		              cd  tar-surge-client/Cammis.Surge.Client
+	                  dotnet tool install dotnet-sonarscanner --global
+		              export PATH="$PATH:/home/jenkins/agent/.dotnet/tools"
+		              dotnet sonarscanner begin /key:"tar-surge-client" /d:sonar.host.url="http://sonarqube-tools.apps.bld.cammis.medi-cal.ca.gov"
+                      dotnet publish /p:EnableWindowsTargeting=true
+                      dotnet sonarscanner end   
+              """
+          }
+        }
+      }
+    }
+
+    stage('prepare deployment') {
+            steps {
+                container(name: "node") {
+					lock(resource: 'deployments-github-repo', inversePrecedence: false) {
+                    dir("${WORKSPACE}/deployrepo") {
+                    withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+		        sh """
+		              # Clone tar-surge-client-deployment repo
+		              git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client-deployment.git --depth=1
+		              cd tar-surge-client-deployment
+		              git checkout master
+		              git pull
+		
+		              
+		              mkdir -p ${WORKSPACE}/deployrepo/tar-surge-client-deployment/tar-surge-client/SurgeAutoupdate
+		
+		              
+		              cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP tar-surge-client/SurgeAutoupdate
+		              cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeInstall_${env_deploy_env}.bat tar-surge-client/SurgeAutoupdate
+		
+		              # Commit and push changes
+		              if [[ -n \$(git status --porcelain) ]]; then
+		                git add .
+		                git commit -m "Automated commit - Deploying SurgeUpdate artifacts"
+		                git push origin master
+		              fi
+		
+		              # Tag this deployment
+		              git tag -f -a "${env_tag_name}" -m "Deploying Thickclient - Tag ${env_tag_name}"
+		              git push origin "${env_tag_name}" --force
+		            """
+					sh """
+					  # Clone deployments-combined-devops repo
+					  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
+					  cd deployments-combined-devops
+					  git checkout master
+					  git pull
+					
+					  # Prepare folders
+					  mkdir -p ${WORKSPACE}/deployrepo/deployments-combined-devops/SurgeAutoupdate/dev/SurgeUpdate
+					  rm -rf SurgeAutoupdate/dev/SurgeUpdate/*
+					
+					  # Copy new build artifacts
+					  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_DEV.ZIP SurgeAutoupdate/dev/SurgeUpdate/
+					
+					  # Commit and push
+					  git add .
+					  git commit -m "Updated build artifacts for tar-surge-client build ${env_tag_name}" || true
+					  git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
+					"""
+					 }
+					}
+                  }
+                }
+            }
+        }
+	  
+ stage('Deploy') {
+      steps {
+        lock(resource: 'codedeploy-ec2-lock') {
+          container("aws-boto3") {
+            script {
+              echo "Deploy Using AWS CodeDeploy..."
+              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr-ecs', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              step([$class: 'AWSCodeDeployPublisher',
+                  applicationName: "tar-surge-app-${env_deploy_env}",
+                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                  credentials: 'awsAccessKey',
+                  deploymentConfig: "tar-surge-app-${env_deploy_env}-config",
+                  deploymentGroupAppspec: false,
+                  deploymentGroupName: "tar-surge-app-${env_deploy_env}-INPLACE-deployment-group",
+                  deploymentMethod: 'deploy',
+                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                  region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
+                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always { echo "Build Process complete." }
+    success { echo "Build and Deploy succeeded." }
+    failure { echo "Build or Deploy failed." }
+    aborted { echo "Build aborted." }
+  }
+}
