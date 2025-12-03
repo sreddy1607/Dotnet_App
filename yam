@@ -321,7 +321,7 @@ stage('Sonar Scan') {
                   git pull
 
 				  # Prepare folders
-					  mkdir -p ${WORKSPACE}/deployrepo/deployments-combined-devops/SurgeAutoupdate/${env_deploy_env}/SurgeUpdate
+					  mkdir -p ${WORKSPACE}/deployrepo/deployments-combined-devops/SurgeAutoupdate/dev/SurgeUpdate
 					  rm -rf SurgeAutoupdate/dev/SurgeUpdate/*
 
 					 echo "Removing BAT script from SurgeUpdate before zipping..."
