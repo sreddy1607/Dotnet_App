@@ -296,10 +296,17 @@ stage('Sonar Scan') {
 		              cd tar-surge-client-deployment
 		              git checkout master
 		              git pull
-		
-		              
+	              
 		              mkdir -p ${WORKSPACE}/deployrepo/tar-surge-client-deployment/tar-surge-client/SurgeAutoupdate
-		
+		              echo "Removing BAT script from SurgeUpdate before zipping..."
+					  rm -f ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeInstall_${env_deploy_env}.bat || true
+						
+					  echo "Recreating ZIP again without BAT script..."
+					  cd ${WORKSPACE}/devops/codedeploy
+					  rm -f SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP
+					  zip -r SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeUpdate
+						
+					  echo "Copying ZIP and BAT script separately..."
 		              
 		              cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP tar-surge-client/SurgeAutoupdate
 		              cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeInstall_${env_deploy_env}.bat tar-surge-client/SurgeAutoupdate
@@ -327,7 +334,7 @@ stage('Sonar Scan') {
 					  rm -rf SurgeAutoupdate/dev/SurgeUpdate/*
 					
 					  # Copy new build artifacts
-					  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_DEV.ZIP SurgeAutoupdate/dev/SurgeUpdate/
+					  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeAutoupdate/dev/SurgeUpdate/
 					
 					  # Commit and push
 					  git add .
