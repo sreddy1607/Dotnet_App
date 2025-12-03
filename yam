@@ -283,70 +283,6 @@ stage('Sonar Scan') {
         }
       }
     }
-
-    stage('prepare deployment') {
-            steps {
-                container(name: "node") {
-					lock(resource: 'deployments-github-repo', inversePrecedence: false) {
-                    dir("${WORKSPACE}/deployrepo") {
-                    withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
-		        sh """
-		              # Clone tar-surge-client-deployment repo
-		              git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client-deployment.git --depth=1
-		              cd tar-surge-client-deployment
-		              git checkout master
-		              git pull
-	              
-		              mkdir -p ${WORKSPACE}/deployrepo/tar-surge-client-deployment/tar-surge-client/SurgeAutoupdate
-		              echo "Removing BAT script from SurgeUpdate before zipping..."
-					  rm -f ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeInstall_${env_deploy_env}.bat || true
-						
-					  echo "Recreating ZIP again without BAT script..."
-					  cd ${WORKSPACE}/devops/codedeploy
-					  rm -f SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP
-					  zip -r SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeUpdate
-						
-					  echo "Copying ZIP and BAT script separately..."
-		              
-		              cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP tar-surge-client/SurgeAutoupdate
-		              cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeInstall_${env_deploy_env}.bat tar-surge-client/SurgeAutoupdate
-		
-		              # Commit and push changes
-		              if [[ -n \$(git status --porcelain) ]]; then
-		                git add .
-		                git commit -m "Automated commit - Deploying SurgeUpdate artifacts"
-		                git push origin master
-		              fi
-		
-		              # Tag this deployment
-		              git tag -f -a "${env_tag_name}" -m "Deploying Thickclient - Tag ${env_tag_name}"
-		              git push origin "${env_tag_name}" --force
-		            """
-					sh """
-					  # Clone deployments-combined-devops repo
-					  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
-					  cd deployments-combined-devops
-					  git checkout master
-					  git pull
-					
-					  # Prepare folders
-					  mkdir -p ${WORKSPACE}/deployrepo/deployments-combined-devops/SurgeAutoupdate/dev/SurgeUpdate
-					  rm -rf SurgeAutoupdate/dev/SurgeUpdate/*
-					
-					  # Copy new build artifacts
-					  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeAutoupdate/dev/SurgeUpdate/
-					
-					  # Commit and push
-					  git add .
-					  git commit -m "Updated build artifacts for tar-surge-client build ${env_tag_name}" || true
-					  git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
-					"""
-					 }
-					}
-                  }
-                }
-            }
-        }
 	  
  stage('Deploy') {
       steps {
@@ -371,6 +307,72 @@ stage('Sonar Scan') {
             }
           }
         }
+        container(name: "jnlp") {
+          lock(resource: 'deployments-github-repo',inversePrecedence: false ) {
+           dir("${WORKSPACE}/deployrepo"){
+              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                sh """
+                  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
+                  git config  --global user.email "jenkins@cammis.com"
+                  git config  --global user.name "jenkins"
+
+                  cd deployments-combined-devops
+                  git checkout master
+                  git pull
+
+				  # Prepare folders
+					  mkdir -p ${WORKSPACE}/deployrepo/deployments-combined-devops/SurgeAutoupdate/dev/SurgeUpdate
+					  rm -rf SurgeAutoupdate/dev/SurgeUpdate/*
+
+					 echo "Removing BAT script from SurgeUpdate before zipping..."
+					  rm -f ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeInstall_${env_deploy_env}.bat || true
+						
+					  echo "Recreating ZIP again without BAT script..."
+					  cd ${WORKSPACE}/devops/codedeploy
+					  rm -f SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP
+					  zip -r SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeUpdate
+						
+					  echo "Copying ZIP to deployed combined repo"
+					  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeAutoupdate/dev/SurgeUpdate/
+					
+					  # Commit and push
+					  git add .
+					  git commit -m "Updated build artifacts for tar-surge-client build ${env_tag_name}" || true
+					  git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
+					  
+                """
+
+                sh """
+                  # Clone tar-surge-client-deployment repo
+		              git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-client-deployment.git --depth=1
+		              cd tar-surge-client-deployment
+		              git checkout master
+		              git pull
+	              
+		              mkdir -p ${WORKSPACE}/deployrepo/tar-surge-client-deployment/tar-surge-client/SurgeAutoupdate
+						
+					  echo "Copying ZIP and BAT script separately..."
+		              
+		              cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP tar-surge-client/SurgeAutoupdate
+		              cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeInstall_${env_deploy_env}.bat tar-surge-client/SurgeAutoupdate
+		
+		              # Commit and push changes
+		              if [[ -n \$(git status --porcelain) ]]; then
+		                git add .
+		                git commit -m "Automated commit - Deploying SurgeUpdate artifacts"
+		                git push origin master
+		              fi
+		
+		              # Tag this deployment
+		              git tag -f -a "${env_tag_name}" -m "Deploying Thickclient - Tag ${env_tag_name}"
+		              git push origin "${env_tag_name}" --force
+					  
+                """
+              } //end withCredentials
+            } //end dir
+          } //end lock
+        }  //end container
+		  
       }
     }
   }
