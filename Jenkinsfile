@@ -4,6 +4,8 @@ MotioCI → Cognos Automated Deployment Pipeline
 Maintained by: DevOps Team
 Purpose: Automate Cognos content promotion from DEV/TEST to PRD using MotioCI CLI.
 =======================================================================================
+Uses: Active Choice Reactive Parameters Plugin for dynamic dropdowns from MotioCI
+=======================================================================================
 */
 
 def branch = env.BRANCH_NAME ?: "DEV"
@@ -11,7 +13,593 @@ def namespace = env.NAMESPACE ?: "dev"
 def cloudName = env.CLOUD_NAME == "openshift" ? "openshift" : "kubernetes"
 def workingDir = "/home/jenkins/agent"
 
-APP_NAME = "combined-devops-cognos-deployments"
+def APP_NAME = "combined-devops-cognos-deployments"
+
+// ═══════════════════════════════════════════════════════════════════════════════════
+// ACTIVE CHOICE REACTIVE PARAMETERS - Must be OUTSIDE pipeline block
+// ═══════════════════════════════════════════════════════════════════════════════════
+// Prerequisites: Install "Active Choices" plugin in Jenkins
+//   - Manage Jenkins → Plugin Manager → Available → "Active Choices"
+// ═══════════════════════════════════════════════════════════════════════════════════
+
+properties([
+  parameters([
+    // ─────────────────────────────────────────────────────────────────────────
+    // SOURCE_ENV: Dynamically fetch Cognos instances from MotioCI
+    // ─────────────────────────────────────────────────────────────────────────
+    [$class: 'ChoiceParameter',
+      name: 'SOURCE_ENV',
+      description: 'Source Cognos environment (fetched from MotioCI)',
+      choiceType: 'PT_SINGLE_SELECT',
+      filterLength: 1,
+      filterable: true,
+      randomName: 'source-env-choice',
+      script: [
+        $class: 'GroovyScript',
+        fallbackScript: [
+          classpath: [],
+          sandbox: true,
+          script: '''
+            return ["Error fetching instances - check MotioCI connection"]
+          '''
+        ],
+        script: [
+          classpath: [],
+          sandbox: false,
+          script: '''
+            import groovy.json.JsonSlurper
+            import groovy.json.JsonOutput
+            import javax.net.ssl.*
+            import java.security.cert.X509Certificate
+            
+            // Disable SSL verification for self-signed certs
+            def trustAllCerts = [
+              checkClientTrusted: { chain, authType -> },
+              checkServerTrusted: { chain, authType -> },
+              getAcceptedIssuers: { null }
+            ] as X509TrustManager
+            
+            def sc = SSLContext.getInstance("TLS")
+            sc.init(null, [trustAllCerts] as TrustManager[], new java.security.SecureRandom())
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+            HttpsURLConnection.setDefaultHostnameVerifier({ hostname, session -> true } as HostnameVerifier)
+            
+            def motioServer = "https://cgrptmcip01.cloud.cammis.ca.gov"
+            def graphUrl = "${motioServer}/api/graphql"
+            def loginUrl = "${motioServer}/api/login"
+            
+            try {
+              // Read credentials from Jenkins credential store
+              def credentialsJson = ""
+              try {
+                def creds = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+                  com.cloudbees.plugins.credentials.common.StandardCredentials.class,
+                  jenkins.model.Jenkins.instance,
+                  null,
+                  null
+                ).find { it.id == 'cognos-credentials' }
+                
+                if (creds instanceof org.jenkinsci.plugins.plaincredentials.FileCredentials) {
+                  credentialsJson = creds.getContent().text
+                }
+              } catch (Exception e) {
+                def credsPath = "/var/jenkins_home/motio-creds.json"
+                def credsFile = new File(credsPath)
+                if (credsFile.exists()) {
+                  credentialsJson = credsFile.text
+                }
+              }
+              
+              if (!credentialsJson) {
+                return ["ERROR: Cannot read credentials file"]
+              }
+              
+              // Login to MotioCI - Token is in RESPONSE HEADERS!
+              def loginConn = new URL(loginUrl).openConnection()
+              loginConn.setRequestMethod("POST")
+              loginConn.setDoOutput(true)
+              loginConn.setRequestProperty("Content-Type", "application/json")
+              loginConn.getOutputStream().write(credentialsJson.getBytes("UTF-8"))
+              
+              // Get response code first
+              def responseCode = loginConn.getResponseCode()
+              if (responseCode != 200) {
+                return ["ERROR: Login failed with status ${responseCode}"]
+              }
+              
+              // Token comes from response HEADERS, not body!
+              def authToken = loginConn.getHeaderField("x-auth-token")
+              
+              if (!authToken) {
+                return ["ERROR: No x-auth-token in response headers"]
+              }
+              
+              // Query instances from GraphQL API
+              def instanceQuery = """{"query":"query { instances { edges { node { id name } } } }"}"""
+              
+              def graphConn = new URL(graphUrl).openConnection()
+              graphConn.setRequestMethod("POST")
+              graphConn.setDoOutput(true)
+              graphConn.setRequestProperty("Content-Type", "application/json")
+              graphConn.setRequestProperty("x-auth-token", authToken)
+              graphConn.getOutputStream().write(instanceQuery.getBytes("UTF-8"))
+              
+              def graphResponse = new JsonSlurper().parseText(graphConn.getInputStream().getText())
+              def instances = graphResponse?.data?.instances?.edges?.collect { it.node.name }
+              
+              if (!instances || instances.isEmpty()) {
+                return ["No instances found"]
+              }
+              
+              return instances
+              
+            } catch (Exception e) {
+              return ["ERROR: ${e.getMessage()}"]
+            }
+          '''
+        ]
+      ]
+    ],
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // TARGET_ENV: Reactive parameter - excludes selected SOURCE_ENV
+    // ─────────────────────────────────────────────────────────────────────────
+    [$class: 'CascadeChoiceParameter',
+      name: 'TARGET_ENV',
+      description: 'Target Cognos environment (excludes source)',
+      choiceType: 'PT_SINGLE_SELECT',
+      filterLength: 1,
+      filterable: true,
+      randomName: 'target-env-choice',
+      referencedParameters: 'SOURCE_ENV',
+      script: [
+        $class: 'GroovyScript',
+        fallbackScript: [
+          classpath: [],
+          sandbox: true,
+          script: '''
+            return ["Error fetching target instances"]
+          '''
+        ],
+        script: [
+          classpath: [],
+          sandbox: false,
+          script: '''
+            import groovy.json.JsonSlurper
+            import groovy.json.JsonOutput
+            import javax.net.ssl.*
+            
+            // Disable SSL verification
+            def trustAllCerts = [
+              checkClientTrusted: { chain, authType -> },
+              checkServerTrusted: { chain, authType -> },
+              getAcceptedIssuers: { null }
+            ] as X509TrustManager
+            
+            def sc = SSLContext.getInstance("TLS")
+            sc.init(null, [trustAllCerts] as TrustManager[], new java.security.SecureRandom())
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+            HttpsURLConnection.setDefaultHostnameVerifier({ hostname, session -> true } as HostnameVerifier)
+            
+            def motioServer = "https://cgrptmcip01.cloud.cammis.ca.gov"
+            def graphUrl = "${motioServer}/api/graphql"
+            def loginUrl = "${motioServer}/api/login"
+            
+            // Check if SOURCE_ENV is valid
+            if (!SOURCE_ENV || SOURCE_ENV.toString().startsWith("ERROR") || SOURCE_ENV.toString().startsWith("No ")) {
+              return ["Select valid source environment first"]
+            }
+            
+            try {
+              def credentialsJson = ""
+              try {
+                def creds = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+                  com.cloudbees.plugins.credentials.common.StandardCredentials.class,
+                  jenkins.model.Jenkins.instance,
+                  null,
+                  null
+                ).find { it.id == 'cognos-credentials' }
+                
+                if (creds instanceof org.jenkinsci.plugins.plaincredentials.FileCredentials) {
+                  credentialsJson = creds.getContent().text
+                }
+              } catch (Exception e) {
+                def credsFile = new File("/var/jenkins_home/motio-creds.json")
+                if (credsFile.exists()) credentialsJson = credsFile.text
+              }
+              
+              if (!credentialsJson) return ["ERROR: Cannot read credentials"]
+              
+              // Login - Token from HEADERS
+              def loginConn = new URL(loginUrl).openConnection()
+              loginConn.setRequestMethod("POST")
+              loginConn.setDoOutput(true)
+              loginConn.setRequestProperty("Content-Type", "application/json")
+              loginConn.getOutputStream().write(credentialsJson.getBytes("UTF-8"))
+              
+              def responseCode = loginConn.getResponseCode()
+              if (responseCode != 200) return ["ERROR: Login failed"]
+              
+              def authToken = loginConn.getHeaderField("x-auth-token")
+              if (!authToken) return ["ERROR: No auth token"]
+              
+              // Query instances
+              def instanceQuery = """{"query":"query { instances { edges { node { id name } } } }"}"""
+              
+              def graphConn = new URL(graphUrl).openConnection()
+              graphConn.setRequestMethod("POST")
+              graphConn.setDoOutput(true)
+              graphConn.setRequestProperty("Content-Type", "application/json")
+              graphConn.setRequestProperty("x-auth-token", authToken)
+              graphConn.getOutputStream().write(instanceQuery.getBytes("UTF-8"))
+              
+              def graphResponse = new JsonSlurper().parseText(graphConn.getInputStream().getText())
+              def instances = graphResponse?.data?.instances?.edges?.collect { it.node.name }
+              
+              // Filter out the source environment
+              def filtered = instances?.findAll { it.toString() != SOURCE_ENV.toString() }
+              
+              if (!filtered || filtered.isEmpty()) {
+                return ["No target instances available"]
+              }
+              
+              return filtered
+              
+            } catch (Exception e) {
+              return ["ERROR: ${e.getMessage()}"]
+            }
+          '''
+        ]
+      ]
+    ],
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // PROJECT_NAME: Reactive - fetches projects for selected SOURCE_ENV
+    // ─────────────────────────────────────────────────────────────────────────
+    [$class: 'CascadeChoiceParameter',
+      name: 'PROJECT_NAME',
+      description: 'MotioCI project (fetched based on source environment)',
+      choiceType: 'PT_SINGLE_SELECT',
+      filterLength: 1,
+      filterable: true,
+      randomName: 'project-name-choice',
+      referencedParameters: 'SOURCE_ENV',
+      script: [
+        $class: 'GroovyScript',
+        fallbackScript: [
+          classpath: [],
+          sandbox: true,
+          script: '''
+            return ["Error fetching projects"]
+          '''
+        ],
+        script: [
+          classpath: [],
+          sandbox: false,
+          script: '''
+            import groovy.json.JsonSlurper
+            import javax.net.ssl.*
+            
+            // SSL bypass
+            def trustAllCerts = [
+              checkClientTrusted: { chain, authType -> },
+              checkServerTrusted: { chain, authType -> },
+              getAcceptedIssuers: { null }
+            ] as X509TrustManager
+            def sc = SSLContext.getInstance("TLS")
+            sc.init(null, [trustAllCerts] as TrustManager[], new java.security.SecureRandom())
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+            HttpsURLConnection.setDefaultHostnameVerifier({ hostname, session -> true } as HostnameVerifier)
+            
+            def motioServer = "https://cgrptmcip01.cloud.cammis.ca.gov"
+            def graphUrl = "${motioServer}/api/graphql"
+            def loginUrl = "${motioServer}/api/login"
+            
+            if (!SOURCE_ENV || SOURCE_ENV.toString().startsWith("ERROR") || SOURCE_ENV.toString().startsWith("No ")) {
+              return ["Select source environment first"]
+            }
+            
+            try {
+              // Get credentials
+              def credentialsJson = ""
+              def creds = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+                com.cloudbees.plugins.credentials.common.StandardCredentials.class,
+                jenkins.model.Jenkins.instance, null, null
+              ).find { it.id == 'cognos-credentials' }
+              if (creds instanceof org.jenkinsci.plugins.plaincredentials.FileCredentials) {
+                credentialsJson = creds.getContent().text
+              }
+              if (!credentialsJson) return ["ERROR: No credentials"]
+              
+              // Login
+              def loginConn = new URL(loginUrl).openConnection()
+              loginConn.setRequestMethod("POST")
+              loginConn.setDoOutput(true)
+              loginConn.setRequestProperty("Content-Type", "application/json")
+              loginConn.getOutputStream().write(credentialsJson.getBytes("UTF-8"))
+              if (loginConn.getResponseCode() != 200) return ["ERROR: Login failed"]
+              def authToken = loginConn.getHeaderField("x-auth-token")
+              if (!authToken) return ["ERROR: No token"]
+              
+              // Query all projects then filter by instance name
+              def sourceEnvName = SOURCE_ENV.toString()
+              def projectQuery = '{"query":"{ instances { edges { node { name projects { edges { node { name } } } } } } }"}'
+              
+              def graphConn = new URL(graphUrl).openConnection()
+              graphConn.setRequestMethod("POST")
+              graphConn.setDoOutput(true)
+              graphConn.setRequestProperty("Content-Type", "application/json")
+              graphConn.setRequestProperty("x-auth-token", authToken)
+              graphConn.getOutputStream().write(projectQuery.getBytes("UTF-8"))
+              
+              def json = new JsonSlurper().parseText(graphConn.getInputStream().getText())
+              
+              // Find the matching instance and get its projects
+              def projects = []
+              json?.data?.instances?.edges?.each { instanceEdge ->
+                if (instanceEdge?.node?.name == sourceEnvName) {
+                  instanceEdge?.node?.projects?.edges?.each { projectEdge ->
+                    def pname = projectEdge?.node?.name
+                    if (pname) {
+                      projects.add(pname)
+                    }
+                  }
+                }
+              }
+              
+              if (projects.isEmpty()) {
+                return ["No projects found in ${sourceEnvName}"]
+              }
+              
+              return projects.sort()
+              
+            } catch (Exception e) {
+              return ["ERROR: " + e.getMessage()]
+            }
+          '''
+        ]
+      ]
+    ],
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // VERSIONED_ITEM: Reactive - fetches versioned item paths for selected source environment
+    // Returns only paths (no IDs), filtered by SOURCE_ENV only (not project)
+    // ─────────────────────────────────────────────────────────────────────────
+    [$class: 'CascadeChoiceParameter',
+      name: 'VERSIONED_ITEM',
+      description: 'Versioned item path to promote (fetched from MotioCI)',
+      choiceType: 'PT_SINGLE_SELECT',
+      filterLength: 1,
+      filterable: true,
+      randomName: 'versioned-item-choice',
+      referencedParameters: 'SOURCE_ENV',
+      script: [
+        $class: 'GroovyScript',
+        fallbackScript: [
+          classpath: [],
+          sandbox: true,
+          script: '''
+            return ["Error fetching versioned items"]
+          '''
+        ],
+        script: [
+          classpath: [],
+          sandbox: false,
+          script: '''
+            import groovy.json.JsonSlurper
+            import javax.net.ssl.*
+            
+            // SSL bypass
+            def trustAllCerts = [
+              checkClientTrusted: { chain, authType -> },
+              checkServerTrusted: { chain, authType -> },
+              getAcceptedIssuers: { null }
+            ] as X509TrustManager
+            def sc = SSLContext.getInstance("TLS")
+            sc.init(null, [trustAllCerts] as TrustManager[], new java.security.SecureRandom())
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+            HttpsURLConnection.setDefaultHostnameVerifier({ hostname, session -> true } as HostnameVerifier)
+            
+            def motioServer = "https://cgrptmcip01.cloud.cammis.ca.gov"
+            def graphUrl = "${motioServer}/api/graphql"
+            def loginUrl = "${motioServer}/api/login"
+            
+            if (!SOURCE_ENV || 
+                SOURCE_ENV.toString().startsWith("ERROR") || 
+                SOURCE_ENV.toString().startsWith("Select") || 
+                SOURCE_ENV.toString().startsWith("No ")) {
+              return ["Select source environment first"]
+            }
+            
+            try {
+              // Get credentials
+              def credentialsJson = ""
+              def creds = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+                com.cloudbees.plugins.credentials.common.StandardCredentials.class,
+                jenkins.model.Jenkins.instance, null, null
+              ).find { it.id == 'cognos-credentials' }
+              if (creds instanceof org.jenkinsci.plugins.plaincredentials.FileCredentials) {
+                credentialsJson = creds.getContent().text
+              }
+              if (!credentialsJson) return ["ERROR: No credentials"]
+              
+              // Login
+              def loginConn = new URL(loginUrl).openConnection()
+              loginConn.setRequestMethod("POST")
+              loginConn.setDoOutput(true)
+              loginConn.setRequestProperty("Content-Type", "application/json")
+              loginConn.getOutputStream().write(credentialsJson.getBytes("UTF-8"))
+              if (loginConn.getResponseCode() != 200) return ["ERROR: Login failed"]
+              def authToken = loginConn.getHeaderField("x-auth-token")
+              if (!authToken) return ["ERROR: No token"]
+              
+              // Query versioned items - only prettyPath, no ID
+              def sourceEnvName = SOURCE_ENV.toString()
+              
+              // Query all versioned items for the instance (across all projects)
+              def query = '{"query":"{ instances { edges { node { name projects { edges { node { versionedItems(currentOnly: true) { edges { node { prettyPath } } } } } } } } } }"}'
+              
+              def graphConn = new URL(graphUrl).openConnection()
+              graphConn.setRequestMethod("POST")
+              graphConn.setDoOutput(true)
+              graphConn.setRequestProperty("Content-Type", "application/json")
+              graphConn.setRequestProperty("x-auth-token", authToken)
+              graphConn.getOutputStream().write(query.getBytes("UTF-8"))
+              
+              def json = new JsonSlurper().parseText(graphConn.getInputStream().getText())
+              
+              // Find the matching instance, get all versioned items (across all projects)
+              def paths = []
+              json?.data?.instances?.edges?.each { instanceEdge ->
+                if (instanceEdge?.node?.name == sourceEnvName) {
+                  instanceEdge?.node?.projects?.edges?.each { projectEdge ->
+                    projectEdge?.node?.versionedItems?.edges?.each { itemEdge ->
+                      def path = itemEdge?.node?.prettyPath
+                      if (path) {
+                        // Force string conversion
+                        String pathStr = "" + path
+                        paths.add(pathStr)
+                      }
+                    }
+                  }
+                }
+              }
+              
+              if (paths.isEmpty()) {
+                return ["No versioned items in ${sourceEnvName}"]
+              }
+              
+              // Return unique sorted paths
+              return paths.unique().sort()
+              
+            } catch (Exception e) {
+              return ["ERROR: " + e.getMessage()]
+            }
+          '''
+        ]
+      ]
+    ],
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // ROLLBACK_LABEL: Reactive - fetches existing labels for rollback
+    // ─────────────────────────────────────────────────────────────────────────
+    [$class: 'CascadeChoiceParameter',
+      name: 'ROLLBACK_LABEL',
+      description: 'Optional: select existing label to redeploy (for rollback)',
+      choiceType: 'PT_SINGLE_SELECT',
+      filterLength: 1,
+      filterable: true,
+      randomName: 'rollback-label-choice',
+      referencedParameters: 'SOURCE_ENV,PROJECT_NAME',
+      script: [
+        $class: 'GroovyScript',
+        fallbackScript: [
+          classpath: [],
+          sandbox: true,
+          script: '''
+            return ["(None - Create New Deployment)"]
+          '''
+        ],
+        script: [
+          classpath: [],
+          sandbox: false,
+          script: '''
+            import groovy.json.JsonSlurper
+            import javax.net.ssl.*
+            
+            // SSL bypass
+            def trustAllCerts = [
+              checkClientTrusted: { chain, authType -> },
+              checkServerTrusted: { chain, authType -> },
+              getAcceptedIssuers: { null }
+            ] as X509TrustManager
+            def sc = SSLContext.getInstance("TLS")
+            sc.init(null, [trustAllCerts] as TrustManager[], new java.security.SecureRandom())
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+            HttpsURLConnection.setDefaultHostnameVerifier({ hostname, session -> true } as HostnameVerifier)
+            
+            def motioServer = "https://cgrptmcip01.cloud.cammis.ca.gov"
+            def graphUrl = "${motioServer}/api/graphql"
+            def loginUrl = "${motioServer}/api/login"
+            
+            // First option is always "no rollback"
+            def labels = ["(None - Create New Deployment)"]
+            
+            if (!SOURCE_ENV || !PROJECT_NAME || 
+                SOURCE_ENV.toString().startsWith("ERROR") || PROJECT_NAME.toString().startsWith("ERROR") ||
+                SOURCE_ENV.toString().startsWith("Select") || PROJECT_NAME.toString().startsWith("No ") ||
+                PROJECT_NAME.toString().contains("object Object")) {
+              return labels
+            }
+            
+            try {
+              // Get credentials
+              def credentialsJson = ""
+              def creds = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+                com.cloudbees.plugins.credentials.common.StandardCredentials.class,
+                jenkins.model.Jenkins.instance, null, null
+              ).find { it.id == 'cognos-credentials' }
+              if (creds instanceof org.jenkinsci.plugins.plaincredentials.FileCredentials) {
+                credentialsJson = creds.getContent().text
+              }
+              if (!credentialsJson) return labels
+              
+              // Login
+              def loginConn = new URL(loginUrl).openConnection()
+              loginConn.setRequestMethod("POST")
+              loginConn.setDoOutput(true)
+              loginConn.setRequestProperty("Content-Type", "application/json")
+              loginConn.getOutputStream().write(credentialsJson.getBytes("UTF-8"))
+              if (loginConn.getResponseCode() != 200) return labels
+              def authToken = loginConn.getHeaderField("x-auth-token")
+              if (!authToken) return labels
+              
+              // Query all labels then filter by instance and project
+              def sourceEnvName = SOURCE_ENV.toString()
+              def projectName = PROJECT_NAME.toString()
+              
+              def query = '{"query":"{ instances { edges { node { name projects { edges { node { name labels { edges { node { name } } } } } } } } } }"}'
+              
+              def graphConn = new URL(graphUrl).openConnection()
+              graphConn.setRequestMethod("POST")
+              graphConn.setDoOutput(true)
+              graphConn.setRequestProperty("Content-Type", "application/json")
+              graphConn.setRequestProperty("x-auth-token", authToken)
+              graphConn.getOutputStream().write(query.getBytes("UTF-8"))
+              
+              def json = new JsonSlurper().parseText(graphConn.getInputStream().getText())
+              
+              // Find the matching instance and project, get its labels
+              json?.data?.instances?.edges?.each { instanceEdge ->
+                if (instanceEdge?.node?.name == sourceEnvName) {
+                  instanceEdge?.node?.projects?.edges?.each { projectEdge ->
+                    if (projectEdge?.node?.name == projectName) {
+                      projectEdge?.node?.labels?.edges?.each { labelEdge ->
+                        def labelName = labelEdge?.node?.name
+                        if (labelName) {
+                          labels.add(labelName)
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              
+              return labels
+              
+            } catch (Exception e) {
+              return labels
+            }
+          '''
+        ]
+      ]
+    ]
+  ])
+])
+
+// ═══════════════════════════════════════════════════════════════════════════════════
+// PIPELINE DEFINITION
+// ═══════════════════════════════════════════════════════════════════════════════════
 
 pipeline {
   agent {
@@ -105,151 +693,46 @@ spec:
   }
 
   stages {
-
     stage('Initialize') {
       steps {
         script {
           echo "Branch: ${env.GIT_BRANCH}"
-    
-    properties([
-  parameters([
-
-    //Source Environment
-    [
-      $class: 'ChoiceParameter',
-      choiceType: 'PT_SINGLE_SELECT',
-      name: 'SOURCE_ENV',
-      description: 'Select Cognos Source Environment',
-      script: [
-        $class: 'GroovyScript',
-        fallbackScript: [
-          classpath: [], sandbox: true,
-          script: "return ['Error loading environments']"
-        ],
-        script: [
-          classpath: [], sandbox: true,
-          script: """
-            return ['Cognos-DEV/TEST', 'Cognos-SIT', 'Cognos-UAT']
+          
+          // Handle rollback label selection
+          def rollbackLabel = params.ROLLBACK_LABEL
+          if (rollbackLabel == "(None - Create New Deployment)") {
+            rollbackLabel = ""
+          }
+          env.ROLLBACK_LABEL_CLEANED = rollbackLabel
+          
+          // VERSIONED_ITEM is now just the path (no ID)
+          env.VERSIONED_ITEM_PATH = params.VERSIONED_ITEM ?: ""
+          
+          echo """
+          ================================================
+          MotioCI → Cognos Deployment Pipeline (Enhanced)
+          ================================================
+          Source: ${params.SOURCE_ENV}
+          Target: ${params.TARGET_ENV}
+          Project: ${params.PROJECT_NAME}
+          Versioned Item Path: ${env.VERSIONED_ITEM_PATH}
+          Rollback Label: ${env.ROLLBACK_LABEL_CLEANED ?: "N/A (New Deployment)"}
+          ================================================
           """
-        ]
-      ]
-    ],
-
-    //Target Environment (Reactive)
-    [
-      $class: 'CascadeChoiceParameter',
-      choiceType: 'PT_SINGLE_SELECT',
-      name: 'TARGET_ENV',
-      description: 'Select Target Cognos Environment',
-      referencedParameters: 'SOURCE_ENV',
-      script: [
-        $class: 'GroovyScript',
-        fallbackScript: [
-          classpath: [], sandbox: true,
-          script: "return ['Error loading targets']"
-        ],
-        script: [
-          classpath: [], sandbox: true,
-          script: """
-            if (SOURCE_ENV == 'Cognos-DEV/TEST') return ['Cognos-SIT','Cognos-UAT','Cognos-PRD']
-            else if (SOURCE_ENV == 'Cognos-SIT') return ['Cognos-UAT','Cognos-PRD']
-            else return ['Cognos-PRD']
-          """
-        ]
-      ]
-    ],
-
-    //Dynamic Project List (from projects.txt)
-    [
-      $class: 'ChoiceParameter',
-      choiceType: 'PT_SINGLE_SELECT',
-      name: 'PROJECT_NAME',
-      description: 'Select MotioCI Project (auto-loaded after first login)',
-      script: [
-        $class: 'GroovyScript',
-        fallbackScript: [
-          classpath: [], sandbox: true,
-          script: "return ['(Run MotioCI Login once to fetch projects)']"
-        ],
-        script: [
-          classpath: [], sandbox: true,
-          script: """
-            import java.nio.file.*
-            def f = new File("${WORKSPACE}/projects.txt")
-            if (f.exists()) {
-              def lines = f.readLines().findAll { it?.trim() }
-              if (lines) return lines
-              else return ['(No projects found — rerun login)']
-            } else {
-              return ['(projects.txt not found — run MotioCI Login stage first)']
-            }
-          """
-        ]
-      ]
-    ],
-
-    //Dynamic Folder List (depends on Project)
-    [
-      $class: 'CascadeChoiceParameter',
-      choiceType: 'PT_SINGLE_SELECT',
-      name: 'OBJECT_PATH',
-      description: 'Select Folder or Report Path (auto-loaded from folders.txt)',
-      referencedParameters: 'PROJECT_NAME',
-      script: [
-        $class: 'GroovyScript',
-        fallbackScript: [
-          classpath: [], sandbox: true,
-          script: "return ['(No folders found)']"
-        ],
-        script: [
-          classpath: [], sandbox: true,
-          script: """
-            import java.nio.file.*
-            def f = new File("${WORKSPACE}/folders.txt")
-            if (f.exists()) {
-              def lines = f.readLines().findAll { it?.trim() }
-              if (lines) return lines
-              else return ['(Empty — rerun login)']
-            } else {
-              return ['(folders.txt not found — run MotioCI Login)']
-            }
-          """
-        ]
-      ]
-    ],
-
-    //Manual Project & Path overrides
-    [
-      $class: 'DynamicReferenceParameter',
-      name: 'PROJECT_NAME',
-      description: 'Enter Project manually if not listed',
-      defaultValue: ''
-    ],
-    [
-      $class: 'DynamicReferenceParameter',
-      name: 'OBJECT_PATH',
-      description: 'Enter Folder Path manually if not listed',
-      defaultValue: ''
-    ],
-    [
-      $class: 'StringParameterDefinition',
-      name: 'ROLLBACK_LABEL',
-      defaultValue: '',
-      description: 'Enter existing label name to redeploy'
-    ]
-  ])
-])           
-        echo """
-                  ================================================
-                  MotioCI → Cognos Deployment Pipeline (Enhanced)
-                  ================================================
-                  Source: ${params.SOURCE_ENV}
-                  Target: ${params.TARGET_ENV}
-                  Project: ${params.PROJECT_NAME}
-                  Object Path: ${params.OBJECT_PATH}
-                  Rollback Label: ${params.ROLLBACK_LABEL ?: "N/A"}
-                  ================================================
-                  """
+          
+          // Validate parameters
+          if (params.SOURCE_ENV?.startsWith("ERROR") || params.SOURCE_ENV?.startsWith("Select")) {
+            error("Invalid SOURCE_ENV selection: ${params.SOURCE_ENV}")
+          }
+          if (params.TARGET_ENV?.startsWith("ERROR") || params.TARGET_ENV?.startsWith("No target") || params.TARGET_ENV?.startsWith("Select")) {
+            error("Invalid TARGET_ENV selection: ${params.TARGET_ENV}")
+          }
+          if (params.PROJECT_NAME?.startsWith("ERROR") || params.PROJECT_NAME?.startsWith("Select") || params.PROJECT_NAME?.startsWith("No ")) {
+            error("Invalid PROJECT_NAME selection: ${params.PROJECT_NAME}")
+          }
+          if (!env.VERSIONED_ITEM_PATH || params.VERSIONED_ITEM?.startsWith("ERROR") || params.VERSIONED_ITEM?.startsWith("Select") || params.VERSIONED_ITEM?.startsWith("No ")) {
+            error("Invalid VERSIONED_ITEM selection: ${params.VERSIONED_ITEM}")
+          }
         }
       }
     }
@@ -287,177 +770,143 @@ spec:
               echo "$TOKEN" > ../token.txt
               echo "Login successful"
             '''
-          echo "Fetching available projects for ${SOURCE_ENV}..."
-python3 ci-cli.py --server="$MOTIO_SERVER" \
-  project ls --xauthtoken "$TOKEN" \
-  --instanceName "${SOURCE_ENV}" > ../projects_raw.json
-
-
-grep -o "'name': '[^']*'" ../projects_raw.json | cut -d"'" -f4 | sort | uniq > ../../projects.txt || true
-echo "Saved project list to: $WORKSPACE/projects.txt"
-head -n 10 ../../projects.txt || echo "(No projects found)"
-
-if [ -n "${PROJECT_NAME:-}" ]; then
-  echo "Fetching folders for project: ${PROJECT_NAME}"
-  python3 ci-cli.py --server="$MOTIO_SERVER" \
-    versionedItems ls --xauthtoken "$TOKEN" \
-    --instanceName "${SOURCE_ENV}" \
-    --projectName "${PROJECT_NAME}" > ../folders_raw.json || true
-
-  grep "prettyPath" ../folders_raw.json | cut -d"'" -f4 | sort | uniq > ../../folders.txt || true
-  echo "Saved folder list to: $WORKSPACE/folders.txt"
-  head -n 10 ../../folders.txt || echo "(No folders found)"
-else
-  echo "Skipping folder discovery — PROJECT_NAME not provided yet."
-fi
-
-ls -lh ../../projects.txt ../../folders.txt || true
-        }
-      }
-    }
-}
-stage('Prepare deployment') {
-  when { expression { return !params.ROLLBACK_LABEL?.trim() } }
-  steps {
-    container('python') {
-      sh '''
-        set -e
-        cd MotioCI/api/CLI
-
-        TOKEN=$(cat ../token.txt)
-        echo "Using MotioCI token (length: ${#TOKEN})"
-
-        echo "Project: ${PROJECT_NAME}"
-        echo "Object Path: ${OBJECT_PATH:-<none>}"
-
-        # List all versioned items for the project
-        echo "Discovering versioned items in project ${PROJECT_NAME}..."
-        python3 ci-cli.py --server="$MOTIO_SERVER" \
-          versionedItems ls \
-          --xauthtoken "$TOKEN" \
-          --instanceName "${SOURCE_ENV}" \
-          --projectName "${PROJECT_NAME}" > items_full.out
-
-        echo "Total items listed (raw): $(grep -c \"'id':\" items_full.out || true)"
-
-        # ------------------------------------------------------------
-        # Determine which IDs to label (whole project vs. specific path)
-        # ------------------------------------------------------------
-        if [ -z "${OBJECT_PATH}" ]; then
-          echo "No OBJECT_PATH provided — deploying the entire project ${PROJECT_NAME}"
-          grep "'id':" items_full.out | grep -v "instanceId" | grep -o "[0-9][0-9]*" \
-            | paste -sd, - > ids.txt || true
-        else
-          echo "Filtering for path: ${OBJECT_PATH}"
-          grep -A8 "prettyPath.: '${OBJECT_PATH}'" items_full.out > items.out || true
-          grep "'id':" items.out | grep -v "instanceId" | grep -o "[0-9][0-9]*" \
-            | paste -sd, - > ids.txt || true
-        fi
-
-        IDS=$(cat ids.txt || true)
-
-        if [ -z "$IDS" ]; then
-          echo "ERROR: No versioned items found for selection."
-          echo "Hint: Check if the object is versioned or the path is correct."
-          exit 1
-        fi
-
-        ID_COUNT=$(echo $IDS | tr ',' '\\n' | wc -l | tr -d ' ')
-        echo "Found ${ID_COUNT} versioned item(s)."
-        echo "Matched IDs: $IDS"
-
-        # ------------------------------------------------------------
-        # Create Deployment label for identified IDs
-        # ------------------------------------------------------------
-        VERSION_NAME="AutoLabel_${BUILD_NUMBER}_$(date +%Y%m%d_%H%M)"
-        echo "Creating Deployment Label: $VERSION_NAME with IDs [$IDS]"
-        python3 ci-cli.py --server="$MOTIO_SERVER" label create \
-          --xauthtoken "$TOKEN" \
-          --instanceName "${SOURCE_ENV}" \
-          --projectName "${PROJECT_NAME}" \
-          --name "$VERSION_NAME" \
-          --versionedItemIds "[$IDS]"
-
-        # ------------------------------------------------------------
-        # Fetch and store Label ID
-        # ------------------------------------------------------------
-        python3 ci-cli.py --server="$MOTIO_SERVER" label ls \
-          --xauthtoken "$TOKEN" \
-          --instanceName "${SOURCE_ENV}" \
-          --projectName "${PROJECT_NAME}" \
-          --labelName "$VERSION_NAME" > label_info.out
-
-        LABEL_ID=$(python3 -c "import ast; data=open('label_info.out').read(); \
-          parsed=ast.literal_eval(data); \
-          print(parsed['data']['instances']['edges'][0]['node']['projects']['edges'][0]['node']['labels']['edges'][0]['node']['id'])" \
-          2>/dev/null || echo "")
-
-        if [ -z "$LABEL_ID" ]; then
-          echo "ERROR: Unable to retrieve label ID!"
-          exit 1
-        fi
-
-        echo "$LABEL_ID" > ../label_id.txt
-        echo "Label $VERSION_NAME (ID: $LABEL_ID) created successfully."
-
-      '''
-    }
-  }
-}
-    
-  stage('Deploy') {
-      steps {
-        container('python') {
-          withCredentials([string(credentialsId: 'cognos-api-key-prd', variable: 'COGNOS_API_KEY_PRD')]) {
-            sh '''
-              set -e
-              cd MotioCI/api/CLI
-
-              # If rollback specified, skip label creation
-              if [ -n "${ROLLBACK_LABEL}" ]; then
-                echo "Using existing rollback label: ${ROLLBACK_LABEL}"
-                echo "0" > ../label_id.txt
-              fi
-
-              TOKEN=$(cat ../token.txt)
-              echo "Obtaining PROD CAMPassport..."
-              BASE="https://dhcsprodcognos.ca.analytics.ibm.com/api/v1"
-              echo "{\\"parameters\\":[{\\"name\\":\\"CAMAPILoginKey\\",\\"value\\":\\"$COGNOS_API_KEY_PRD\\"}]}" > login.json
-              curl -sS -X PUT "$BASE/session" -H "Content-Type: application/json" -d @login.json -o session.json
-              SESSION_KEY=$(python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))')
-              SESSION_KEY=$(echo "$SESSION_KEY" | sed 's/^CAM[ ]*//')
-              echo "✓ CAMPassport captured"
-
-              if [ -n "${ROLLBACK_LABEL}" ]; then
-                LABEL_NAME="${ROLLBACK_LABEL}"
-                echo "Promoting rollback label ${ROLLBACK_LABEL}"
-                DEPLOY_LABEL_NAME="Rollback_${BUILD_NUMBER}"
-              else
-                LABEL_ID=$(cat ../label_id.txt)
-                LABEL_NAME=""
-                DEPLOY_LABEL_NAME="PROMOTED_${BUILD_NUMBER}"
-              fi
-
-              echo "Deploying to ${TARGET_ENV}..."
-              python3 ci-cli.py --server="$MOTIO_SERVER" deploy \
-                --xauthtoken "$TOKEN" \
-                --sourceInstanceName "${SOURCE_ENV}" \
-                --targetInstanceName "${TARGET_ENV}" \
-                --projectName "${PROJECT_NAME}" \
-                ${LABEL_NAME:+--labelName "$LABEL_NAME"} \
-                ${LABEL_ID:+--labelId "$LABEL_ID"} \
-                --targetLabelName "$DEPLOY_LABEL_NAME" \
-                --camPassportId "$SESSION_KEY" > deploy.out 2>&1 || true
-
-              cat deploy.out
-              if grep -q '"errors"' deploy.out; then echo "Deployment failed"; exit 1; fi
-              echo "Deployment executed successfully."
-            '''
           }
         }
       }
     }
-  }
+
+    stage('Prepare deployment') {
+      when { expression { return !env.ROLLBACK_LABEL_CLEANED?.trim() } }
+      steps {
+        container('python') {
+          sh '''
+            set -e
+            cd MotioCI/api/CLI
+
+            TOKEN=$(cat ../token.txt)
+            echo "Using MotioCI token (length: ${#TOKEN})"
+
+            ITEM_PATH="${VERSIONED_ITEM_PATH}"
+            
+            if [ -z "${ITEM_PATH}" ]; then
+              echo "ERROR: Versioned Item Path not provided!"
+              exit 1
+            fi
+            
+            echo "Versioned Item Path: ${ITEM_PATH}"
+            echo "Project: ${PROJECT_NAME}"
+            echo "Source Instance: ${SOURCE_ENV}"
+
+            # Look up versioned item ID from the path
+            echo "Looking up versioned item ID for path: ${ITEM_PATH}"
+            python3 ci-cli.py --server="$MOTIO_SERVER" \
+              versionedItems ls \
+              --xauthtoken "$TOKEN" \
+              --instanceName "${SOURCE_ENV}" \
+              --projectName "${PROJECT_NAME}" > items_full.out
+
+            # Find the ID for the exact path
+            grep -A8 "prettyPath.: '${ITEM_PATH}'" items_full.out > items.out || true
+            
+            # Extract the ID
+            ITEM_ID=$(grep "'id':" items.out | grep -v "instanceId" | grep -o "[0-9][0-9]*" | head -1 || true)
+            
+            if [ -z "${ITEM_ID}" ]; then
+              echo "ERROR: Could not find versioned item ID for path: ${ITEM_PATH}"
+              echo "Available paths in this project:"
+              grep "prettyPath" items_full.out | head -20
+              exit 1
+            fi
+            
+            echo "Found Versioned Item ID: ${ITEM_ID}"
+
+            # Create deployment label with the versioned item ID
+            VERSION_NAME="AutoLabel_${BUILD_NUMBER}_$(date +%Y%m%d_%H%M)"
+            echo "Creating Deployment Label: $VERSION_NAME with ID [${ITEM_ID}]"
+            python3 ci-cli.py --server="$MOTIO_SERVER" label create \
+              --xauthtoken "$TOKEN" \
+              --instanceName "${SOURCE_ENV}" \
+              --projectName "${PROJECT_NAME}" \
+              --name "$VERSION_NAME" \
+              --versionedItemIds "[${ITEM_ID}]"
+
+            # Get the label ID for deployment
+            python3 ci-cli.py --server="$MOTIO_SERVER" label ls \
+              --xauthtoken "$TOKEN" \
+              --instanceName "${SOURCE_ENV}" \
+              --projectName "${PROJECT_NAME}" \
+              --labelName "$VERSION_NAME" > label_info.out
+
+            LABEL_ID=$(python3 -c "import ast; data=open('label_info.out').read(); parsed=ast.literal_eval(data); print(parsed['data']['instances']['edges'][0]['node']['projects']['edges'][0]['node']['labels']['edges'][0]['node']['id'])" 2>/dev/null || echo "")
+            echo "$LABEL_ID" > ../label_id.txt
+            echo "Label $VERSION_NAME (ID: $LABEL_ID) created successfully."
+
+            echo "Verifying label contents ..."
+            python3 ci-cli.py --server="$MOTIO_SERVER" label ls \
+              --xauthtoken "$TOKEN" \
+              --instanceName "${SOURCE_ENV}" \
+              --projectName "${PROJECT_NAME}" \
+              --labelName "$VERSION_NAME" > label_verify.out
+            grep "prettyPath" label_verify.out || echo "(no paths found)"
+          '''
+        }
+      }
+    }
+    
+    stage('Retrieve CAMPassport & Deploy') {
+        steps {
+          container('python') {
+            withCredentials([string(credentialsId: 'cognos-api-key-prd', variable: 'COGNOS_API_KEY_PRD')]) {
+              sh '''
+                set -e
+                cd MotioCI/api/CLI
+
+                # If rollback specified, skip label creation
+                ROLLBACK_LABEL="${ROLLBACK_LABEL_CLEANED}"
+                if [ -n "${ROLLBACK_LABEL}" ]; then
+                  echo "Using existing rollback label: ${ROLLBACK_LABEL}"
+                  echo "0" > ../label_id.txt
+                fi
+
+                TOKEN=$(cat ../token.txt)
+                echo "Obtaining PROD CAMPassport..."
+                BASE="https://dhcsprodcognos.ca.analytics.ibm.com/api/v1"
+                echo "{\\"parameters\\":[{\\"name\\":\\"CAMAPILoginKey\\",\\"value\\":\\"$COGNOS_API_KEY_PRD\\"}]}" > login.json
+                curl -sS -X PUT "$BASE/session" -H "Content-Type: application/json" -d @login.json -o session.json
+                SESSION_KEY=$(python3 -c 'import json; print(json.load(open("session.json")).get("session_key",""))')
+                SESSION_KEY=$(echo "$SESSION_KEY" | sed 's/^CAM[ ]*//')
+                echo "✓ CAMPassport captured"
+
+                if [ -n "${ROLLBACK_LABEL}" ]; then
+                  LABEL_NAME="${ROLLBACK_LABEL}"
+                  echo "Promoting rollback label ${ROLLBACK_LABEL}"
+                  DEPLOY_LABEL_NAME="Rollback_${BUILD_NUMBER}"
+                else
+                  LABEL_ID=$(cat ../label_id.txt)
+                  LABEL_NAME=""
+                  DEPLOY_LABEL_NAME="PROMOTED_${BUILD_NUMBER}"
+                fi
+
+                echo "Deploying to ${TARGET_ENV}..."
+                python3 ci-cli.py --server="$MOTIO_SERVER" deploy \
+                  --xauthtoken "$TOKEN" \
+                  --sourceInstanceName "${SOURCE_ENV}" \
+                  --targetInstanceName "${TARGET_ENV}" \
+                  --projectName "${PROJECT_NAME}" \
+                  ${LABEL_NAME:+--labelName "$LABEL_NAME"} \
+                  ${LABEL_ID:+--labelId "$LABEL_ID"} \
+                  --targetLabelName "$DEPLOY_LABEL_NAME" \
+                  --camPassportId "$SESSION_KEY" > deploy.out 2>&1 || true
+
+                cat deploy.out
+                if grep -q '"errors"' deploy.out; then echo "Deployment failed"; exit 1; fi
+                echo "Deployment executed successfully."
+              '''
+            }
+          }
+        }
+      }
+    }
 
   post {
     always {
@@ -471,3 +920,5 @@ stage('Prepare deployment') {
     }
   }
 }
+
+
