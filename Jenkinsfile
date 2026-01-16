@@ -179,7 +179,7 @@ pipeline {
                       mkdir -p tar-surge-app/${env_promotion_to_environment}
                       touch tar-surge-app/${env_promotion_to_environment}/tempfile
                       rm -r tar-surge-app/${env_promotion_to_environment}/*
-                      cp -a tar-surge-app/uat/. tar-surge-app/${env_promotion_to_environment}/
+                      cp -a tar-surge-app/${env_promotion_from_environment}/. tar-surge-app/${env_promotion_to_environment}/
                       git add -Av
 
                       if ! git diff-index --quiet HEAD; then
@@ -215,7 +215,7 @@ pipeline {
             // Need to copy files from env_promotion_to_environment back into the devops/codedeploy directory to then deploy
 
             sh """
-              cp -a ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/uat/. ${WORKSPACE}/devops/codedeploy/
+              cp -a ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/${env_promotion_to_environment}/. ${WORKSPACE}/devops/codedeploy/
               sed -i "s,{DEPLOY_FILES},true," ${WORKSPACE}/devops/codedeploy/after-install.bat
             """
             SURGE_ENV = "${env_promotion_to_environment}".toUpperCase()
