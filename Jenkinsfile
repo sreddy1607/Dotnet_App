@@ -1,19 +1,15 @@
-version: 0.0
-os: windows
-files:
-  - source: \scripts
-    destination: D:\tar-surge-Api-staging\scripts
-  - source: \serverconfig
-    destination: D:\tar-surge-Api-staging\serverconfig
-  - source: \environment
-    destination: D:\tar-surge-Api-staging\environment
-  - source: \surgeapi
-    destination: D:\tar-surge-Api-staging\Apiservices  
-file_exists_behavior: OVERWRITE    
-hooks:
-  BeforeInstall:
-    - location: \before-install.bat
-      timeout: 900
-  AfterInstall:
-    - location: \after-install.bat
-      timeout: 900
+REM Install Internet Information Server (IIS). 
+c:\Windows\Sysnative\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command Import-Module -Name ServerManager
+c:\Windows\Sysnative\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command Install-WindowsFeature Web-Server
+
+REM Backup existing configuration for IIS
+C:\Windows\System32\inetsrv\appcmd.exe add backup
+
+REM Ensure that api directory is empty before deploying files
+DEL /S /Q D:\tar-surge-Api-staging\Apiservices\*
+
+DEL /S /Q D:\tar-surge-Api-staging\serverconfig\*
+DEL /S /Q D:\tar-surge-Api-staging\environment\*
+DEL /S /Q D:\tar-surge-Api-staging\scripts\*
+
+exit 0
