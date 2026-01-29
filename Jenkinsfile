@@ -1,27 +1,112 @@
-@echo off
+function Stop-Web-App-Pool($AppPoolName) {
+  if ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped" ) {
+      Write-Host $AppPoolName " already stopped"
+  }
+  else {
+      Write-Host "Shutting down the " $AppPoolName
+      Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
+      Stop-WebAppPool -Name $AppPoolName 
+  }
 
-REM Remove the files necessary to get apps pushed if they are empty
-DEL D:\tar-surge-Api-staging\Apiservices\placeholder.txt
+  do {
+      Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
+      Start-Sleep -Seconds 1
+  }
+  until ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped" )
+}
 
-REM These values are replaced during the build based on parameters set
-SET "DEPLOY_FILES={DEPLOY_FILES}"
-SET "DEPLOY_CONFIG={DEPLOY_CONFIG}" 
-SET "DEPLOY_ENVIRONMENT={DEPLOY_ENVIRONMENT}"
+function Stop-Web-Site($WebsiteName) {
+  if ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped" ) {
+      Write-Host $WebsiteName " already stopped"
+  }
+  else {
+      Write-Host "Shutting down the " $WebsiteName
+      Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
+      Stop-Website -Name $WebsiteName 
+  }
 
-REM If environment is being pushed, perform thes first
-if %DEPLOY_ENVIRONMENT%==true (
-    echo "ENVIRONMENT will be deployed"
-    C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -NoProfile D:\tar-surge-Api-staging\environment\deploy-environment.ps1
-)
+  do {
+      Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
+      Start-Sleep -Seconds 1
+  }
+  until ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped" )
+}
 
-REM If config is being pushed for the environment, perform these steps second
-if %DEPLOY_CONFIG%==true (
-    echo "CONFIG will be deployed"
-    C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -NoProfile D:\tar-surge-Api-staging\serverconfig\deploy-config.ps1
-)
+# This is needed because AWS CodeDeploy Agent runs in 32-bit mode,
+# script below needs to run in 64-bit mode.
 
-REM Finally, if files are being pushed, perform these steps last
-if %DEPLOY_FILES%==true (
-    echo "FILES will be deployed"
-    C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -NoProfile D:\tar-surge-Api-staging\scripts\deploy-files.ps1
-)
+# Are you running in 32-bit mode?
+#   (\SysWOW64\ = 32-bit mode)
+
+if ($PSHOME -like "*SysWOW64*")
+{
+  Write-Warning "Restarting this script under 64-bit Windows PowerShell."
+
+  # Restart this script under 64-bit Windows PowerShell.
+  #   (\SysNative\ redirects to \System32\ for 64-bit mode)
+
+  & (Join-Path ($PSHOME -replace "SysWOW64", "SysNative") powershell.exe) -File `
+    (Join-Path $PSScriptRoot $MyInvocation.MyCommand) @args
+
+  # Exit 32-bit script.
+
+  Exit $LastExitCode
+}
+
+# Was restart successful?
+Write-Warning "Hello from $PSHOME"
+Write-Warning "  (\SysWOW64\ = 32-bit mode, \System32\ = 64-bit mode)"
+Write-Warning "Original arguments (if any): $args"
+
+# Variables
+$SiteName = "Apiservices-SBX"
+
+# Stop Site and App Pools
+Write-Host "Stopping $SiteName"
+Stop-Web-Site("$SiteName")
+Write-Host "Stop status: $?"
+
+Write-Host "Sleeping for 5 seconds for web site to stop"
+Start-Sleep -Seconds 5
+
+Write-Host "Stopping Application Pools"
+Stop-Web-App-Pool("Apiservices-SBX")
+
+
+Write-Host "Sleeping for 5 seconds for app pools to stop"
+Start-Sleep -Seconds 5
+
+Write-Host "Status of Application Pools"
+Get-IISAppPool -Name Apiservices-SBX
+
+# Set environment variables for Vault access
+Write-Host "Setting environment variables for Vault access"
+[Environment]::SetEnvironmentVariable("VAULT_ADDRESS", "{VAULT_ADDR}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_APPROLE_ROLE_ID", "{APPROLE_ROLE_ID}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_APPROLE_SECRET_ID", "{APPROLE_SECRET_ID}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH", "{VAULT_SECRET_PATH}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH_LTAR", "{VAULT_SECRET_PATH_LTAR}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH_IMGVWR", "{VAULT_SECRET_PATH_IMGVWR}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_APPROLE_AUTH_PATH", "{VAULT_APPROLE_AUTH_PATH}", "Machine")
+
+[Environment]::SetEnvironmentVariable("SURGE_ENVNAME", "{SURGE_ENVNAME}", "Machine")
+[Environment]::SetEnvironmentVariable("SURGE_RPM_ROOT", "{SURGE_RPM_ROOT}", "Machine")
+[Environment]::SetEnvironmentVariable("SURGE_RPM_ONLINE_KEY", "/online", "Machine")
+
+
+Write-Host "Setting environment to enable Datadog file logging"
+[Environment]::SetEnvironmentVariable("DD_LOGS_ENABLED", "true", "Machine")
+
+# Start Site and App Pools
+Write-Host "Starting Application Pools"
+Start-WebAppPool -Name "Apiservices-SBX"
+
+
+Write-Host "Status of Application Pools"
+Get-IISAppPool -Name Apiservices-SBX
+
+Write-Host "Starting $SiteName"
+Start-Website -name "$SiteName"
+Write-Host "Start status: $?"
+
+Write-Host "Environment Deploy Complete"
