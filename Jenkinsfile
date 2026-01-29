@@ -1,112 +1,254 @@
-function Stop-Web-App-Pool($AppPoolName) {
-  if ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped" ) {
-      Write-Host $AppPoolName " already stopped"
-  }
-  else {
-      Write-Host "Shutting down the " $AppPoolName
-      Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
-      Stop-WebAppPool -Name $AppPoolName 
+/*
+=======================================================================================
+This file is being updated constantly by the DevOps team to introduce new enhancements
+based on the template.  If you have suggestions for improvement,
+please contact the DevOps team so that we can incorporate the changes into the
+template.  In the meantime, if you have made changes here or don't want this file to be
+updated, please indicate so at the beginning of this file.
+=======================================================================================
+*/
+
+def branch = env.BRANCH_NAME ?: "Dev"
+def workingDir = "/home/jenkins/agent"
+
+def SURGE_ENV
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+        apiVersion: v1
+        kind: Pod
+        spec:
+          serviceAccountName: jenkins
+          volumes:
+            - name: dockersock
+              hostPath:
+                path: /var/run/docker.sock
+            - emptyDir: {}
+              name: varlibcontainers
+            - name: jenkins-trusted-ca-bundle
+              configMap:
+                name: jenkins-trusted-ca-bundle
+                defaultMode: 420
+                optional: true
+          containers:
+            - name: dotnet
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammismspapp:1.0.34
+              tty: true
+              command: ["/bin/bash"]
+              securityContext:
+                privileged: true
+              workingDir: ${workingDir}
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+            - name: jnlp
+              securityContext:
+                privileged: true
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+            - name: node
+              image: registry.access.redhat.com/ubi8/nodejs-18:latest
+              tty: true
+              command: ["/bin/bash"]
+              securityContext:
+                privileged: true
+              workingDir: ${workingDir}
+              securityContext:
+                privileged: true
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+            - name: aws-boto3
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.0.1
+              tty: true
+              command: ["/bin/bash"]
+              workingDir: ${workingDir}
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+      """
+    }
   }
 
-  do {
-      Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
-      Start-Sleep -Seconds 1
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+    timeout(time:5 , unit: 'HOURS')
+    skipDefaultCheckout()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
   }
-  until ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped" )
+
+  environment {
+    env_current_git_commit=""
+    env_accesskey=""
+    env_secretkey=""
+    env_tag_name=""
+    env_deploy_env=""
+    env_DEPLOY_CONFIG="true"
+  }
+
+  stages {
+    stage("initialize") {
+      steps {
+        container(name: "node") {
+          script {
+
+            properties([
+              parameters([
+                choice(name: 'DEPLOY_ENV', choices: ['NONE','SBX','HFX'], description: 'Deployment Environment'),
+              ])
+            ])
+             WHEN SBX SELECTED II SHOULD BE EQUAL TO DEV 
+             WHEN HFX SELECTED IT SHOULD BE EQUAL TO SIT
+            // SURGE_ENV = params.DEPLOY_ENV
+            SURGE_ENV = params.DEPLOY_ENV
+
+            deleteDir()
+
+            checkout(scm).GIT_COMMIT
+
+            echo "Current deployment environment is ${SURGE_ENV}"
+          } //END script
+        } //END container node
+      } //END steps
+    } //END stage
+
+    stage('Prepare Deployment') {
+      when {
+        expression {
+          SURGE_ENV != "NONE"
+        }
+      }
+      steps {
+        container(name: "aws-boto3") {
+          script {
+            sh """#!/bin/bash
+              echo "Setting up app directories with files, or deployment will fail"
+              mkdir devops/codedeploy/surgeapi
+              touch devops/codedeploy/surgeapi/placeholder.txt
+              
+              
+              echo "Update after-install.bat to deploy config"
+              sed -i "s,{DEPLOY_CONFIG},${env_DEPLOY_CONFIG}," devops/codedeploy/after-install.bat
+              sed -i "s,{server-environment},${SURGE_ENV}," devops/codedeploy/serverconfig/index.html
+            """
+          } // end of script
+        } // end of container
+      } // end of steps
+    }  // end of Prepare Deployment Stage
+
+    stage('Deploy') {
+      when {
+        expression {
+          SURGE_ENV != "NONE"
+        }
+      }
+      steps {
+        container(name: "aws-boto3") {
+          script {
+            echo "Deploy to Non-DR"
+
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              step([$class: 'AWSCodeDeployPublisher',
+                  applicationName: "tar-surge-app-${SURGE_ENV}",
+                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                  credentials: 'awsAccessKey',
+                  deploymentConfig: "tar-surge-app-${SURGE_ENV}-config",
+                  deploymentGroupAppspec: false,
+                  deploymentGroupName: "tar-surge-app-${SURGE_ENV}-INPLACE-deployment-group",
+                  deploymentMethod: 'deploy',
+                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                  region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
+                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+            }
+
+            if ("${SURGE_ENV}" != "DEV") {
+              echo "Deploy to DR"
+              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                step([$class: 'AWSCodeDeployPublisher',
+                    applicationName: "tar-surge-app-${SURGE_ENV}-DR",
+                    awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                    awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                    credentials: 'awsAccessKey',
+                    deploymentConfig: "tar-surge-app-${SURGE_ENV}-DR-config",
+                    deploymentGroupAppspec: false,
+                    deploymentGroupName: "tar-surge-app-${SURGE_ENV}-DR-INPLACE-deployment-group",
+                    deploymentMethod: 'deploy',
+                    excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                    region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
+                    subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+              }
+            }
+          } // end of script
+        } // end of container
+      } // end of steps
+    } // end of Deploy stage
+  } // end of stages
+
+  //pipeline post actions
+  post {
+    always {
+        echo "Build Process complete."
+    } // always
+
+    success {
+        echo "Build Process was success."
+    } //success
+
+    unstable {
+        echo "Build is unstable."
+    } // unstable
+
+    aborted {
+        echo "Pipeline aborted."
+    } // aborted
+
+    failure {
+        echo "Build encountered failures ."
+    } // failure
+
+    changed {
+        echo "Build content was changed."
+    } // changed
+
+  } // post
 }
-
-function Stop-Web-Site($WebsiteName) {
-  if ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped" ) {
-      Write-Host $WebsiteName " already stopped"
-  }
-  else {
-      Write-Host "Shutting down the " $WebsiteName
-      Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
-      Stop-Website -Name $WebsiteName 
-  }
-
-  do {
-      Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
-      Start-Sleep -Seconds 1
-  }
-  until ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped" )
-}
-
-# This is needed because AWS CodeDeploy Agent runs in 32-bit mode,
-# script below needs to run in 64-bit mode.
-
-# Are you running in 32-bit mode?
-#   (\SysWOW64\ = 32-bit mode)
-
-if ($PSHOME -like "*SysWOW64*")
-{
-  Write-Warning "Restarting this script under 64-bit Windows PowerShell."
-
-  # Restart this script under 64-bit Windows PowerShell.
-  #   (\SysNative\ redirects to \System32\ for 64-bit mode)
-
-  & (Join-Path ($PSHOME -replace "SysWOW64", "SysNative") powershell.exe) -File `
-    (Join-Path $PSScriptRoot $MyInvocation.MyCommand) @args
-
-  # Exit 32-bit script.
-
-  Exit $LastExitCode
-}
-
-# Was restart successful?
-Write-Warning "Hello from $PSHOME"
-Write-Warning "  (\SysWOW64\ = 32-bit mode, \System32\ = 64-bit mode)"
-Write-Warning "Original arguments (if any): $args"
-
-# Variables
-$SiteName = "Apiservices-SBX"
-
-# Stop Site and App Pools
-Write-Host "Stopping $SiteName"
-Stop-Web-Site("$SiteName")
-Write-Host "Stop status: $?"
-
-Write-Host "Sleeping for 5 seconds for web site to stop"
-Start-Sleep -Seconds 5
-
-Write-Host "Stopping Application Pools"
-Stop-Web-App-Pool("Apiservices-SBX")
-
-
-Write-Host "Sleeping for 5 seconds for app pools to stop"
-Start-Sleep -Seconds 5
-
-Write-Host "Status of Application Pools"
-Get-IISAppPool -Name Apiservices-SBX
-
-# Set environment variables for Vault access
-Write-Host "Setting environment variables for Vault access"
-[Environment]::SetEnvironmentVariable("VAULT_ADDRESS", "{VAULT_ADDR}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_APPROLE_ROLE_ID", "{APPROLE_ROLE_ID}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_APPROLE_SECRET_ID", "{APPROLE_SECRET_ID}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH", "{VAULT_SECRET_PATH}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH_LTAR", "{VAULT_SECRET_PATH_LTAR}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH_IMGVWR", "{VAULT_SECRET_PATH_IMGVWR}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_APPROLE_AUTH_PATH", "{VAULT_APPROLE_AUTH_PATH}", "Machine")
-
-[Environment]::SetEnvironmentVariable("SURGE_ENVNAME", "{SURGE_ENVNAME}", "Machine")
-[Environment]::SetEnvironmentVariable("SURGE_RPM_ROOT", "{SURGE_RPM_ROOT}", "Machine")
-[Environment]::SetEnvironmentVariable("SURGE_RPM_ONLINE_KEY", "/online", "Machine")
-
-
-Write-Host "Setting environment to enable Datadog file logging"
-[Environment]::SetEnvironmentVariable("DD_LOGS_ENABLED", "true", "Machine")
-
-# Start Site and App Pools
-Write-Host "Starting Application Pools"
-Start-WebAppPool -Name "Apiservices-SBX"
-
-
-Write-Host "Status of Application Pools"
-Get-IISAppPool -Name Apiservices-SBX
-
-Write-Host "Starting $SiteName"
-Start-Website -name "$SiteName"
-Write-Host "Start status: $?"
-
-Write-Host "Environment Deploy Complete"
