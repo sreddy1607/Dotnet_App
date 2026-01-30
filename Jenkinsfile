@@ -1,54 +1,24 @@
 /*
- =======================================================================================
- This file is being updated constantly by the DevOps team to introduce new enhancements
- based on the template.  If you have suggestions for improvement,
- please contact the DevOps team so that we can incorporate the changes into the
- template.  In the meantime, if you have made changes here or don't want this file to be
- updated, please indicate so at the beginning of this file.
- =======================================================================================
- */
- 
- def branch = env.BRANCH_NAME ?: "master"
- def workingDir = "/home/jenkins/agent"
- 
- def VAULT_SECRET_PATH = [
-   "DEV":"kv-dev/data/us-west/dev-tar/tar-surgenet-service-secrets",
-   "SIT":"kv-tst/data/us-west/sit-tar/tar-surgenet-service-secrets",
-   "UAT":"kv-tst/data/us-west/uat-tar/tar-surgenet-service-secrets",
-   "PRD":"kv-prd/data/us-west/prd-tar/tar-surgenet-service-secrets"
- ]
- 
- def VAULT_SECRET_PATH_LTAR = [
-   "DEV":"kv-dev/data/us-west/dev-tar/tar-ltar-service-secrets",
-   "SIT":"kv-tst/data/us-west/sit-tar/tar-ltar-service-secrets",
-   "UAT":"kv-tst/data/us-west/uat-tar/tar-ltar-service-secrets",
-   "PRD":"kv-prd/data/us-west/prd-tar/tar-ltar-service-secrets"
- ]
- 
- def VAULT_SECRET_PATH_IMGVWR = [
-   "DEV":"kv-dev/data/us-west/dev-tar/tar-image-viewer-service-secrets",
-   "SIT":"kv-tst/data/us-west/sit-tar/tar-image-viewer-service-secrets",
-   "UAT":"kv-tst/data/us-west/uat-tar/tar-image-viewer-service-secrets",
-   "PRD":"kv-prd/data/us-west/prd-tar/tar-image-viewer-service-secrets"
- ]
+=======================================================================================
+This file is being updated constantly by the DevOps team to introduce new enhancements
+based on the template.  If you have suggestions for improvement,
+please contact the DevOps team so that we can incorporate the changes into the
+template.  In the meantime, if you have made changes here or don't want this file to be
+updated, please indicate so at the beginning of this file.
+=======================================================================================
+*/
 
-def SURGE_ENV_CONFIG = [
-  "DEV":  ["SURGE_ENVNAME": "DEV",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_dev/rpm_root"],
-  "SIT":  ["SURGE_ENVNAME": "SIT",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_sit/rpm_root"],
-  "UAT":  ["SURGE_ENVNAME": "UAT",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_uat/rpm_root"],
-  "PRD": ["SURGE_ENVNAME": "PRD",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_prd/rpm_root"]
-]
+def branch = env.BRANCH_NAME ?: "master"
+def workingDir = "/home/jenkins/agent"
 
- def SURGE_ENV
+def DEPLOY_FROM_ENV = [
+    "dev":"N/A",
+    "sit":"dev",
+    "uat":"sit",
+    "prd":"uat"
+  ]
 
-def VAULT_ADDR = [
-    "DEV":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
-    "SIT":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
-    "UAT":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
-    "PRD":"https://secrets.cammis.medi-cal.ca.gov/v1/"
-]
-
- def VAULT_APPROLE_AUTH_PATH="auth/approle/login"
+def SURGE_ENV
 
 
 pipeline {
@@ -160,9 +130,8 @@ pipeline {
     env_secretkey=""
     env_tag_name=""
     env_deploy_env=""
-    env_DEPLOY_ENVIRONMENT="true"
-    env_DEPLOY_FILES="false"
-    env_DEPLOY_CONFIG="false"
+    env_promotion_to_environment=""
+    env_promotion_from_environment=""
   }
 
   stages {
@@ -173,98 +142,87 @@ pipeline {
 
             properties([
               parameters([
-                choice(name: 'DEPLOY_ENV', choices: ['NONE','DEV','SIT','UAT','PRD'], description: 'Deployment Environment'),
+                choice(name: 'PROMOTE_TO_ENV', choices: ['sit','uat','prd'], description: 'Where to promote to?')
               ])
             ])
 
-            SURGE_ENV = params.DEPLOY_ENV
+            env_promotion_to_environment = params.PROMOTE_TO_ENV
+            env_promotion_from_environment=DEPLOY_FROM_ENV["${env_promotion_to_environment}"]
 
             deleteDir()
 
             checkout(scm).GIT_COMMIT
 
-            echo "Current deployment environment is ${SURGE_ENV}"
-
+            echo "Promoting to environment: ${env_promotion_to_environment}"
+            echo "Promoting from environment: ${env_promotion_from_environment}"
           } //END script
         } //END container node
       } //END steps
     } //END stage
 
     stage('Prepare Deployment') {
-      when {
-        expression {
-          SURGE_ENV != "NONE"
-        }
-      }
       steps {
         container(name: "aws-boto3") {
           script {
+            container(name: "jnlp") {
+              lock(resource: 'deployments-github-repo',inversePrecedence: false ) {
+              dir("${WORKSPACE}/deployrepo"){
+                  withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                    sh """
+                      pwd
+                      git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
+                      git config  --global user.email "jenkins@cammis.com"
+                      git config  --global user.name "jenkins"
+                      cd deployments-combined-devops
+                      git checkout master
+                      git pull
+                      mkdir -p tar-surge-app/${env_promotion_to_environment}
+                      touch tar-surge-app/${env_promotion_to_environment}/tempfile
+                      rm -r tar-surge-app/${env_promotion_to_environment}/*
+                      cp -a tar-surge-app/${env_promotion_from_environment}/. tar-surge-app/${env_promotion_to_environment}/
+                      git add -Av
 
-              def surgeEnv = SURGE_ENV_CONFIG[SURGE_ENV]
+                      if ! git diff-index --quiet HEAD; then
+                        git commit -m "Promotion of tar-surge-app from ${env_promotion_from_environment} to ${env_promotion_to_environment}"
+                        commitId=\""\$(git rev-parse --short=8 HEAD)"\"
+                        echo "The commit ID is: \$commitId"
+                        dateTime=\""\$(git show -s --format=%cd --date=format:%Y-%m-%d_%H-%M-%S \$commitId)"\"
+                        commitTag="Promote_tar-surge-app_to_${env_promotion_to_environment}_\${commitId}_\$dateTime"
+                        echo "The commit tag will be: \$commitTag"
+                        git tag -f -a \"\$commitTag\" -m "tag promotion" \"\$commitId\"
+                        git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
+                        git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git "\$commitTag"
 
-            sh """#!/bin/bash
-              echo "Setting up app directories with files, or deployment will fail"
-              mkdir devops/codedeploy/surgeapi
-              touch devops/codedeploy/surgeapi/placeholder.txt
-              
-              echo "Replacing tokenized values for accessing Vault"
-              
-              sed -i "s,{VAULT_ADDR},${VAULT_ADDR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_SECRET_PATH},${VAULT_SECRET_PATH["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_SECRET_PATH_LTAR},${VAULT_SECRET_PATH_LTAR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_SECRET_PATH_IMGVWR},${VAULT_SECRET_PATH_IMGVWR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_APPROLE_AUTH_PATH},${VAULT_APPROLE_AUTH_PATH}," devops/codedeploy/environment/deploy-environment.ps1
-
-         
-               sed -i "s,{SURGE_ENVNAME},${surgeEnv["SURGE_ENVNAME"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{SURGE_RPM_ROOT},${surgeEnv["SURGE_RPM_ROOT"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
-
-            """
-            if ("${SURGE_ENV}" != "PRD") {
-              withCredentials([string(credentialsId: 'APPROLE_ROLE_ID', variable: 'APPROLE_ROLE_ID')]) {
-                sh """#!/bin/bash
-                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                """
-              }
-
-              withCredentials([string(credentialsId: 'APPROLE_SECRET_ID', variable: 'APPROLE_SECRET_ID')]) {
-                sh """#!/bin/bash
-                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                  echo "Preparing Deployment"
-                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
-                """
-              }
-            } else {
-              withCredentials([string(credentialsId: 'APPROLE_ROLE_ID_PRD', variable: 'APPROLE_ROLE_ID')]) {
-                sh """#!/bin/bash
-                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                """
-              }
-
-              withCredentials([string(credentialsId: 'APPROLE_SECRET_ID_PRD', variable: 'APPROLE_SECRET_ID')]) {
-                sh """#!/bin/bash
-                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                  echo "Preparing Deployment"
-                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
-                """
-              }
-            }
+                      else
+                        echo "Nothing changes to commit to deployment repository, still will deploy..."
+                      fi
+                    """
+                  } //end withCredentials
+                } //end dir
+              } //end lock
+            }  //end container
           } // end of script
         } // end of container
       } // end of steps
     }  // end of Prepare Deployment Stage
 
     stage('Deploy') {
-      when {
-        expression {
-          SURGE_ENV != "NONE"
-        }
-      }
       steps {
         container(name: "aws-boto3") {
           script {
-            echo "Deploy to Non-DR"
+            echo "Deploy Using AWS CodeDeploy"
+
+            // Need to copy files from env_promotion_to_environment back into the devops/codedeploy directory to then deploy
+
+            sh """
+              cp -a ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/${env_promotion_to_environment}/. ${WORKSPACE}/devops/codedeploy/
+              sed -i "s,{DEPLOY_FILES},true," ${WORKSPACE}/devops/codedeploy/after-install.bat
+            """
+            SURGE_ENV = "${env_promotion_to_environment}".toUpperCase()
+
+            echo "Here is the environment to go to: ${SURGE_ENV}"
+
+            echo "Deploying to Non-DR"
 
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
               step([$class: 'AWSCodeDeployPublisher',
@@ -280,23 +238,22 @@ pipeline {
                   region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
                   subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
             }
-            
-            if ("${SURGE_ENV}" != "DEV") {
-              echo "Deploy to DR"
-              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                step([$class: 'AWSCodeDeployPublisher',
-                    applicationName: "tar-surge-app-${SURGE_ENV}-DR",
-                    awsAccessKey: "${AWS_ACCESS_KEY_ID}",
-                    awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
-                    credentials: 'awsAccessKey',
-                    deploymentConfig: "tar-surge-app-${SURGE_ENV}-DR-config",
-                    deploymentGroupAppspec: false,
-                    deploymentGroupName: "tar-surge-app-${SURGE_ENV}-DR-INPLACE-deployment-group",
-                    deploymentMethod: 'deploy',
-                    excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
-                    region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
-                    subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
-              }
+
+            echo "Deploying to DR"
+
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              step([$class: 'AWSCodeDeployPublisher',
+                  applicationName: "tar-surge-app-${SURGE_ENV}-DR",
+                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                  credentials: 'awsAccessKey',
+                  deploymentConfig: "tar-surge-app-${SURGE_ENV}-DR-config",
+                  deploymentGroupAppspec: false,
+                  deploymentGroupName: "tar-surge-app-${SURGE_ENV}-DR-INPLACE-deployment-group",
+                  deploymentMethod: 'deploy',
+                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                  region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
+                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
             }
           } // end of script
         } // end of container
