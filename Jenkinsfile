@@ -1,17 +1,55 @@
 /*
-=======================================================================================
-This file is being updated constantly by the DevOps team to introduce new enhancements
-based on the template.  If you have suggestions for improvement,
-please contact the DevOps team so that we can incorporate the changes into the
-template.  In the meantime, if you have made changes here or don't want this file to be
-updated, please indicate so at the beginning of this file.
-=======================================================================================
-*/
+ =======================================================================================
+ This file is being updated constantly by the DevOps team to introduce new enhancements
+ based on the template.  If you have suggestions for improvement,
+ please contact the DevOps team so that we can incorporate the changes into the
+ template.  In the meantime, if you have made changes here or don't want this file to be
+ updated, please indicate so at the beginning of this file.
+ =======================================================================================
+ */
+ 
+ def branch = env.BRANCH_NAME ?: "master"
+ def workingDir = "/home/jenkins/agent"
+ 
+ def VAULT_SECRET_PATH = [
+   "DEV":"kv-dev/data/us-west/dev-tar/tar-surgenet-service-secrets",
+   "SIT":"kv-tst/data/us-west/sit-tar/tar-surgenet-service-secrets",
+   "UAT":"kv-tst/data/us-west/uat-tar/tar-surgenet-service-secrets",
+   "PRD":"kv-prd/data/us-west/prd-tar/tar-surgenet-service-secrets"
+ ]
+ 
+ def VAULT_SECRET_PATH_LTAR = [
+   "DEV":"kv-dev/data/us-west/dev-tar/tar-ltar-service-secrets",
+   "SIT":"kv-tst/data/us-west/sit-tar/tar-ltar-service-secrets",
+   "UAT":"kv-tst/data/us-west/uat-tar/tar-ltar-service-secrets",
+   "PRD":"kv-prd/data/us-west/prd-tar/tar-ltar-service-secrets"
+ ]
+ 
+ def VAULT_SECRET_PATH_IMGVWR = [
+   "DEV":"kv-dev/data/us-west/dev-tar/tar-image-viewer-service-secrets",
+   "SIT":"kv-tst/data/us-west/sit-tar/tar-image-viewer-service-secrets",
+   "UAT":"kv-tst/data/us-west/uat-tar/tar-image-viewer-service-secrets",
+   "PRD":"kv-prd/data/us-west/prd-tar/tar-image-viewer-service-secrets"
+ ]
 
-def branch = env.BRANCH_NAME ?: "Dev"
-def workingDir = "/home/jenkins/agent"
+def SURGE_ENV_CONFIG = [
+  "DEV":  ["SURGE_ENVNAME": "DEV",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_dev/rpm_root"],
+  "SIT":  ["SURGE_ENVNAME": "SIT",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_sit/rpm_root"],
+  "UAT":  ["SURGE_ENVNAME": "UAT",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_uat/rpm_root"],
+  "PRD": ["SURGE_ENVNAME": "PRD",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_prd/rpm_root"]
+]
 
-def SURGE_ENV
+ def SURGE_ENV
+
+def VAULT_ADDR = [
+    "DEV":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
+    "SIT":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
+    "UAT":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
+    "PRD":"https://secrets.cammis.medi-cal.ca.gov/v1/"
+]
+
+ def VAULT_APPROLE_AUTH_PATH="auth/approle/login"
+
 
 pipeline {
   agent {
@@ -122,7 +160,9 @@ pipeline {
     env_secretkey=""
     env_tag_name=""
     env_deploy_env=""
-    env_DEPLOY_CONFIG="true"
+    env_DEPLOY_ENVIRONMENT="true"
+    env_DEPLOY_FILES="false"
+    env_DEPLOY_CONFIG="false"
   }
 
   stages {
@@ -133,12 +173,10 @@ pipeline {
 
             properties([
               parameters([
-                choice(name: 'DEPLOY_ENV', choices: ['NONE','SBX','HFX'], description: 'Deployment Environment'),
+                choice(name: 'DEPLOY_ENV', choices: ['NONE','DEV','SIT','UAT','PRD'], description: 'Deployment Environment'),
               ])
             ])
-             WHEN SBX SELECTED II SHOULD BE EQUAL TO DEV 
-             WHEN HFX SELECTED IT SHOULD BE EQUAL TO SIT
-            // SURGE_ENV = params.DEPLOY_ENV
+
             SURGE_ENV = params.DEPLOY_ENV
 
             deleteDir()
@@ -146,6 +184,7 @@ pipeline {
             checkout(scm).GIT_COMMIT
 
             echo "Current deployment environment is ${SURGE_ENV}"
+
           } //END script
         } //END container node
       } //END steps
@@ -160,16 +199,57 @@ pipeline {
       steps {
         container(name: "aws-boto3") {
           script {
+
+              def surgeEnv = SURGE_ENV_CONFIG[SURGE_ENV]
+
             sh """#!/bin/bash
               echo "Setting up app directories with files, or deployment will fail"
               mkdir devops/codedeploy/surgeapi
               touch devops/codedeploy/surgeapi/placeholder.txt
               
+              echo "Replacing tokenized values for accessing Vault"
               
-              echo "Update after-install.bat to deploy config"
-              sed -i "s,{DEPLOY_CONFIG},${env_DEPLOY_CONFIG}," devops/codedeploy/after-install.bat
-              sed -i "s,{server-environment},${SURGE_ENV}," devops/codedeploy/serverconfig/index.html
+              sed -i "s,{VAULT_ADDR},${VAULT_ADDR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_SECRET_PATH},${VAULT_SECRET_PATH["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_SECRET_PATH_LTAR},${VAULT_SECRET_PATH_LTAR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_SECRET_PATH_IMGVWR},${VAULT_SECRET_PATH_IMGVWR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_APPROLE_AUTH_PATH},${VAULT_APPROLE_AUTH_PATH}," devops/codedeploy/environment/deploy-environment.ps1
+
+         
+               sed -i "s,{SURGE_ENVNAME},${surgeEnv["SURGE_ENVNAME"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{SURGE_RPM_ROOT},${surgeEnv["SURGE_RPM_ROOT"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
+
             """
+            if ("${SURGE_ENV}" != "PRD") {
+              withCredentials([string(credentialsId: 'APPROLE_ROLE_ID', variable: 'APPROLE_ROLE_ID')]) {
+                sh """#!/bin/bash
+                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
+                """
+              }
+
+              withCredentials([string(credentialsId: 'APPROLE_SECRET_ID', variable: 'APPROLE_SECRET_ID')]) {
+                sh """#!/bin/bash
+                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
+                  echo "Preparing Deployment"
+                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
+                """
+              }
+            } else {
+              withCredentials([string(credentialsId: 'APPROLE_ROLE_ID_PRD', variable: 'APPROLE_ROLE_ID')]) {
+                sh """#!/bin/bash
+                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
+                """
+              }
+
+              withCredentials([string(credentialsId: 'APPROLE_SECRET_ID_PRD', variable: 'APPROLE_SECRET_ID')]) {
+                sh """#!/bin/bash
+                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
+                  echo "Preparing Deployment"
+                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
+                """
+              }
+            }
           } // end of script
         } // end of container
       } // end of steps
@@ -200,7 +280,7 @@ pipeline {
                   region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
                   subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
             }
-
+            
             if ("${SURGE_ENV}" != "DEV") {
               echo "Deploy to DR"
               withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
