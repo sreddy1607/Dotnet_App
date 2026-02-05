@@ -8,14 +8,13 @@ updated, please indicate so at the beginning of this file.
 =======================================================================================
 */
 
-def branch = env.BRANCH_NAME ?: "master"
+def branch = env.BRANCH_NAME ?: "sandbox00"
 def workingDir = "/home/jenkins/agent"
 
 def DEPLOY_FROM_ENV = [
-    "dev":"N/A",
-    "sit":"dev",
-    "uat":"sit",
-    "prd":"uat"
+    "sandbox":"N/A",
+    "hotfix":"sandbox",
+    "prd":"hotfix"
   ]
 
 def SURGE_ENV
@@ -142,9 +141,20 @@ pipeline {
 
             properties([
               parameters([
-                choice(name: 'PROMOTE_TO_ENV', choices: ['sit','uat','prd'], description: 'Where to promote to?')
+                choice(name: 'PROMOTE_TO_ENV', choices: ['hotfix','prd'], description: 'Where to promote to?')
               ])
             ])
+
+            def ENV_ALIAS_MAP = [
+                                "hotfix": "DEV",
+                                "prd": "PRD"
+                              ]
+
+                    if (params.DEPLOY_ENV == "NONE") {
+                       SURGE_ENV = "NONE"
+                     } else {
+                        SURGE_ENV = ENV_ALIAS_MAP[params.PROMOTE_TO_ENV]
+                     }
 
             env_promotion_to_environment = params.PROMOTE_TO_ENV
             env_promotion_from_environment=DEPLOY_FROM_ENV["${env_promotion_to_environment}"]
