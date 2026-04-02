@@ -1,45 +1,15 @@
 /*
- =======================================================================================
- This file is being updated constantly by the DevOps team to introduce new enhancements
- based on the template.  If you have suggestions for improvement,
- please contact the DevOps team so that we can incorporate the changes into the
- template.  In the meantime, if you have made changes here or don't want this file to be
- updated, please indicate so at the beginning of this file.
- =======================================================================================
- */
- 
- def branch = env.BRANCH_NAME ?: "sandbox00"
- def workingDir = "/home/jenkins/agent"
- 
- def VAULT_SECRET_PATH = [
-   "DEV":"kv-dev/data/us-west/dev-tar/tar-surgenet-service-secrets",
-   "SIT":"kv-tst/data/us-west/sit-tar/tar-surgenet-service-secrets"
- ]
- 
- def VAULT_SECRET_PATH_LTAR = [
-   "DEV":"kv-dev/data/us-west/dev-tar/tar-ltar-service-secrets",
-   "SIT":"kv-tst/data/us-west/sit-tar/tar-ltar-service-secrets"
- ]
- 
- def VAULT_SECRET_PATH_IMGVWR = [
-   "DEV":"kv-dev/data/us-west/dev-tar/tar-image-viewer-service-secrets",
-   "SIT":"kv-tst/data/us-west/sit-tar/tar-image-viewer-service-secrets"
- ]
+=======================================================================================
+This file is being updated constantly by the DevOps team to introduce new enhancements
+based on the template.  If you have suggestions for improvement,
+please contact the DevOps team so that we can incorporate the changes into the
+template.  In the meantime, if you have made changes here or don't want this file to be
+updated, please indicate so at the beginning of this file.
+=======================================================================================
+*/
 
-def SURGE_ENV_CONFIG = [
-  "DEV":  ["SURGE_ENVNAME": "DEV",  "SURGE_RPM_ROOT": "E:/inetpub/ApiServices/RPM/dhcs_dev/rpm_root"],
-  "SIT":  ["SURGE_ENVNAME": "SIT",  "SURGE_RPM_ROOT": "E:/inetpub/ApiServices/RPM/dhcs_sit/rpm_root"]
-]
-
- def SURGE_ENV
-
-def VAULT_ADDR = [
-    "DEV":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
-    "SIT":"https://np.secrets.cammis.medi-cal.ca.gov/v1/"
-]
-
- def VAULT_APPROLE_AUTH_PATH="auth/approle/login"
-
+def branch = env.BRANCH_NAME ?: "sandbox00"
+def workingDir = "/home/jenkins/agent"
 
 pipeline {
   agent {
@@ -150,104 +120,176 @@ pipeline {
     env_secretkey=""
     env_tag_name=""
     env_deploy_env=""
-    env_DEPLOY_ENVIRONMENT="true"
-    env_DEPLOY_FILES="false"
+    env_DEPLOY_ENVIRONMENT="false"
+    env_DEPLOY_FILES="true"
     env_DEPLOY_CONFIG="false"
+    env_release_type=""
+    SONAR_TIMEOUT = 3
+    SONAR_SLEEP = 10000
+    SONAR_ERROR_MSG = "QUALITY GATE ERROR: Pipeline set to unstable"
+    SONAR_BUILD_RESULT = "UNSTABLE"
+    SONAR_SLACK_MSG = "Quality Gate Passed"	  
   }
 
   stages {
-    stage("initialize") {
+     stage("initialize") {
       steps {
         container(name: "node") {
           script {
 
             properties([
               parameters([
-                choice(name: 'DEPLOY_ENV', choices: ['NONE','SANDBOX','HOTFIX'], description: 'Deployment Environment'),
+                choice(name: 'RELEASE_TYPE', choices: ['PATCH','MINOR','MAJOR'], description: 'Enter Release type'),
+                booleanParam(name: 'USE_GIT_TAG', defaultValue: false, description: 'Use the selected git tag instead of LATEST commit'),
+                gitParameter(name: 'GIT_TAG', defaultValue: 'tar-surge-app_from_sandbox', description: 'git tag', type: 'PT_TAG'),
+                string(name: 'GIT_SHA',defaultValue: 'enter git sha(8+ chars)', description: 'enter git sha that you want to deploy') 
               ])
             ])
 
-              def ENV_ALIAS_MAP = [
-                                "SANDBOX": "DEV",
-                                "HOTFIX": "SIT"
-                              ]
-
-                    if (params.DEPLOY_ENV == "NONE") {
-                       SURGE_ENV = "NONE"
-                     } else {
-                        SURGE_ENV = ENV_ALIAS_MAP[params.DEPLOY_ENV]
-                     }
-
             deleteDir()
 
-            checkout(scm).GIT_COMMIT
+            env_release_type = params.RELEASE_TYPE
+            echo 'checkout source  and get the commit id'
+            env_current_git_commit = checkout(scm).GIT_COMMIT
 
-            echo "Current deployment environment is ${SURGE_ENV}"
+            // get the short version of commit
+            env_current_git_commit="${env_current_git_commit[0..7]}"
 
+            env_deploy_env = "sandbox"
+
+            echo "Current deployment environment is ${env_deploy_env}"
+
+            env_tag_name = "${branch}_${BUILD_NUMBER}_${env_current_git_commit}"
+
+            if (params.USE_GIT_TAG == true) {
+              env_current_git_commit = params.GIT_TAG
+            }
+
+            if ( ! params.GIT_SHA.contains("enter") ) {
+              env_current_git_commit = params.GIT_SHA
+            }
+
+            echo "Tag to be applied is: ${env_tag_name}"
+            echo "Tag will be applied to: ${env_current_git_commit}"
+
+
+            if ( ( params.GIT_SHA.contains("enter")) && (params.USE_GIT_TAG == false)) {
+              // use latest commit to build and deploy to sandbox
+              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                sh """#!/bin/bash
+                  git config --global --add safe.directory '*'
+                  git config --system --add safe.directory '*' 
+                  echo "The commit hash from the latest git current commit is ${env_current_git_commit}"
+                  echo "The current build number is: ${BUILD_NUMBER}"
+                  echo "The current branch is: ${branch}"
+                  tagMessage="${env_tag_name}"
+                  git checkout \${branch}
+                  echo "Checked out ${branch}"
+                  git config  --global user.email "jenkins@cammis.com"
+                  git config  --global user.name "jenkins"
+                  echo "The tagMessage is \$tagMessage"
+                  echo "About to fetch"
+                  git fetch --quiet --tags https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-app.git
+                  echo "About to tag commit with build and branch"
+                  git tag -f -a "\$tagMessage" -m "tag build" ${env_current_git_commit}
+                  echo "About to push tag"
+                  git push -f https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-app.git \$tagMessage
+                  echo "Push is done"
+                  echo "Checking out selected commit"
+                  git checkout ${env_current_git_commit}
+                  git show --stat ${env_current_git_commit} > commit-changes.txt
+                  echo "START OF FILES CHANGED"
+                  cat commit-changes.txt
+                  echo "END OF FILES CHANGED"
+                  echo "Checkout out ${env_current_git_commit}"
+                  """
+              }
+            } else if ( (params.USE_GIT_TAG == true) || ( ! params.GIT_SHA.contains("enter")) ) {
+  			      // using a git tag or git sha, ${env_current_git_commit}" is now the commit tag selected or git sha entered
+              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                sh """#!/bin/bash
+                  echo "Checking out SHA or TAG: ${env_current_git_commit}"
+                  git config --global --add safe.directory '*'
+                  git config --system --add safe.directory '*' 
+                  git checkout \${env_current_git_commit}
+                  echo "Since this is a previous commit, need to rebuild everything"
+                  echo "Cammis.Surge.Api" > commit-changes.txt
+                  echo "Cammis.Surge.Core" >> commit-changes.txt
+                  echo "Cammis.Surge.Server" >> commit-changes.txt
+		          echo "Cammis.Surge.Shared" >> commit-changes.txt
+                  cat commit-changes.txt
+                  echo "Checked out ${env_current_git_commit}"
+                  """
+              }
+            } 
           } //END script
         } //END container node
       } //END steps
     } //END stage
 
-    stage('Prepare Deployment') {
+stage('Build') {
+      steps {
+        container(name: "node") {
+          script {
+           sh '''
+              echo "Creating directory to build into and deploy from."
+              echo "Need to add the placeholder.txt file so AWS CodeDeploy deploys an empty directory"
+              mkdir -p devops/codedeploy/surgeapi
+              touch devops/codedeploy/surgeapi/placeholder.txt
+              
+            '''
+          }
+        }
+
+        container(name: "dotnet") {
+          script {
+           sh '''
+             echo " Cammis.Surge.Api.Sln needs to be built and deployed..."
+	    
+             dotnet publish Cammis.Surge.Api.sln -o devops/codedeploy/surgeapi --verbosity detailed /p:EnableWindowsTargeting=true
+	   
+            '''
+          }
+        }
+      } // end of steps
+    } // end of Build stage
+	  
+    stage('Sonar Scan') {
       when {
         expression {
-          SURGE_ENV != "NONE"
+          env_DEPLOY_FILES == "true"
         }
       }
       steps {
+        container(name: "dotnet") {
+          script {
+            sh """#!/bin/bash
+		      set +e
+                      echo 'Sonar Scan Stage....\n\n'
+                
+		      cd  Cammis.Surge.Api
+	              dotnet tool install dotnet-sonarscanner --global
+		          export PATH="$PATH:/home/jenkins/agent/.dotnet/tools"
+		          dotnet sonarscanner begin /key:"tar-surge-api" /d:sonar.host.url="http://sonarqube-tools.apps.bld.cammis.medi-cal.ca.gov"
+                  dotnet publish /p:EnableWindowsTargeting=true
+                  dotnet sonarscanner end  
+				  
+              """
+          }
+        }
+      }
+    }
+	  
+    stage('Prepare Deployment') {
+      steps {
         container(name: "aws-boto3") {
           script {
-
-              def surgeEnv = SURGE_ENV_CONFIG[SURGE_ENV]
-
-            sh """#!/bin/bash
-              echo "Setting up app directories with files, or deployment will fail"
-              mkdir devops/codedeploy/surgeapi
-              touch devops/codedeploy/surgeapi/placeholder.txt
-              
-              echo "Replacing tokenized values for accessing Vault"
-              
-              sed -i "s,{VAULT_ADDR},${VAULT_ADDR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_SECRET_PATH},${VAULT_SECRET_PATH["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_SECRET_PATH_LTAR},${VAULT_SECRET_PATH_LTAR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_SECRET_PATH_IMGVWR},${VAULT_SECRET_PATH_IMGVWR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_APPROLE_AUTH_PATH},${VAULT_APPROLE_AUTH_PATH}," devops/codedeploy/environment/deploy-environment.ps1
-
-         
-               sed -i "s,{SURGE_ENVNAME},${surgeEnv["SURGE_ENVNAME"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{SURGE_RPM_ROOT},${surgeEnv["SURGE_RPM_ROOT"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
-
-            """
-            if ("${SURGE_ENV}" != "PRD") {
-              withCredentials([string(credentialsId: 'APPROLE_ROLE_ID', variable: 'APPROLE_ROLE_ID')]) {
-                sh """#!/bin/bash
-                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                """
-              }
-
-              withCredentials([string(credentialsId: 'APPROLE_SECRET_ID', variable: 'APPROLE_SECRET_ID')]) {
-                sh """#!/bin/bash
-                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                  echo "Preparing Deployment"
-                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
-                """
-              }
-            } else {
-              withCredentials([string(credentialsId: 'APPROLE_ROLE_ID_PRD', variable: 'APPROLE_ROLE_ID')]) {
-                sh """#!/bin/bash
-                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                """
-              }
-
-              withCredentials([string(credentialsId: 'APPROLE_SECRET_ID_PRD', variable: 'APPROLE_SECRET_ID')]) {
-                sh """#!/bin/bash
-                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                  echo "Preparing Deployment"
-                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
-                """
-              }
+            withCredentials([string(credentialsId: 'APPROLE_SECRET_ID', variable: 'APPROLE_SECRET_ID')]) {
+              sh """#!/bin/bash
+                echo "Preparing Deployment"
+                sed -i "s,{DEPLOY_FILES},${env_DEPLOY_FILES}," devops/codedeploy/after-install.bat
+                sed -i "s,{server-environment},${env_deploy_env}," devops/codedeploy/serverconfig/index.html
+              """
             }
           } // end of script
         } // end of container
@@ -255,50 +297,88 @@ pipeline {
     }  // end of Prepare Deployment Stage
 
     stage('Deploy') {
-      when {
-        expression {
-          SURGE_ENV != "NONE"
-        }
-      }
       steps {
+       lock(resource: 'codedeploy-ec2-lock') {	      
         container(name: "aws-boto3") {
           script {
-            echo "Deploy to Non-DR"
-
-            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+             sh """#!/bin/bash
+            echo "Deploy Using AWS CodeDeploy"
+            """
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr-ecs', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
               step([$class: 'AWSCodeDeployPublisher',
-                  applicationName: "tar-surge-app-${SURGE_ENV}",
+                  applicationName: "tar-surge-app-DEV",
                   awsAccessKey: "${AWS_ACCESS_KEY_ID}",
                   awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
                   credentials: 'awsAccessKey',
-                  deploymentConfig: "tar-surge-app-${SURGE_ENV}-config",
+                  deploymentConfig: "tar-surge-app-DEV-config",
                   deploymentGroupAppspec: false,
-                  deploymentGroupName: "tar-surge-app-${SURGE_ENV}-INPLACE-deployment-group",
+                  deploymentGroupName: "tar-surge-app-DEV-INPLACE-deployment-group",
                   deploymentMethod: 'deploy',
                   excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
                   region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
                   subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
             }
-            
-            if ("${SURGE_ENV}" != "DEV") {
-              echo "Deploy to DR"
-              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                step([$class: 'AWSCodeDeployPublisher',
-                    applicationName: "tar-surge-app-${SURGE_ENV}-DR",
-                    awsAccessKey: "${AWS_ACCESS_KEY_ID}",
-                    awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
-                    credentials: 'awsAccessKey',
-                    deploymentConfig: "tar-surge-app-${SURGE_ENV}-DR-config",
-                    deploymentGroupAppspec: false,
-                    deploymentGroupName: "tar-surge-app-${SURGE_ENV}-DR-INPLACE-deployment-group",
-                    deploymentMethod: 'deploy',
-                    excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
-                    region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
-                    subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
-              }
-            }
           } // end of script
         } // end of container
+       }
+        container(name: "jnlp") {
+          lock(resource: 'deployments-github-repo',inversePrecedence: false ) {
+           dir("${WORKSPACE}/deployrepo"){
+              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                sh """
+                  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
+                  git config  --global user.email "jenkins@cammis.com"
+                  git config  --global user.name "jenkins"
+
+                  cd deployments-combined-devops
+                  git checkout master
+                  git pull
+
+                  cp ${WORKSPACE}/devops/codedeploy/serverconfig/index.html ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/sandbox
+
+                            
+                    echo "Cammis.Surge.Api was built, need to update deployment repository"
+                    echo "Comparing the directories with DIFF:"
+                    set +e
+                    diff -r ${WORKSPACE}/devops/codedeploy/surgeapi ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/sandbox/surgeapi
+                    set -e
+                    # remove and replace deployment for surgeapi
+                    rm -r ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/sandbox/surgeapi/*
+                    cp -a ${WORKSPACE}/devops/codedeploy/surgeapi/. ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/sandbox/surgeapi/
+                    rm ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/sandbox/surgeapi/placeholder.txt
+                    updates_to_deploy=true
+                  
+
+                  if [ "\$updates_to_deploy" = true ] ; then
+                    touch tar-surge-app/updates_to_deploy
+                  fi
+
+
+                """
+                
+                script {
+                   incrementVersion()
+                }
+
+                sh """
+                  cd ${WORKSPACE}/deployrepo/deployments-combined-devops
+                  if [ -f tar-surge-app/updates_to_deploy ] ; then
+                    echo 'Pushing to the deployment repository'
+                    rm tar-surge-app/updates_to_deploy
+                    echo "Will tag deploy repo with: \"Updated build artifacts for tar-surge-app build ${env_tag_name}\""
+                    git add -Av
+                    git commit -m "Updated build artifacts for tar-surge-app build ${env_tag_name}"
+                    git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
+                  else
+                    echo "Nothing needs to be pushed to deployment repository"
+                  fi
+                  pwd
+                """
+              } //end withCredentials
+            } //end dir
+          } //end lock
+        }  //end container
+
       } // end of steps
     } // end of Deploy stage
   } // end of stages
@@ -330,4 +410,33 @@ pipeline {
     } // changed
 
   } // post
+}
+
+def incrementVersion() {
+  def versionInfo = readYaml file: "deployments-combined-devops/tar-surge-app/sandbox/release/version.yaml"
+  def Integer newMinor = versionInfo.app.version.minor
+  def Integer newMajor = versionInfo.app.version.major
+  def Integer newPatch = versionInfo.app.version.patch
+  
+  if(env_release_type == "PATCH" ) {
+    newPatch = newPatch+1
+  } else if (env_release_type == "MINOR") {
+    newMinor = newMinor+1
+    newPatch = 0
+  } else if (env_release_type == "MAJOR") {
+    newMajor = newMajor+1
+    newMinor = 0
+    newPatch = 0
+  }
+  
+  def updatedVersionInfo = versionInfo
+  def buildDate = new Date()
+  updatedVersionInfo.app.version.patch=newPatch
+  updatedVersionInfo.app.version.major=newMajor
+  updatedVersionInfo.app.version.full=updatedVersionInfo.app.version.major+"."+updatedVersionInfo.app.version.minor+"."+updatedVersionInfo.app.version.patch
+  updatedVersionInfo.app.build.date=buildDate.format("yyyy-MM-dd_HH:mm")
+  updatedVersionInfo.app.build.number="${BUILD_NUMBER}"
+  updatedVersionInfo.app.build.commit="${env_current_git_commit}"
+  println "Saving version.yaml file...\n${updatedVersionInfo}"
+  writeYaml file: "deployments-combined-devops/tar-surge-app/sandbox/release/version.yaml", data: updatedVersionInfo, overwrite: true
 }
