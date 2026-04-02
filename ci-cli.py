@@ -8,18 +8,11 @@ updated, please indicate so at the beginning of this file.
 =======================================================================================
 */
 
-def branch = env.BRANCH_NAME ?: "master"
+def branch = env.BRANCH_NAME ?: "sandbox00"
 def workingDir = "/home/jenkins/agent"
 
-def DEPLOY_FROM_ENV = [
-    "dev":"N/A",
-    "sit":"dev",
-    "uat":"sit",
-    "prd":"uat"
-  ]
-
 def SURGE_ENV
-
+def TARGET_ENV
 
 pipeline {
   agent {
@@ -130,8 +123,7 @@ pipeline {
     env_secretkey=""
     env_tag_name=""
     env_deploy_env=""
-    env_promotion_to_environment=""
-    env_promotion_from_environment=""
+    env_DEPLOY_CONFIG="true"
   }
 
   stages {
@@ -142,118 +134,98 @@ pipeline {
 
             properties([
               parameters([
-                choice(name: 'PROMOTE_TO_ENV', choices: ['sit','uat','prd'], description: 'Where to promote to?')
+                choice(name: 'DEPLOY_ENV', choices: ['NONE','SANDBOX','HOTFIX'], description: 'Deployment Environment'),
               ])
             ])
+               def ENV_ALIAS_MAP = [
+                   "SANDBOX": ["TARGET": "DEV", "SURGE": "SANDBOX"],
+                   "HOTFIX": ["TARGET": "SIT", "SURGE": "HOTFIX"]
+                ]
 
-            env_promotion_to_environment = params.PROMOTE_TO_ENV
-            env_promotion_from_environment=DEPLOY_FROM_ENV["${env_promotion_to_environment}"]
+               if (params.DEPLOY_ENV == "NONE") {
+               TARGET_ENV  = "NONE"
+               SURGE_ENV = "NONE"
+               } else {
+               TARGET_ENV  = ENV_ALIAS_MAP[params.DEPLOY_ENV]["TARGET"]
+               SURGE_ENV = ENV_ALIAS_MAP[params.DEPLOY_ENV]["SURGE"]
+               }
 
             deleteDir()
 
             checkout(scm).GIT_COMMIT
 
-            echo "Promoting to environment: ${env_promotion_to_environment}"
-            echo "Promoting from environment: ${env_promotion_from_environment}"
+            echo "Current deployment environment is ${SURGE_ENV}"
           } //END script
         } //END container node
       } //END steps
     } //END stage
 
     stage('Prepare Deployment') {
+      when {
+        expression {
+          TARGET_ENV != "NONE"
+        }
+      }
       steps {
         container(name: "aws-boto3") {
           script {
-            container(name: "jnlp") {
-              lock(resource: 'deployments-github-repo',inversePrecedence: false ) {
-              dir("${WORKSPACE}/deployrepo"){
-                  withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
-                    sh """
-                      pwd
-                      git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
-                      git config  --global user.email "jenkins@cammis.com"
-                      git config  --global user.name "jenkins"
-                      cd deployments-combined-devops
-                      git checkout master
-                      git pull
-                      mkdir -p tar-surge-app/${env_promotion_to_environment}
-                      touch tar-surge-app/${env_promotion_to_environment}/tempfile
-                      rm -r tar-surge-app/${env_promotion_to_environment}/*
-                      cp -a tar-surge-app/${env_promotion_from_environment}/. tar-surge-app/${env_promotion_to_environment}/
-                      git add -Av
-
-                      if ! git diff-index --quiet HEAD; then
-                        git commit -m "Promotion of tar-surge-app from ${env_promotion_from_environment} to ${env_promotion_to_environment}"
-                        commitId=\""\$(git rev-parse --short=8 HEAD)"\"
-                        echo "The commit ID is: \$commitId"
-                        dateTime=\""\$(git show -s --format=%cd --date=format:%Y-%m-%d_%H-%M-%S \$commitId)"\"
-                        commitTag="Promote_tar-surge-app_to_${env_promotion_to_environment}_\${commitId}_\$dateTime"
-                        echo "The commit tag will be: \$commitTag"
-                        git tag -f -a \"\$commitTag\" -m "tag promotion" \"\$commitId\"
-                        git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
-                        git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git "\$commitTag"
-
-                      else
-                        echo "Nothing changes to commit to deployment repository, still will deploy..."
-                      fi
-                    """
-                  } //end withCredentials
-                } //end dir
-              } //end lock
-            }  //end container
+            sh """#!/bin/bash
+              echo "Setting up app directories with files, or deployment will fail"
+              mkdir devops/codedeploy/surgeapi
+              touch devops/codedeploy/surgeapi/placeholder.txt
+              
+              
+              echo "Update after-install.bat to deploy config"
+              sed -i "s,{DEPLOY_CONFIG},${env_DEPLOY_CONFIG}," devops/codedeploy/after-install.bat
+              sed -i "s,{server-environment},${SURGE_ENV}," devops/codedeploy/serverconfig/index.html
+            """
           } // end of script
         } // end of container
       } // end of steps
     }  // end of Prepare Deployment Stage
 
     stage('Deploy') {
+      when {
+        expression {
+          TARGET_ENV != "NONE"
+        }
+      }
       steps {
         container(name: "aws-boto3") {
           script {
-            echo "Deploy Using AWS CodeDeploy"
-
-            // Need to copy files from env_promotion_to_environment back into the devops/codedeploy directory to then deploy
-
-            sh """
-              cp -a ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/${env_promotion_to_environment}/. ${WORKSPACE}/devops/codedeploy/
-              sed -i "s,{DEPLOY_FILES},true," ${WORKSPACE}/devops/codedeploy/after-install.bat
-            """
-            SURGE_ENV = "${env_promotion_to_environment}".toUpperCase()
-
-            echo "Here is the environment to go to: ${SURGE_ENV}"
-
-            echo "Deploying to Non-DR"
+            echo "Deploy to Non-DR"
 
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
               step([$class: 'AWSCodeDeployPublisher',
-                  applicationName: "tar-surge-app-${SURGE_ENV}",
+                  applicationName: "tar-surge-app-${TARGET_ENV}",
                   awsAccessKey: "${AWS_ACCESS_KEY_ID}",
                   awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
                   credentials: 'awsAccessKey',
-                  deploymentConfig: "tar-surge-app-${SURGE_ENV}-config",
+                  deploymentConfig: "tar-surge-app-${TARGET_ENV}-config",
                   deploymentGroupAppspec: false,
-                  deploymentGroupName: "tar-surge-app-${SURGE_ENV}-INPLACE-deployment-group",
+                  deploymentGroupName: "tar-surge-app-${TARGET_ENV}-INPLACE-deployment-group",
                   deploymentMethod: 'deploy',
                   excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
                   region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
                   subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
             }
 
-            echo "Deploying to DR"
-
-            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-              step([$class: 'AWSCodeDeployPublisher',
-                  applicationName: "tar-surge-app-${SURGE_ENV}-DR",
-                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
-                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
-                  credentials: 'awsAccessKey',
-                  deploymentConfig: "tar-surge-app-${SURGE_ENV}-DR-config",
-                  deploymentGroupAppspec: false,
-                  deploymentGroupName: "tar-surge-app-${SURGE_ENV}-DR-INPLACE-deployment-group",
-                  deploymentMethod: 'deploy',
-                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
-                  region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
-                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+            if ("${TARGET_ENV}" != "DEV") {
+              echo "Deploy to DR"
+              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                step([$class: 'AWSCodeDeployPublisher',
+                    applicationName: "tar-surge-app-${TARGET_ENV}-DR",
+                    awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                    awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                    credentials: 'awsAccessKey',
+                    deploymentConfig: "tar-surge-app-${TARGET_ENV}-DR-config",
+                    deploymentGroupAppspec: false,
+                    deploymentGroupName: "tar-surge-app-${TARGET_ENV}-DR-INPLACE-deployment-group",
+                    deploymentMethod: 'deploy',
+                    excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                    region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
+                    subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+              }
             }
           } // end of script
         } // end of container
