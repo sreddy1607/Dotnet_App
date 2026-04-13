@@ -58,8 +58,11 @@ Write-Warning "Hello from $PSHOME"
 Write-Warning "  (\SysWOW64\ = 32-bit mode, \System32\ = 64-bit mode)"
 Write-Warning "Original arguments (if any): $args"
 
+Import-Module WebAdministration
+
 # Variables
-$SiteName = "Apiservices-SBX"
+$SiteName = "ETarApiService-SBX"
+$AppPoolName = "ETarApiService-SBX"
 
 # Stop Site and App Pools
 Write-Host "Stopping $SiteName"
@@ -70,53 +73,48 @@ Write-Host "Sleeping for 5 seconds for web site to stop"
 Start-Sleep -Seconds 5
 
 Write-Host "Stopping Application Pools"
-Stop-Web-App-Pool("Apiservices-SBX")
+Stop-Web-App-Pool("$AppPoolName")
 
 
 Write-Host "Sleeping for 5 seconds for app pools to stop"
 Start-Sleep -Seconds 5
 
 Write-Host "Status of Application Pools"
-Get-IISAppPool -Name Apiservices-SBX
+Get-IISAppPool -Name $AppPoolName
 
-# ================================
-# SET APP POOL LEVEL ENV VARIABLES
-# ================================
+# Set environment variables for Vault access
+Write-Host "Setting environment variables for Vault access"
+[Environment]::SetEnvironmentVariable("VAULT_ADDRESS", "{VAULT_ADDR}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_APPROLE_ROLE_ID", "{APPROLE_ROLE_ID}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_APPROLE_SECRET_ID", "{APPROLE_SECRET_ID}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH", "{VAULT_SECRET_PATH}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH_LTAR", "{VAULT_SECRET_PATH_LTAR}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH_IMGVWR", "{VAULT_SECRET_PATH_IMGVWR}", "Machine")
+[Environment]::SetEnvironmentVariable("VAULT_APPROLE_AUTH_PATH", "{VAULT_APPROLE_AUTH_PATH}", "Machine")
+[Environment]::SetEnvironmentVariable("APIPath", "{SURGE_API_PATH}", "Machine")
+[Environment]::SetEnvironmentVariable("SURGE_ENVNAME", "{SURGE_ENVNAME}", "Machine")
+[Environment]::SetEnvironmentVariable("SURGE_RPM_ONLINE_KEY", "/online", "Machine")
 
-Write-Host "Setting App Pool–level environment variables for $AppPoolName"
+$rawRpmRoot = "{SURGE_RPM_ROOT}"
+$formattedRpmRoot = $rawRpmRoot -replace '/',[char]92
+[Environment]::SetEnvironmentVariable("SURGE_RPM_ROOT", $formattedRpmRoot, "Machine")
 
-$envVars = @{
-    VAULT_ADDRESS              = "{VAULT_ADDR}"
-    VAULT_APPROLE_ROLE_ID      = "{APPROLE_ROLE_ID}"
-    VAULT_APPROLE_SECRET_ID    = "{APPROLE_SECRET_ID}"
-    VAULT_SECRET_PATH          = "{VAULT_SECRET_PATH}"
-    VAULT_SECRET_PATH_LTAR     = "{VAULT_SECRET_PATH_LTAR}"
-    VAULT_SECRET_PATH_IMGVWR   = "{VAULT_SECRET_PATH_IMGVWR}"
-    VAULT_APPROLE_AUTH_PATH    = "{VAULT_APPROLE_AUTH_PATH}"
 
-    SURGE_ENVNAME              = "{SURGE_ENVNAME}"
-    SURGE_RPM_ROOT             = "{SURGE_RPM_ROOT}"
-    SURGE_RPM_ONLINE_KEY       = "/online"
-
-    DD_LOGS_ENABLED            = "true"
-}
-
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" `
-  -Name processModel.environmentVariables `
-  -Value $envVars
-
-Write-Host "App Pool environment variables applied successfully"
+Write-Host "Setting environment to enable Datadog file logging"
+[Environment]::SetEnvironmentVariable("DD_LOGS_ENABLED", "true", "Machine")
 
 # Start Site and App Pools
 Write-Host "Starting Application Pools"
-Start-WebAppPool -Name "Apiservices-SBX"
+Start-WebAppPool -Name "$AppPoolName"
 
 
 Write-Host "Status of Application Pools"
-Get-IISAppPool -Name Apiservices-SBX
+Get-IISAppPool -Name $AppPoolName
 
 Write-Host "Starting $SiteName"
 Start-Website -name "$SiteName"
 Write-Host "Start status: $?"
+
+
 
 Write-Host "Environment Deploy Complete"
