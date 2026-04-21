@@ -1,3 +1,4 @@
+# Functions needed to ensure the Website and AppPools are fully stopped before continuing
 function Stop-Web-App-Pool($AppPoolName) {
   if ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped" ) {
       Write-Host $AppPoolName " already stopped"
@@ -45,7 +46,7 @@ if ($PSHOME -like "*SysWOW64*")
   # Restart this script under 64-bit Windows PowerShell.
   #   (\SysNative\ redirects to \System32\ for 64-bit mode)
 
-  & (Join-Path ($PSHOME -replace "SysWOW64", "SysNative") powershell.exe) -File `
+  & (Join-Path ($PSHOME -replace "SysWOW64", "SysNative") powershell.exe) -NoProfile -File `
     (Join-Path $PSScriptRoot $MyInvocation.MyCommand) @args
 
   # Exit 32-bit script.
@@ -60,51 +61,36 @@ Write-Warning "Original arguments (if any): $args"
 
 # Variables
 $SiteName = "ETarWeb-SBX"
+$SiteFolder = 'E:\inetpub'
+$StagingFolder = 'E:\tar-etar-web-staging'
+
+Import-Module -Name WebAdministration
 
 # Stop Site and App Pools
 Write-Host "Stopping $SiteName"
 Stop-Web-Site("$SiteName")
 Write-Host "Stop status: $?"
 
-Write-Host "Sleeping for 5 seconds for web site to stop"
-Start-Sleep -Seconds 5
-
 Write-Host "Stopping Application Pools"
 Stop-Web-App-Pool("ETarWeb-SBX")
 
 
-Write-Host "Sleeping for 5 seconds for app pools to stop"
-Start-Sleep -Seconds 5
-
 Write-Host "Status of Application Pools"
 Get-IISAppPool -Name ETarWeb-SBX
 
-# Set environment variables for Vault access
-Write-Host "Setting environment variables for Vault access"
-[Environment]::SetEnvironmentVariable("VAULT_ADDRESS", "{VAULT_ADDR}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_APPROLE_ROLE_ID", "{APPROLE_ROLE_ID}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_APPROLE_SECRET_ID", "{APPROLE_SECRET_ID}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH", "{VAULT_SECRET_PATH}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH_LTAR", "{VAULT_SECRET_PATH_LTAR}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_SECRET_PATH_IMGVWR", "{VAULT_SECRET_PATH_IMGVWR}", "Machine")
-[Environment]::SetEnvironmentVariable("VAULT_APPROLE_AUTH_PATH", "{VAULT_APPROLE_AUTH_PATH}", "Machine")
-
-[Environment]::SetEnvironmentVariable("APIPath", "{SURGE_API_PATH}", "Machine")
-[Environment]::SetEnvironmentVariable("SURGE_ENVNAME", "{SURGE_ENVNAME}", "Machine")
-[Environment]::SetEnvironmentVariable("SURGE_RPM_ONLINE_KEY", "/online", "Machine")
-
-$rawRpmRoot = "{SURGE_RPM_ROOT}"
-$formattedRpmRoot = $rawRpmRoot -replace '/',[char]92
-[Environment]::SetEnvironmentVariable("SURGE_RPM_ROOT", $formattedRpmRoot, "Machine")
-
-
-Write-Host "Setting environment to enable Datadog file logging"
-[Environment]::SetEnvironmentVariable("DD_LOGS_ENABLED", "true", "Machine")
+# Remove Existing and Copy Deployed Files for ETarWeb if app deployed
+if (Test-Path $StagingFolder\ETarWeb\*) {
+  Write-Host "Removing existing ETarWeb files from $SiteFolder\ETarWeb"
+  Remove-Item -Recurse $SiteFolder\ETarWeb\*
+  Write-Host "Removal status for ETarWeb files: $?"
+  Write-Host "Copying newly deployed ETarWeb files to $SiteName\ETarWeb"
+  xcopy /s/y/e  $StagingFolder\ETarWeb $SiteFolder\ETarWeb
+  Write-Host "Copy status for ETarWeb files: $?"
+}
 
 # Start Site and App Pools
 Write-Host "Starting Application Pools"
 Start-WebAppPool -Name "ETarWeb-SBX"
-
 
 Write-Host "Status of Application Pools"
 Get-IISAppPool -Name ETarWeb-SBX
@@ -113,7 +99,4 @@ Write-Host "Starting $SiteName"
 Start-Website -name "$SiteName"
 Write-Host "Start status: $?"
 
-Write-Host "Resetting IIS to ensure everything is restarted"
-& 'C:\Windows\System32\iisreset.exe'
-
-Write-Host "Environment Deploy Complete"
+Write-Host "Deploy Complete"
