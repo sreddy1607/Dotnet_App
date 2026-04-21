@@ -59,7 +59,7 @@ Write-Warning "  (\SysWOW64\ = 32-bit mode, \System32\ = 64-bit mode)"
 Write-Warning "Original arguments (if any): $args"
 
 # Variables
-$SiteName = "ETarWeb"
+$SiteName = "ETarWeb-SBX"
 
 # Stop Site and App Pools
 Write-Host "Stopping $SiteName"
@@ -70,14 +70,14 @@ Write-Host "Sleeping for 5 seconds for web site to stop"
 Start-Sleep -Seconds 5
 
 Write-Host "Stopping Application Pools"
-Stop-Web-App-Pool("ETarWeb")
+Stop-Web-App-Pool("ETarWeb-SBX")
 
 
 Write-Host "Sleeping for 5 seconds for app pools to stop"
 Start-Sleep -Seconds 5
 
 Write-Host "Status of Application Pools"
-Get-IISAppPool -Name ETarWeb
+Get-IISAppPool -Name ETarWeb-SBX
 
 # Set environment variables for Vault access
 Write-Host "Setting environment variables for Vault access"
@@ -103,11 +103,11 @@ Write-Host "Setting environment to enable Datadog file logging"
 
 # Start Site and App Pools
 Write-Host "Starting Application Pools"
-Start-WebAppPool -Name "ETarWeb"
+Start-WebAppPool -Name "ETarWeb-SBX"
 
 
 Write-Host "Status of Application Pools"
-Get-IISAppPool -Name ETarWeb
+Get-IISAppPool -Name ETarWeb-SBX
 
 Write-Host "Starting $SiteName"
 Start-Website -name "$SiteName"
