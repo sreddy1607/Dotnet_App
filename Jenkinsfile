@@ -8,34 +8,44 @@
  =======================================================================================
  */
  
- def branch = env.BRANCH_NAME ?: "sandbox00"
+ def branch = env.BRANCH_NAME ?: "master"
  def workingDir = "/home/jenkins/agent"
  
  def VAULT_SECRET_PATH = [
    "DEV":"kv-dev/data/us-west/dev-tar/tar-surgenet-service-secrets",
-   "SIT":"kv-tst/data/us-west/sit-tar/tar-surgenet-service-secrets"
+   "SIT":"kv-tst/data/us-west/sit-tar/tar-surgenet-service-secrets",
+   "UAT":"kv-tst/data/us-west/uat-tar/tar-surgenet-service-secrets",
+   "PRD":"kv-prd/data/us-west/prd-tar/tar-surgenet-service-secrets"
  ]
  
  def VAULT_SECRET_PATH_LTAR = [
    "DEV":"kv-dev/data/us-west/dev-tar/tar-ltar-service-secrets",
-   "SIT":"kv-tst/data/us-west/sit-tar/tar-ltar-service-secrets"
+   "SIT":"kv-tst/data/us-west/sit-tar/tar-ltar-service-secrets",
+   "UAT":"kv-tst/data/us-west/uat-tar/tar-ltar-service-secrets",
+   "PRD":"kv-prd/data/us-west/prd-tar/tar-ltar-service-secrets"
  ]
  
  def VAULT_SECRET_PATH_IMGVWR = [
    "DEV":"kv-dev/data/us-west/dev-tar/tar-image-viewer-service-secrets",
-   "SIT":"kv-tst/data/us-west/sit-tar/tar-image-viewer-service-secrets"
+   "SIT":"kv-tst/data/us-west/sit-tar/tar-image-viewer-service-secrets",
+   "UAT":"kv-tst/data/us-west/uat-tar/tar-image-viewer-service-secrets",
+   "PRD":"kv-prd/data/us-west/prd-tar/tar-image-viewer-service-secrets"
  ]
 
 def SURGE_ENV_CONFIG = [
-  "DEV":  ["SURGE_ENVNAME": "DEV",  "SURGE_RPM_ROOT": "E:/inetpub/ApiServices/RPM/dhcs_dev/rpm_root"],
-  "SIT":  ["SURGE_ENVNAME": "SIT",  "SURGE_RPM_ROOT": "E:/inetpub/ApiServices/RPM/dhcs_sit/rpm_root"]
+  "DEV":  ["SURGE_ENVNAME": "DEV",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_dev/rpm_root"],
+  "SIT":  ["SURGE_ENVNAME": "SIT",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_sit/rpm_root"],
+  "UAT":  ["SURGE_ENVNAME": "UAT",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_uat/rpm_root"],
+  "PRD": ["SURGE_ENVNAME": "PRD",  "SURGE_RPM_ROOT": "D:/inetpub/ApiServices/RPM/dhcs_prd/rpm_root"]
 ]
 
  def SURGE_ENV
 
 def VAULT_ADDR = [
     "DEV":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
-    "SIT":"https://np.secrets.cammis.medi-cal.ca.gov/v1/"
+    "SIT":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
+    "UAT":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
+    "PRD":"https://secrets.cammis.medi-cal.ca.gov/v1/"
 ]
 
  def VAULT_APPROLE_AUTH_PATH="auth/approle/login"
@@ -163,20 +173,11 @@ pipeline {
 
             properties([
               parameters([
-                choice(name: 'DEPLOY_ENV', choices: ['NONE','SANDBOX','HOTFIX'], description: 'Deployment Environment'),
+                choice(name: 'DEPLOY_ENV', choices: ['NONE','DEV','SIT','UAT','PRD'], description: 'Deployment Environment'),
               ])
             ])
 
-              def ENV_ALIAS_MAP = [
-                                "SANDBOX": "DEV",
-                                "HOTFIX": "SIT"
-                              ]
-
-                    if (params.DEPLOY_ENV == "NONE") {
-                       SURGE_ENV = "NONE"
-                     } else {
-                        SURGE_ENV = ENV_ALIAS_MAP[params.DEPLOY_ENV]
-                     }
+            SURGE_ENV = params.DEPLOY_ENV
 
             deleteDir()
 
