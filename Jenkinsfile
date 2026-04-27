@@ -1,165 +1,333 @@
-function Stop-Web-App-Pool($AppPoolName) {
-     if ((Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped") {
-         Write-Host "$AppPoolName already stopped"
-     }
-     else {
-         Write-Host "Shutting down $AppPoolName"
-         Stop-WebAppPool -Name $AppPoolName
-     }
+/*
+ =======================================================================================
+ This file is being updated constantly by the DevOps team to introduce new enhancements
+ based on the template.  If you have suggestions for improvement,
+ please contact the DevOps team so that we can incorporate the changes into the
+ template.  In the meantime, if you have made changes here or don't want this file to be
+ updated, please indicate so at the beginning of this file.
+ =======================================================================================
+ */
  
-     do {
-         Start-Sleep -Seconds 1
-     } until ((Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped")
- }
+ def branch = env.BRANCH_NAME ?: "sandbox00"
+ def workingDir = "/home/jenkins/agent"
  
- function Stop-Web-Site($WebsiteName) {
-     if ((Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped") {
-         Write-Host "$WebsiteName already stopped"
-     }
-     else {
-         Write-Host "Shutting down $WebsiteName"
-         Stop-Website -Name $WebsiteName
-     }
+ def VAULT_SECRET_PATH = [
+   "DEV":"kv-dev/data/us-west/dev-tar/tar-surgenet-service-secrets",
+   "SIT":"kv-tst/data/us-west/sit-tar/tar-surgenet-service-secrets"
+ ]
  
-     do {
-         Start-Sleep -Seconds 1
-     } until ((Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped")
- }
+ def VAULT_SECRET_PATH_LTAR = [
+   "DEV":"kv-dev/data/us-west/dev-tar/tar-ltar-service-secrets",
+   "SIT":"kv-tst/data/us-west/sit-tar/tar-ltar-service-secrets"
+ ]
  
- # Ensure script runs in 64-bit mode
- if ($PSHOME -like "*SysWOW64*") {
-     Write-Warning "Restarting script in 64-bit Windows PowerShell..."
-     & (Join-Path ($PSHOME -replace "SysWOW64", "SysNative") powershell.exe) -NoProfile -File `
-         (Join-Path $PSScriptRoot $MyInvocation.MyCommand) @args
-     Exit $LastExitCode
- }
+ def VAULT_SECRET_PATH_IMGVWR = [
+   "DEV":"kv-dev/data/us-west/dev-tar/tar-image-viewer-service-secrets",
+   "SIT":"kv-tst/data/us-west/sit-tar/tar-image-viewer-service-secrets"
+ ]
+
+def SURGE_ENV_CONFIG = [
+  "DEV":  ["SURGE_ENVNAME": "DEV",  "SURGE_RPM_ROOT": "E:/inetpub/ApiServices/RPM/dhcs_dev/rpm_root"],
+  "SIT":  ["SURGE_ENVNAME": "SIT",  "SURGE_RPM_ROOT": "E:/inetpub/ApiServices/RPM/dhcs_sit/rpm_root"]
+]
+
+ def SURGE_ENV
+
+def VAULT_ADDR = [
+    "DEV":"https://np.secrets.cammis.medi-cal.ca.gov/v1/",
+    "SIT":"https://np.secrets.cammis.medi-cal.ca.gov/v1/"
+]
+
+ def VAULT_APPROLE_AUTH_PATH="auth/approle/login"
 
 
-     Write-Warning "Hello from $PSHOME"
-     Write-Warning "  (\SysWOW64\ = 32-bit mode, \System32\ = 64-bit mode)"
-     Write-Warning "Original arguments (if any): $args"
-     
-     # Create Paths if they do not already exist
-     Write-Host "Creating directories if they do not already exist"
-     if (-Not (Test-Path -Path "E:\inetpub\ETarWeb")) {
-          New-Item -ItemType "directory" -Path "E:\inetpub\ETarWeb"
-     }
-     
-     if (-Not (Test-Path -Path "E:\IISLogs")) {
-          New-Item -ItemType "directory" -Path "E:\IISLogs"
-     }
-     
-     if (-Not (Test-Path -Path "E:\apps\ErrorLogs")) {
-          New-Item -ItemType "directory" -Path "E:\apps\ErrorLogs"
-     }
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+        apiVersion: v1
+        kind: Pod
+        spec:
+          serviceAccountName: jenkins
+          volumes:
+            - name: dockersock
+              hostPath:
+                path: /var/run/docker.sock
+            - emptyDir: {}
+              name: varlibcontainers
+            - name: jenkins-trusted-ca-bundle
+              configMap:
+                name: jenkins-trusted-ca-bundle
+                defaultMode: 420
+                optional: true
+          containers:
+            - name: dotnet
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammismspapp:1.0.34
+              tty: true
+              command: ["/bin/bash"]
+              securityContext:
+                privileged: true
+              workingDir: ${workingDir}
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+            - name: jnlp
+              securityContext:
+                privileged: true
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+            - name: node
+              image: registry.access.redhat.com/ubi8/nodejs-18:latest
+              tty: true
+              command: ["/bin/bash"]
+              securityContext:
+                privileged: true
+              workingDir: ${workingDir}
+              securityContext:
+                privileged: true
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+            - name: aws-boto3
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.0.1
+              tty: true
+              command: ["/bin/bash"]
+              workingDir: ${workingDir}
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+      """
+    }
+  }
 
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+    timeout(time:5 , unit: 'HOURS')
+    skipDefaultCheckout()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+  }
 
- 
- # Setup Paths & Variables
- Import-Module -Name WebAdministration
- $Hostname = ""
- $SiteName = "ETarWeb-SBX"
- $SiteFolder = 'E:\inetpub\ETarWeb'
- $LoggingDir = 'E:\IISLogs'
- $AppPoolName = 'ETarWeb-SBX'
- $StagingDir = "E:\tar-etar-web-staging"
- $IISRootDir = "E:\inetpub"
- 
- # Ensure Required Directories Exist
- Write-Host "Ensuring required directories exist..."
- @("$SiteFolder", "$LoggingDir", "E:\apps\ErrorLogs") | ForEach-Object {
-     if (-Not (Test-Path -Path $_)) {
-         New-Item -ItemType "directory" -Path $_ | Out-Null
-     }
- }
- 
- # Stop Site & App Pool if they exist
- Write-Host "Stopping '$SiteName'"
- Stop-Web-Site("$SiteName")
- 
- Write-Host "Stopping Application Pool '$AppPoolName'"
- Stop-Web-App-Pool("$AppPoolName")
- 
- # Remove Existing Site & App Pool
- Write-Host "Removing '$SiteName' from IIS"
- Remove-Website -Name "$SiteName" -ErrorAction SilentlyContinue
- 
- Write-Host "Removing Application Pool '$AppPoolName'"
- Remove-WebAppPool -Name "$AppPoolName" -ErrorAction SilentlyContinue
- 
- # Create New Application Pool
- Write-Host "Creating Application Pool '$AppPoolName'"
- New-WebAppPool -Name $AppPoolName
+  environment {
+    env_current_git_commit=""
+    env_accesskey=""
+    env_secretkey=""
+    env_tag_name=""
+    env_deploy_env=""
+    env_DEPLOY_ENVIRONMENT="true"
+    env_DEPLOY_FILES="false"
+    env_DEPLOY_CONFIG="false"
+  }
 
- # ================================
- # SET IIS RECYCLE TIME (12:15 AM PST → 08:15 UTC)
- # ================================
+  stages {
+    stage("initialize") {
+      steps {
+        container(name: "node") {
+          script {
 
- $RecycleTime = "08:15"
+            properties([
+              parameters([
+                choice(name: 'DEPLOY_ENV', choices: ['NONE','SANDBOX','HOTFIX'], description: 'Deployment Environment'),
+              ])
+            ])
 
- Write-Host "Clearing existing recycle schedule for '$AppPoolName'..."
+              def ENV_ALIAS_MAP = [
+                                "SANDBOX": "DEV",
+                                "HOTFIX": "SIT"
+                              ]
 
- # Clear all existing schedule entries (works on all IIS versions)
- Clear-WebConfiguration -Filter "system.applicationHost/applicationPools/add[@name='$AppPoolName']/recycling/periodicRestart/schedule"
+                    if (params.DEPLOY_ENV == "NONE") {
+                       SURGE_ENV = "NONE"
+                     } else {
+                        SURGE_ENV = ENV_ALIAS_MAP[params.DEPLOY_ENV]
+                     }
 
- Write-Host "Adding new recycle time $RecycleTime..."
+            deleteDir()
 
- # Add the new specific recycle time
- Add-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' `
-  -filter "system.applicationHost/applicationPools/add[@name='$AppPoolName']/recycling/periodicRestart/schedule" `
-  -name "." -value @{value=$RecycleTime}
+            checkout(scm).GIT_COMMIT
 
-Write-Host "Recycle schedule updated successfully to $RecycleTime UTC (12:15 AM PST)"
- 
- Write-Host "Disabling regular time interval recycling for $AppPoolName"
- Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name recycling.periodicRestart.time -Value ([TimeSpan]::Zero)
+            echo "Current deployment environment is ${SURGE_ENV}"
 
- # Set Application Pool to "No Managed Code"
- Write-Host "Setting $AppPoolName to No Managed Code"
- Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name managedRuntimeVersion -Value ""
+          } //END script
+        } //END container node
+      } //END steps
+    } //END stage
 
- Write-Host "Setting 'Load User Profile' to True for $AppPoolName"
- Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.loadUserProfile -Value $true
- 
- # Create IIS Site (No Nested App)
- Write-Host "Creating IIS site '$SiteName' and assigning to App Pool '$AppPoolName'"
- New-WebSite -Name "$SiteName" -PhysicalPath "$SiteFolder" -ApplicationPool "$AppPoolName" -Force
- 
- # Configure Site Bindings (No IP Address)
- Write-Host "Configuring web bindings for '$SiteName'"
- New-WebBinding -Name "$SiteName" -Port 8081 -HostHeader "$Hostname" -Protocol "http"
- 
- # Configure Logging Directory
- Write-Host "Setting logging directory for '$SiteName'"
- Set-WebConfigurationProperty "/system.applicationHost/sites/siteDefaults" -Name logfile.directory -Value $LoggingDir 
- 
- # Push the index.html file
- Write-Host "Deploying index.html"
- Remove-Item "$IISRootDir\index.html" -ErrorAction SilentlyContinue
- Copy-Item "$StagingDir\serverconfig\index.html" -Destination "$IISRootDir"
- (Get-Content "$IISRootDir\index.html") -replace "{server-hostname}", "$Hostname" | Set-Content "$IISRootDir\index.html"
- 
- Write-Host "Installing/Updating Datadog Configuration"
- xcopy /s/y/e $StagingDir\serverconfig\datadog\conf.d\* C:\ProgramData\Datadog\conf.d\
+    stage('Prepare Deployment') {
+      when {
+        expression {
+          SURGE_ENV != "NONE"
+        }
+      }
+      steps {
+        container(name: "aws-boto3") {
+          script {
 
- Write-Host "`nAdding ddagentuser to C:\ProgramData\Amazon\CodeDeploy\deployment-logs so Datadog can read the CodeDeploy log file`n"
- $Folder = 'C:\ProgramData\Amazon\CodeDeploy\deployment-logs'
- $ACL = Get-Acl $Folder
- $ACL_Rule = new-object System.Security.AccessControl.FileSystemAccessRule (
-    'ddagentuser',
-    'ReadAndExecute',
-    ([System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::Objectinherit),
-    [System.Security.AccessControl.PropagationFlags]::None,
-    [System.Security.AccessControl.AccessControlType]::Allow
- )
- $ACL.SetAccessRule($ACL_Rule)
- Set-Acl -Path $Folder -AclObject $ACL
+              def surgeEnv = SURGE_ENV_CONFIG[SURGE_ENV]
 
- Write-Host "Restarting the Datadog agent service"
- & 'C:\Program Files\Datadog\Datadog Agent\bin\agent.exe' restart-service
- 
- # Restart Datadog Service
- Write-Host "Restarting Datadog agent service"
- & 'C:\Program Files\Datadog\Datadog Agent\bin\agent.exe' restart-service
- 
- Write-Host "IIS Configuration Deployment Complete"
+            sh """#!/bin/bash
+              echo "Setting up app directories with files, or deployment will fail"
+              mkdir devops/codedeploy/surgeapi
+              touch devops/codedeploy/surgeapi/placeholder.txt
+              
+              echo "Replacing tokenized values for accessing Vault"
+              
+              sed -i "s,{VAULT_ADDR},${VAULT_ADDR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_SECRET_PATH},${VAULT_SECRET_PATH["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_SECRET_PATH_LTAR},${VAULT_SECRET_PATH_LTAR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_SECRET_PATH_IMGVWR},${VAULT_SECRET_PATH_IMGVWR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_APPROLE_AUTH_PATH},${VAULT_APPROLE_AUTH_PATH}," devops/codedeploy/environment/deploy-environment.ps1
+
+         
+               sed -i "s,{SURGE_ENVNAME},${surgeEnv["SURGE_ENVNAME"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{SURGE_RPM_ROOT},${surgeEnv["SURGE_RPM_ROOT"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
+
+            """
+            if ("${SURGE_ENV}" != "PRD") {
+              withCredentials([string(credentialsId: 'APPROLE_ROLE_ID', variable: 'APPROLE_ROLE_ID')]) {
+                sh """#!/bin/bash
+                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
+                """
+              }
+
+              withCredentials([string(credentialsId: 'APPROLE_SECRET_ID', variable: 'APPROLE_SECRET_ID')]) {
+                sh """#!/bin/bash
+                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
+                  echo "Preparing Deployment"
+                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
+                """
+              }
+            } else {
+              withCredentials([string(credentialsId: 'APPROLE_ROLE_ID_PRD', variable: 'APPROLE_ROLE_ID')]) {
+                sh """#!/bin/bash
+                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
+                """
+              }
+
+              withCredentials([string(credentialsId: 'APPROLE_SECRET_ID_PRD', variable: 'APPROLE_SECRET_ID')]) {
+                sh """#!/bin/bash
+                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
+                  echo "Preparing Deployment"
+                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
+                """
+              }
+            }
+          } // end of script
+        } // end of container
+      } // end of steps
+    }  // end of Prepare Deployment Stage
+
+    stage('Deploy') {
+      when {
+        expression {
+          SURGE_ENV != "NONE"
+        }
+      }
+      steps {
+        container(name: "aws-boto3") {
+          script {
+            echo "Deploy to Non-DR"
+
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              step([$class: 'AWSCodeDeployPublisher',
+                  applicationName: "tar-surge-app-${SURGE_ENV}",
+                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                  credentials: 'awsAccessKey',
+                  deploymentConfig: "tar-surge-app-${SURGE_ENV}-config",
+                  deploymentGroupAppspec: false,
+                  deploymentGroupName: "tar-surge-app-${SURGE_ENV}-INPLACE-deployment-group",
+                  deploymentMethod: 'deploy',
+                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                  region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
+                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+            }
+            
+            if ("${SURGE_ENV}" != "DEV") {
+              echo "Deploy to DR"
+              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                step([$class: 'AWSCodeDeployPublisher',
+                    applicationName: "tar-surge-app-${SURGE_ENV}-DR",
+                    awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                    awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                    credentials: 'awsAccessKey',
+                    deploymentConfig: "tar-surge-app-${SURGE_ENV}-DR-config",
+                    deploymentGroupAppspec: false,
+                    deploymentGroupName: "tar-surge-app-${SURGE_ENV}-DR-INPLACE-deployment-group",
+                    deploymentMethod: 'deploy',
+                    excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                    region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
+                    subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+              }
+            }
+          } // end of script
+        } // end of container
+      } // end of steps
+    } // end of Deploy stage
+  } // end of stages
+
+  //pipeline post actions
+  post {
+    always {
+        echo "Build Process complete."
+    } // always
+
+    success {
+        echo "Build Process was success."
+    } //success
+
+    unstable {
+        echo "Build is unstable."
+    } // unstable
+
+    aborted {
+        echo "Pipeline aborted."
+    } // aborted
+
+    failure {
+        echo "Build encountered failures ."
+    } // failure
+
+    changed {
+        echo "Build content was changed."
+    } // changed
+
+  } // post
+}
