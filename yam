@@ -221,35 +221,34 @@ pipeline {
              sed -i "s|{DEPLOY_ENVIRONMENT}|${env_DEPLOY_ENVIRONMENT}|g" devops/codedeploy/after-install.bat
 
             """
-            if ("${SURGE_ENV}" != "PRD") {
-              withCredentials([string(credentialsId: 'APPROLE_ROLE_ID', variable: 'APPROLE_ROLE_ID')]) {
-                sh """#!/bin/bash
-                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                """
-              }
+         if ("${SURGE_ENV}" != "PRD") {
 
-              withCredentials([string(credentialsId: 'APPROLE_SECRET_ID', variable: 'APPROLE_SECRET_ID')]) {
-                sh """#!/bin/bash
-                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                  echo "Preparing Deployment"
-                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
-                """
-              }
-            } else {
-              withCredentials([string(credentialsId: 'APPROLE_ROLE_ID_PRD', variable: 'APPROLE_ROLE_ID')]) {
-                sh """#!/bin/bash
-                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                """
-              }
+          withCredentials([string(credentialsId: 'APPROLE_ROLE_ID', variable: 'APPROLE_ROLE_ID')]) {
+            sh """#!/bin/bash
+              sed -i "s|\\"{APPROLE_ROLE_ID}\\"|\\"${APPROLE_ROLE_ID}\\"|g" devops/codedeploy/environment/deploy-environment.ps1
+            """
+          }
 
-              withCredentials([string(credentialsId: 'APPROLE_SECRET_ID_PRD', variable: 'APPROLE_SECRET_ID')]) {
-                sh """#!/bin/bash
-                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
-                  echo "Preparing Deployment"
-                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
-                """
-              }
-            }
+          withCredentials([string(credentialsId: 'APPROLE_SECRET_ID', variable: 'APPROLE_SECRET_ID')]) {
+            sh """#!/bin/bash
+              sed -i "s|\\"{APPROLE_SECRET_ID}\\"|\\"${APPROLE_SECRET_ID}\\"|g" devops/codedeploy/environment/deploy-environment.ps1
+            """
+          }
+
+        } else {
+
+          withCredentials([string(credentialsId: 'APPROLE_ROLE_ID_PRD', variable: 'APPROLE_ROLE_ID')]) {
+            sh """#!/bin/bash
+              sed -i "s|\\"{APPROLE_ROLE_ID}\\"|\\"${APPROLE_ROLE_ID}\\"|g" devops/codedeploy/environment/deploy-environment.ps1
+            """
+          }
+
+          withCredentials([string(credentialsId: 'APPROLE_SECRET_ID_PRD', variable: 'APPROLE_SECRET_ID')]) {
+            sh """#!/bin/bash
+              sed -i "s|\\"{APPROLE_SECRET_ID}\\"|\\"${APPROLE_SECRET_ID}\\"|g" devops/codedeploy/environment/deploy-environment.ps1
+            """
+          }
+        }
           } // end of script
         } // end of container
       } // end of steps
