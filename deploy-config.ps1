@@ -58,11 +58,8 @@ Write-Warning "Hello from $PSHOME"
 Write-Warning "  (\SysWOW64\ = 32-bit mode, \System32\ = 64-bit mode)"
 Write-Warning "Original arguments (if any): $args"
 
-Import-Module WebAdministration
-
 # Variables
 $SiteName = "Apiservices-SBX"
-$AppPoolName = "Apiservices-SBX"
 
 # Stop Site and App Pools
 Write-Host "Stopping $SiteName"
@@ -82,24 +79,27 @@ Start-Sleep -Seconds 5
 Write-Host "Status of Application Pools"
 Get-IISAppPool -Name Apiservices-SBX
 
-Write-Host "Setting App Pool–level environment variables for $AppPoolName"
+Write-Host "Setting App Pool–level environment variables for Apiservices-SBX"
 
-# Vault variables
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.VAULT_ADDRESS -Value "https://np.secrets.cammis.medi-cal.ca.gov/v1/"
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.VAULT_APPROLE_ROLE_ID -Value "APPROLE_ROLE_ID"
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.VAULT_APPROLE_SECRET_ID -Value "APPROLE_SECRET_ID"
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.VAULT_SECRET_PATH -Value "kv-dev/data/us-west/dev-tar/tar-surgenet-service-secrets"
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.VAULT_SECRET_PATH_LTAR -Value "kv-dev/data/us-west/dev-tar/tar-ltar-service-secrets"
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.VAULT_SECRET_PATH_IMGVWR -Value "kv-dev/data/us-west/dev-tar/tar-image-viewer-service-secrets"
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.VAULT_APPROLE_AUTH_PATH -Value "auth/approle/login"
+$envVars = @{
+    VAULT_ADDRESS              = "https://np.secrets.cammis.medi-cal.ca.gov/v1/"
+    VAULT_APPROLE_ROLE_ID      = "APPROLE_ROLE_ID"
+    VAULT_APPROLE_SECRET_ID    = "APPROLE_SECRET_ID"
+    VAULT_SECRET_PATH          = "kv-dev/data/us-west/dev-tar/tar-surgenet-service-secrets"
+    VAULT_SECRET_PATH_LTAR     = "kv-dev/data/us-west/dev-tar/tar-ltar-service-secrets"
+    VAULT_SECRET_PATH_IMGVWR   = "kv-dev/data/us-west/dev-tar/tar-image-viewer-service-secrets"
+    VAULT_APPROLE_AUTH_PATH    = "auth/approle/login"
 
-# Surge variables
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.SURGE_ENVNAME -Value "SANDBOX"
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.SURGE_RPM_ROOT -Value "E:/inetpub/ApiServices/RPM/dhcs_dev/rpm_root"
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.SURGE_RPM_ONLINE_KEY -Value "/online"
+    SURGE_ENVNAME              = "SANDBOX"
+    SURGE_RPM_ROOT             = "E:/inetpub/ApiServices/RPM/dhcs_dev/rpm_root"
+    SURGE_RPM_ONLINE_KEY       = "/online"
 
-# Datadog
-Set-ItemProperty "IIS:\AppPools\$AppPoolName" -Name processModel.environmentVariables.DD_LOGS_ENABLED -Value "true"
+    DD_LOGS_ENABLED            = "true"
+}
+
+Set-ItemProperty "IIS:\AppPools\Apiservices-SBX" `
+  -Name processModel.environmentVariables `
+  -Value $envVars
 
 Write-Host "App Pool environment variables applied successfully"
 
