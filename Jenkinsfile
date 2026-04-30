@@ -10,7 +10,12 @@
  
  def branch = env.BRANCH_NAME ?: "sandbox00"
  def workingDir = "/home/jenkins/agent"
- 
+
+  def SURGE_API_PATH = [
+  "DEV": "https://dev.surnetapi.cammis.medi-cal.ca.gov/",
+  "SIT": "https://sit.surnetapi.cammis.medi-cal.ca.gov/"
+  ]	
+
  def VAULT_SECRET_PATH = [
    "DEV":"kv-dev/data/us-west/dev-tar/tar-surgenet-service-secrets",
    "SIT":"kv-tst/data/us-west/sit-tar/tar-surgenet-service-secrets"
