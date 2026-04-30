@@ -10,12 +10,7 @@
  
  def branch = env.BRANCH_NAME ?: "sandbox00"
  def workingDir = "/home/jenkins/agent"
-
-  def SURGE_API_PATH = [
-  "DEV": "https://dev.surnetapi.cammis.medi-cal.ca.gov/",
-  "SIT": "https://sit.surnetapi.cammis.medi-cal.ca.gov/"
-  ]	
-
+ 
  def VAULT_SECRET_PATH = [
    "DEV":"kv-dev/data/us-west/dev-tar/tar-surgenet-service-secrets",
    "SIT":"kv-tst/data/us-west/sit-tar/tar-surgenet-service-secrets"
@@ -194,7 +189,7 @@ pipeline {
       } //END steps
     } //END stage
 
-    stage('Prepare Deployment') {
+   stage('Prepare Deployment') {
       when {
         expression {
           SURGE_ENV != "NONE"
@@ -210,8 +205,8 @@ pipeline {
               echo "Setting up app directories with files, or deployment will fail"
               mkdir devops/codedeploy/surgeapi
               touch devops/codedeploy/surgeapi/placeholder.txt
-
-                echo "Replacing tokenized values for accessing Vault"
+              
+             echo "Replacing tokenized values for accessing Vault"
               
                sed -i "s,{VAULT_ADDR},${VAULT_ADDR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
                sed -i "s,{VAULT_SECRET_PATH},${VAULT_SECRET_PATH["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
@@ -219,7 +214,7 @@ pipeline {
                sed -i "s,{VAULT_SECRET_PATH_IMGVWR},${VAULT_SECRET_PATH_IMGVWR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
                sed -i "s,{VAULT_APPROLE_AUTH_PATH},${VAULT_APPROLE_AUTH_PATH}," devops/codedeploy/environment/deploy-environment.ps1
                sed -i "s,{SURGE_RPM_ROOT},${SURGE_RPM_ROOT["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{SURGE_API_PATH},${SURGE_API_PATH["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               
                sed -i "s,{SURGE_ENVNAME},${SURGE_ENV}," devops/codedeploy/environment/deploy-environment.ps1
 
             """
@@ -257,8 +252,11 @@ pipeline {
       
               }
             }
-          } // end of script
-        } // end of container
+
+            """
+      
+              }
+            }
 
     stage('Deploy') {
       when {
@@ -308,32 +306,5 @@ pipeline {
       } // end of steps
     } // end of Deploy stage
   } // end of stages
-
-  //pipeline post actions
-  post {
-    always {
-        echo "Build Process complete."
-    } // always
-
-    success {
-        echo "Build Process was success."
-    } //success
-
-    unstable {
-        echo "Build is unstable."
-    } // unstable
-
-    aborted {
-        echo "Pipeline aborted."
-    } // aborted
-
-    failure {
-        echo "Build encountered failures ."
-    } // failure
-
-    changed {
-        echo "Build content was changed."
-    } // changed
-
-  } // post
+}
 }
