@@ -27,8 +27,8 @@
  ]
 
 def SURGE_ENV_CONFIG = [
-  "DEV":  ["SURGE_ENVNAME": "DEV",  "SURGE_RPM_ROOT": "E:/inetpub/ApiServices/RPM/dhcs_dev/rpm_root"],
-  "SIT":  ["SURGE_ENVNAME": "SIT",  "SURGE_RPM_ROOT": "E:/inetpub/ApiServices/RPM/dhcs_sit/rpm_root"]
+  "DEV":  ["SURGE_ENVNAME": "SANDBOX",  "SURGE_RPM_ROOT": "E:/inetpub/ApiServices/RPM/dhcs_dev/rpm_root"],
+  "SIT":  ["SURGE_ENVNAME": "HOTFIX",  "SURGE_RPM_ROOT": "E:/inetpub/ApiServices/RPM/dhcs_sit/rpm_root"]
 ]
 
  def SURGE_ENV
@@ -205,54 +205,16 @@ pipeline {
               echo "Setting up app directories with files, or deployment will fail"
               mkdir devops/codedeploy/surgeapi
               touch devops/codedeploy/surgeapi/placeholder.txt
- 
-
-             echo "Replacing tokenized values for accessing Vault"
-
-             sed -i "s|\"{VAULT_ADDR}\"|\"${VAULT_ADDR["${SURGE_ENV}"]}\"|g" devops/codedeploy/environment/deploy-environment.ps1
-             sed -i "s|\"{VAULT_SECRET_PATH}\"|\"${VAULT_SECRET_PATH["${SURGE_ENV}"]}\"|g" devops/codedeploy/environment/deploy-environment.ps1
-             sed -i "s|\"{VAULT_SECRET_PATH_LTAR}\"|\"${VAULT_SECRET_PATH_LTAR["${SURGE_ENV}"]}\"|g" devops/codedeploy/environment/deploy-environment.ps1
-             sed -i "s|\"{VAULT_SECRET_PATH_IMGVWR}\"|\"${VAULT_SECRET_PATH_IMGVWR["${SURGE_ENV}"]}\"|g" devops/codedeploy/environment/deploy-environment.ps1
-             sed -i "s|\"{VAULT_APPROLE_AUTH_PATH}\"|\"${VAULT_APPROLE_AUTH_PATH}\"|g" devops/codedeploy/environment/deploy-environment.ps1
-
-             sed -i "s|\"{SURGE_ENVNAME}\"|\"${surgeEnv["SURGE_ENVNAME"]}\"|g" devops/codedeploy/environment/deploy-environment.ps1
-             sed -i "s|\"{SURGE_RPM_ROOT}\"|\"${surgeEnv["SURGE_RPM_ROOT"]}\"|g" devops/codedeploy/environment/deploy-environment.ps1
-
-             sed -i "s|{DEPLOY_ENVIRONMENT}|${env_DEPLOY_ENVIRONMENT}|g" devops/codedeploy/after-install.bat
+              
+              echo "Replacing tokenized values for accessing Vault"
+             sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
 
             """
-         if ("${SURGE_ENV}" != "PRD") {
-
-          withCredentials([string(credentialsId: 'APPROLE_ROLE_ID', variable: 'APPROLE_ROLE_ID')]) {
-            sh """#!/bin/bash
-              sed -i "s|\\"{APPROLE_ROLE_ID}\\"|\\"${APPROLE_ROLE_ID}\\"|g" devops/codedeploy/environment/deploy-environment.ps1
-            """
-          }
-
-          withCredentials([string(credentialsId: 'APPROLE_SECRET_ID', variable: 'APPROLE_SECRET_ID')]) {
-            sh """#!/bin/bash
-              sed -i "s|\\"{APPROLE_SECRET_ID}\\"|\\"${APPROLE_SECRET_ID}\\"|g" devops/codedeploy/environment/deploy-environment.ps1
-            """
-          }
-
-        } else {
-
-          withCredentials([string(credentialsId: 'APPROLE_ROLE_ID_PRD', variable: 'APPROLE_ROLE_ID')]) {
-            sh """#!/bin/bash
-              sed -i "s|\\"{APPROLE_ROLE_ID}\\"|\\"${APPROLE_ROLE_ID}\\"|g" devops/codedeploy/environment/deploy-environment.ps1
-            """
-          }
-
-          withCredentials([string(credentialsId: 'APPROLE_SECRET_ID_PRD', variable: 'APPROLE_SECRET_ID')]) {
-            sh """#!/bin/bash
-              sed -i "s|\\"{APPROLE_SECRET_ID}\\"|\\"${APPROLE_SECRET_ID}\\"|g" devops/codedeploy/environment/deploy-environment.ps1
-            """
-          }
-        }
+      
+              }
+            }
           } // end of script
         } // end of container
-      } // end of steps
-    }  // end of Prepare Deployment Stage
 
     stage('Deploy') {
       when {
