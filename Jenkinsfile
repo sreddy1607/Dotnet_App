@@ -217,7 +217,7 @@ pipeline {
                sed -i "s,{VAULT_APPROLE_AUTH_PATH},${VAULT_APPROLE_AUTH_PATH}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
                sed -i "s,{SURGE_RPM_ROOT},${SURGE_RPM_ROOT["${SURGE_ENV}"]}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
                sed -i "s,{SURGE_API_PATH},${SURGE_API_PATH["${SURGE_ENV}"]}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{SURGE_ENVNAME},${SURGE_ENV}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{SURGE_ENVNAME},${params.DEPLOY_ENV}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
 
             """
             if ("${SURGE_ENV}" != "PRD") {
