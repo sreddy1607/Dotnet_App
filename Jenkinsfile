@@ -205,47 +205,47 @@ pipeline {
           script {
             sh """#!/bin/bash
               echo "Setting up app directories with files, or deployment will fail"
-              mkdir devops.ETAR/codedeploy/etar
-              touch devops.ETAR/codedeploy/etar/placeholder.txt
+              mkdir devops/codedeploy/eTAR
+              touch devops/codedeploy/eTAR/placeholder.txt
               
               echo "Replacing tokenized values for accessing Vault"
               
-               sed -i "s,{VAULT_ADDR},${VAULT_ADDR["${SURGE_ENV}"]}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_SECRET_PATH},${VAULT_SECRET_PATH["${SURGE_ENV}"]}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_SECRET_PATH_LTAR},${VAULT_SECRET_PATH_LTAR["${SURGE_ENV}"]}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_SECRET_PATH_IMGVWR},${VAULT_SECRET_PATH_IMGVWR["${SURGE_ENV}"]}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{VAULT_APPROLE_AUTH_PATH},${VAULT_APPROLE_AUTH_PATH}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{SURGE_RPM_ROOT},${SURGE_RPM_ROOT["${SURGE_ENV}"]}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{SURGE_API_PATH},${SURGE_API_PATH["${SURGE_ENV}"]}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
-               sed -i "s,{SURGE_ENVNAME},${params.DEPLOY_ENV}," devops.ETAR/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_ADDR},${VAULT_ADDR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_SECRET_PATH},${VAULT_SECRET_PATH["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_SECRET_PATH_LTAR},${VAULT_SECRET_PATH_LTAR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_SECRET_PATH_IMGVWR},${VAULT_SECRET_PATH_IMGVWR["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{VAULT_APPROLE_AUTH_PATH},${VAULT_APPROLE_AUTH_PATH}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{SURGE_RPM_ROOT},${SURGE_RPM_ROOT["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{SURGE_API_PATH},${SURGE_API_PATH["${SURGE_ENV}"]}," devops/codedeploy/environment/deploy-environment.ps1
+               sed -i "s,{SURGE_ENVNAME},${params.DEPLOY_ENV}," devops/codedeploy/environment/deploy-environment.ps1
 
             """
             if ("${SURGE_ENV}" != "PRD") {
               withCredentials([string(credentialsId: 'APPROLE_ROLE_ID', variable: 'APPROLE_ROLE_ID')]) {
                 sh """#!/bin/bash
-                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops.ETAR/codedeploy/environment/deploy-environment.ps1
+                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
                 """
               }
 
               withCredentials([string(credentialsId: 'APPROLE_SECRET_ID', variable: 'APPROLE_SECRET_ID')]) {
                 sh """#!/bin/bash
-                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops.ETAR/codedeploy/environment/deploy-environment.ps1
+                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
                   echo "Preparing Deployment"
-                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops.ETAR/codedeploy/after-install.bat
+                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
                 """
               }
             } else {
               withCredentials([string(credentialsId: 'APPROLE_ROLE_ID_PRD', variable: 'APPROLE_ROLE_ID')]) {
                 sh """#!/bin/bash
-                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops.ETAR/codedeploy/environment/deploy-environment.ps1
+                sed -i "s/{APPROLE_ROLE_ID}/${APPROLE_ROLE_ID}/" devops/codedeploy/environment/deploy-environment.ps1
                 """
               }
 
               withCredentials([string(credentialsId: 'APPROLE_SECRET_ID_PRD', variable: 'APPROLE_SECRET_ID')]) {
                 sh """#!/bin/bash
-                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops.ETAR/codedeploy/environment/deploy-environment.ps1
+                  sed -i "s/{APPROLE_SECRET_ID}/${APPROLE_SECRET_ID}/" devops/codedeploy/environment/deploy-environment.ps1
                   echo "Preparing Deployment"
-                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops.ETAR/codedeploy/after-install.bat
+                  sed -i "s,{DEPLOY_ENVIRONMENT},${env_DEPLOY_ENVIRONMENT}," devops/codedeploy/after-install.bat
                 """
               }
             }
@@ -255,53 +255,47 @@ pipeline {
     }  // end of Prepare Deployment Stage
 
     stage('Deploy') {
-      when {
-        expression {
-          SURGE_ENV != "NONE"
-        }
-      }
       steps {
         container(name: "aws-boto3") {
           script {
-            echo "Deploy to Non-DR"
+            echo "Deploy"
 
-            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr-ecs', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
               step([$class: 'AWSCodeDeployPublisher',
-                  applicationName: "tar-etar-app-${SURGE_ENV}",
-                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
-                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
-                  credentials: 'awsAccessKey',
-                  deploymentConfig: "tar-etar-app-${SURGE_ENV}-config",
-                  deploymentGroupAppspec: false,
-                  deploymentGroupName: "tar-etar-app-${SURGE_ENV}-INPLACE-deployment-group",
-                  deploymentMethod: 'deploy',
-                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
-                  region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
-                  subdirectory: 'devops.ETAR/codedeploy', versionFileName: '', waitForCompletion: true])
+                applicationName: "tar-etar-web-${env_deploy_env}",
+                awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                credentials: 'awsAccessKey',
+                deploymentConfig: "tar-etar-web-${env_deploy_env}-config",
+                deploymentGroupAppspec: false,
+                deploymentGroupName: "tar-etar-web-${env_deploy_env}-INPLACE-deployment-group",
+                deploymentMethod: 'deploy',
+                excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
+                subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
             }
-            
-            if ("${SURGE_ENV}" != "DEV") {
+            if ("${env_deploy_env}" != "DEV") {
               echo "Deploy to DR"
-              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                step([$class: 'AWSCodeDeployPublisher',
-                    applicationName: "tar-etar-app-${SURGE_ENV}-DR",
-                    awsAccessKey: "${AWS_ACCESS_KEY_ID}",
-                    awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
-                    credentials: 'awsAccessKey',
-                    deploymentConfig: "tar-etar-app-${SURGE_ENV}-DR-config",
-                    deploymentGroupAppspec: false,
-                    deploymentGroupName: "tar-etar-app-${SURGE_ENV}-DR-INPLACE-deployment-group",
-                    deploymentMethod: 'deploy',
-                    excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
-                    region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
-                    subdirectory: 'devops.ETAR/codedeploy', versionFileName: '', waitForCompletion: true])
-              }
-            }
-          } // end of script
-        } // end of container
-      } // end of steps
-    } // end of Deploy stage
-  } // end of stages
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr-ecs', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              step([$class: 'AWSCodeDeployPublisher',
+                applicationName: "tar-etar-web-${env_deploy_env}-DR",
+                awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                credentials: 'awsAccessKey',
+                deploymentConfig: "tar-etar-web-${env_deploy_env}-DR-config",
+                deploymentGroupAppspec: false,
+                deploymentGroupName: "tar-etar-web-${env_deploy_env}-DR-INPLACE-deployment-group",
+                deploymentMethod: 'deploy',
+                excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                region: 'us-east-1', s3bucket: 'dhcs-codedeploy-app-dr', 
+                subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+            }   
+          }
+        }
+      }
+    }
+   }
+  }
 
   //pipeline post actions
   post {
