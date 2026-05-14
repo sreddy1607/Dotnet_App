@@ -1,4 +1,66 @@
-  name: "jnlp"
+	Pod [Pending][ContainersNotReady] containers with unready status: [dotnet jnlp node aws-boto3]
+Agent tar-jobs-etar-tar-etar-web-env-sandbox00-10-2pcfd-bj7f8-n8p5m is provisioned from template TAR-Jobs_ETAR_tar-etar-web-env_sandbox00_10-2pcfd-bj7f8
+---
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  annotations:
+    kubernetes.jenkins.io/last-refresh: "1778776454498"
+    buildUrl: "http://jenkins.jenkins-builder.svc.cluster.local:80/job/TAR-Jobs/job/ETAR/job/tar-etar-web-env/job/sandbox00/10/"
+    runUrl: "job/TAR-Jobs/job/ETAR/job/tar-etar-web-env/job/sandbox00/10/"
+  labels:
+    jenkins: "slave"
+    jenkins/label-digest: "8f6e920db6d68a28c8114b94c156303c69c762d6"
+    jenkins/label: "TAR-Jobs_ETAR_tar-etar-web-env_sandbox00_10-2pcfd"
+    kubernetes.jenkins.io/controller: "http___jenkins_jenkins-builder_svc_cluster_local_80x"
+  name: "tar-jobs-etar-tar-etar-web-env-sandbox00-10-2pcfd-bj7f8-n8p5m"
+  namespace: "jenkins-builder"
+spec:
+  containers:
+  - command:
+    - "/bin/bash"
+    env:
+    - name: "HOME"
+      value: "/home/jenkins/agent"
+    - name: "BRANCH"
+      value: "sandbox00"
+    envFrom:
+    - configMapRef:
+        name: "jenkins-agent-env"
+        optional: true
+    image: "136299550619.dkr.ecr.us-west-2.amazonaws.com/cammismspapp:1.0.34"
+    name: "dotnet"
+    securityContext:
+      privileged: true
+    tty: true
+    volumeMounts:
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+    workingDir: "/home/jenkins/agent"
+  - env:
+    - name: "GIT_SSL_CAINFO"
+      value: "/etc/pki/tls/certs/ca-bundle.crt"
+    - name: "JENKINS_SECRET"
+      value: "********"
+    - name: "JENKINS_TUNNEL"
+      value: "jenkins-jnlp.jenkins-builder.svc.cluster.local:50000"
+    - name: "JENKINS_AGENT_NAME"
+      value: "tar-jobs-etar-tar-etar-web-env-sandbox00-10-2pcfd-bj7f8-n8p5m"
+    - name: "REMOTING_OPTS"
+      value: "-noReconnectAfter 1d"
+    - name: "JENKINS_NAME"
+      value: "tar-jobs-etar-tar-etar-web-env-sandbox00-10-2pcfd-bj7f8-n8p5m"
+    - name: "JENKINS_AGENT_WORKDIR"
+      value: "/home/jenkins/agent"
+    - name: "JENKINS_URL"
+      value: "http://jenkins.jenkins-builder.svc.cluster.local:80/"
+    envFrom:
+    - configMapRef:
+        name: "jenkins-agent-env"
+        optional: true
+    image: "jenkins/inbound-agent:3355.v388858a_47b_33-3-jdk21"
+    name: "jnlp"
     resources:
       requests:
         memory: "256Mi"
@@ -78,14 +140,14 @@
       medium: ""
     name: "workspace-volume"
 
-Running on tar-jobs-etar-tar-etar-web-env-sandbox00-5-mr7w8-k8bm6-hg8hn in /home/jenkins/agent/workspace/_ETAR_tar-etar-web-env_sandbox00
+Running on tar-jobs-etar-tar-etar-web-env-sandbox00-10-2pcfd-bj7f8-n8p5m in /home/jenkins/agent/workspace/_ETAR_tar-etar-web-env_sandbox00
 [Pipeline] {
 [Pipeline] withEnv
 [Pipeline] {
 [Pipeline] timestamps
 [Pipeline] {
 [Pipeline] timeout
-09:10:09  Timeout set to expire in 5 hr 0 min
+09:34:17  Timeout set to expire in 5 hr 0 min
 [Pipeline] {
 [Pipeline] stage
 [Pipeline] { (initialize)
@@ -96,29 +158,29 @@ Running on tar-jobs-etar-tar-etar-web-env-sandbox00-5-mr7w8-k8bm6-hg8hn in /home
 [Pipeline] properties
 [Pipeline] deleteDir
 [Pipeline] checkout
-09:10:09  Selected Git installation does not exist. Using Default
-09:10:09  The recommended git tool is: NONE
-09:10:10  using credential githubkey
-09:10:10  Warning: JENKINS-30600: special launcher org.csanchez.jenkins.plugins.kubernetes.pipeline.ContainerExecDecorator$1@75771f16; decorates RemoteLauncher[hudson.remoting.Channel@3097b1c9:JNLP4-connect connection from ip-10-155-6-49.us-west-2.compute.internal/10.155.6.49:57828] will be ignored (a typical symptom is the Git executable not being run inside a designated container)
-09:10:10  Cloning the remote Git repository
-09:10:10  Cloning with configured refspecs honoured and without tags
-09:10:10  Cloning repository https://github.com/ca-mmis/tar-etar-web.git
-09:10:10   > git init /home/jenkins/agent/workspace/_ETAR_tar-etar-web-env_sandbox00 # timeout=10
-09:10:10  Fetching upstream changes from https://github.com/ca-mmis/tar-etar-web.git
-09:10:10   > git --version # timeout=10
-09:10:10   > git --version # 'git version 2.47.3'
-09:10:10  using GIT_ASKPASS to set credentials githubkey
-09:10:10   > git fetch --no-tags --force --progress -- https://github.com/ca-mmis/tar-etar-web.git +refs/heads/sandbox00:refs/remotes/origin/sandbox00 # timeout=10
-09:10:11  Avoid second fetch
-09:10:11  Checking out Revision 216edd9a0baa77db016389df8bd9ca4ac15b289d (sandbox00)
-09:10:11   > git config remote.origin.url https://github.com/ca-mmis/tar-etar-web.git # timeout=10
-09:10:11   > git config --add remote.origin.fetch +refs/heads/sandbox00:refs/remotes/origin/sandbox00 # timeout=10
-09:10:11   > git config core.sparsecheckout # timeout=10
-09:10:11   > git checkout -f 216edd9a0baa77db016389df8bd9ca4ac15b289d # timeout=10
-09:10:12  Commit message: "Update Jenkinsfile.environment"
-09:10:12   > git rev-list --no-walk 216edd9a0baa77db016389df8bd9ca4ac15b289d # timeout=10
+09:34:17  Selected Git installation does not exist. Using Default
+09:34:17  The recommended git tool is: NONE
+09:34:18  using credential githubkey
+09:34:18  Warning: JENKINS-30600: special launcher org.csanchez.jenkins.plugins.kubernetes.pipeline.ContainerExecDecorator$1@3ad88a39; decorates RemoteLauncher[hudson.remoting.Channel@605c6879:JNLP4-connect connection from ip-10-155-6-55.us-west-2.compute.internal/10.155.6.55:55652] will be ignored (a typical symptom is the Git executable not being run inside a designated container)
+09:34:18  Cloning the remote Git repository
+09:34:18  Cloning with configured refspecs honoured and without tags
+09:34:18  Cloning repository https://github.com/ca-mmis/tar-etar-web.git
+09:34:18   > git init /home/jenkins/agent/workspace/_ETAR_tar-etar-web-env_sandbox00 # timeout=10
+09:34:18  Fetching upstream changes from https://github.com/ca-mmis/tar-etar-web.git
+09:34:18   > git --version # timeout=10
+09:34:18   > git --version # 'git version 2.47.3'
+09:34:18  using GIT_ASKPASS to set credentials githubkey
+09:34:18   > git fetch --no-tags --force --progress -- https://github.com/ca-mmis/tar-etar-web.git +refs/heads/sandbox00:refs/remotes/origin/sandbox00 # timeout=10
+09:34:19  Avoid second fetch
+09:34:19  Checking out Revision 216edd9a0baa77db016389df8bd9ca4ac15b289d (sandbox00)
+09:34:19  Commit message: "Update Jenkinsfile.environment"
+09:34:19   > git config remote.origin.url https://github.com/ca-mmis/tar-etar-web.git # timeout=10
+09:34:19   > git config --add remote.origin.fetch +refs/heads/sandbox00:refs/remotes/origin/sandbox00 # timeout=10
+09:34:19   > git config core.sparsecheckout # timeout=10
+09:34:19   > git checkout -f 216edd9a0baa77db016389df8bd9ca4ac15b289d # timeout=10
+09:34:19   > git rev-list --no-walk 216edd9a0baa77db016389df8bd9ca4ac15b289d # timeout=10
 [Pipeline] echo
-09:10:16  Current deployment environment is DEV
+09:34:23  Current deployment environment is SIT
 [Pipeline] }
 [Pipeline] // script
 [Pipeline] }
@@ -132,25 +194,25 @@ Running on tar-jobs-etar-tar-etar-web-env-sandbox00-5-mr7w8-k8bm6-hg8hn in /home
 [Pipeline] script
 [Pipeline] {
 [Pipeline] sh
-09:10:17  Setting up app directories with files, or deployment will fail
-09:10:17  Replacing tokenized values for accessing Vault
+09:34:24  Setting up app directories with files, or deployment will fail
+09:34:24  Replacing tokenized values for accessing Vault
 [Pipeline] withCredentials
-09:10:17  Masking supported pattern matches of $APPROLE_ROLE_ID
+09:34:24  Masking supported pattern matches of $APPROLE_ROLE_ID
 [Pipeline] {
 [Pipeline] sh
-09:10:17  Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
-09:10:17  		 Affected argument(s) used the following variable(s): [APPROLE_ROLE_ID]
-09:10:17  		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
+09:34:24  Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+09:34:24  		 Affected argument(s) used the following variable(s): [APPROLE_ROLE_ID]
+09:34:24  		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
 [Pipeline] }
 [Pipeline] // withCredentials
 [Pipeline] withCredentials
-09:10:17  Masking supported pattern matches of $APPROLE_SECRET_ID
+09:34:25  Masking supported pattern matches of $APPROLE_SECRET_ID
 [Pipeline] {
 [Pipeline] sh
-09:10:17  Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
-09:10:17  		 Affected argument(s) used the following variable(s): [APPROLE_SECRET_ID]
-09:10:17  		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
-09:10:18  Preparing Deployment
+09:34:25  Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+09:34:25  		 Affected argument(s) used the following variable(s): [APPROLE_SECRET_ID]
+09:34:25  		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
+09:34:25  Preparing Deployment
 [Pipeline] }
 [Pipeline] // withCredentials
 [Pipeline] }
@@ -166,48 +228,69 @@ Running on tar-jobs-etar-tar-etar-web-env-sandbox00-5-mr7w8-k8bm6-hg8hn in /home
 [Pipeline] script
 [Pipeline] {
 [Pipeline] echo
-09:10:18  Deploy
+09:34:26  Deploy
 [Pipeline] withCredentials
-09:10:18  Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
+09:34:26  Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
 [Pipeline] {
 [Pipeline] step
-09:10:18  Warning: A secret was passed to "step" using Groovy String interpolation, which is insecure.
-09:10:18  		 Affected argument(s) used the following variable(s): [AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY]
-09:10:18  		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
-09:10:18  Zipping files into /tmp/#5-16536270838829264735.zip
-09:10:19  Uploading zip to s3://dhcs-codedeploy-app/#5-16536270838829264735.zip
-09:10:19  Registering revision for application 'tar-etar-web-DEV'
-09:10:19  Creating deployment with revision at {RevisionType: S3,S3Location: {Bucket: dhcs-codedeploy-app,Key: #5-16536270838829264735.zip,BundleType: zip,ETag: 156927bb9c7a65f408ba338be06ee510},}
-09:10:19  Failed CodeDeploy post-build step; exception follows.
-09:10:19  The Deployment Group 'tar-etar-web-DEV-INPLACE-deployment-group (id=6e2de753-b433-43cc-9174-1411d66641e6)' already has an active Deployment 'd-ZAFCQGUOI' (Service: AmazonCodeDeploy; Status Code: 400; Error Code: DeploymentLimitExceededException; Request ID: f1d6304a-2d76-449e-b515-765d6a7853a0; Proxy: null)
-09:10:19  com.amazonaws.services.codedeploy.model.DeploymentLimitExceededException: The Deployment Group 'tar-etar-web-DEV-INPLACE-deployment-group (id=6e2de753-b433-43cc-9174-1411d66641e6)' already has an active Deployment 'd-ZAFCQGUOI' (Service: AmazonCodeDeploy; Status Code: 400; Error Code: DeploymentLimitExceededException; Request ID: f1d6304a-2d76-449e-b515-765d6a7853a0; Proxy: null)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.handleErrorResponse(AmazonHttpClient.java:1912)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.handleServiceErrorResponse(AmazonHttpClient.java:1450)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeOneRequest(AmazonHttpClient.java:1419)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeHelper(AmazonHttpClient.java:1183)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.doExecute(AmazonHttpClient.java:838)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeWithTimer(AmazonHttpClient.java:805)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.execute(AmazonHttpClient.java:779)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.access$500(AmazonHttpClient.java:735)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutionBuilderImpl.execute(AmazonHttpClient.java:717)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:581)
-09:10:19  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:559)
-09:10:19  	at PluginClassLoader for aws-java-sdk-codedeploy//com.amazonaws.services.codedeploy.AmazonCodeDeployClient.doInvoke(AmazonCodeDeployClient.java:4389)
-09:10:19  	at PluginClassLoader for aws-java-sdk-codedeploy//com.amazonaws.services.codedeploy.AmazonCodeDeployClient.invoke(AmazonCodeDeployClient.java:4356)
-09:10:19  	at PluginClassLoader for aws-java-sdk-codedeploy//com.amazonaws.services.codedeploy.AmazonCodeDeployClient.invoke(AmazonCodeDeployClient.java:4345)
-09:10:19  	at PluginClassLoader for aws-java-sdk-codedeploy//com.amazonaws.services.codedeploy.AmazonCodeDeployClient.executeCreateDeployment(AmazonCodeDeployClient.java:1609)
-09:10:19  	at PluginClassLoader for aws-java-sdk-codedeploy//com.amazonaws.services.codedeploy.AmazonCodeDeployClient.createDeployment(AmazonCodeDeployClient.java:1578)
-09:10:19  	at PluginClassLoader for codedeploy//com.amazonaws.codedeploy.AWSCodeDeployPublisher.createDeployment(AWSCodeDeployPublisher.java:418)
-09:10:19  	at PluginClassLoader for codedeploy//com.amazonaws.codedeploy.AWSCodeDeployPublisher.perform(AWSCodeDeployPublisher.java:240)
-09:10:19  	at jenkins.tasks.SimpleBuildStep.perform(SimpleBuildStep.java:123)
-09:10:19  	at PluginClassLoader for workflow-basic-steps//org.jenkinsci.plugins.workflow.steps.CoreStep$Execution.run(CoreStep.java:101)
-09:10:19  	at PluginClassLoader for workflow-basic-steps//org.jenkinsci.plugins.workflow.steps.CoreStep$Execution.run(CoreStep.java:71)
-09:10:19  	at PluginClassLoader for workflow-step-api//org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:49)
-09:10:19  	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
-09:10:19  	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
-09:10:19  	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
-09:10:19  	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
-09:10:19  	at java.base/java.lang.Thread.run(Thread.java:1583)
+09:34:26  Warning: A secret was passed to "step" using Groovy String interpolation, which is insecure.
+09:34:26  		 Affected argument(s) used the following variable(s): [AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY]
+09:34:26  		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
+09:34:26  Zipping files into /tmp/#10-735008552865543668.zip
+09:34:26  Uploading zip to s3://dhcs-codedeploy-app/#10-735008552865543668.zip
+09:34:26  Registering revision for application 'tar-etar-web-SIT'
+09:34:26  Creating deployment with revision at {RevisionType: S3,S3Location: {Bucket: dhcs-codedeploy-app,Key: #10-735008552865543668.zip,BundleType: zip,ETag: 2dc54c85fb0b9358ba54943bec5d7d18},}
+09:34:27  Monitoring deployment with ID d-39XV3STOI...
+09:34:27  Deployment status: Created; instances: null
+09:34:42  Deployment status: Created; instances: null
+09:34:57  Deployment status: InProgress; instances: {Pending: 2,InProgress: 0,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+09:35:12  Deployment status: InProgress; instances: {Pending: 2,InProgress: 0,Succeeded: 0,Failed: 0,Skipped: 0,Ready: 0}
+09:35:27  Deployment status: Succeeded; instances: {Pending: 0,InProgress: 0,Succeeded: 2,Failed: 0,Skipped: 0,Ready: 0}
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] echo
+09:35:27  Deploy to DR
+[Pipeline] withCredentials
+09:35:27  Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
+[Pipeline] {
+[Pipeline] step
+09:35:27  Warning: A secret was passed to "step" using Groovy String interpolation, which is insecure.
+09:35:27  		 Affected argument(s) used the following variable(s): [AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY]
+09:35:27  		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
+09:35:28  Zipping files into /tmp/#10-15856056240904191885.zip
+09:35:28  Uploading zip to s3://dhcs-codedeploy-app-dr/#10-15856056240904191885.zip
+09:35:28  Registering revision for application 'tar-etar-web-SIT-DR'
+09:35:28  Creating deployment with revision at {RevisionType: S3,S3Location: {Bucket: dhcs-codedeploy-app-dr,Key: #10-15856056240904191885.zip,BundleType: zip,ETag: 2dc54c85fb0b9358ba54943bec5d7d18},}
+09:35:28  Failed CodeDeploy post-build step; exception follows.
+09:35:28  The Deployment Group 'tar-etar-web-SIT-DR-INPLACE-deployment-group (id=f24347ec-3994-4455-9cc0-1580031133db)' already has an active Deployment 'd-W1Y8LQGGJ' (Service: AmazonCodeDeploy; Status Code: 400; Error Code: DeploymentLimitExceededException; Request ID: 7c603e72-65c3-4bd5-a1a7-42e6e47f1590; Proxy: null)
+09:35:28  com.amazonaws.services.codedeploy.model.DeploymentLimitExceededException: The Deployment Group 'tar-etar-web-SIT-DR-INPLACE-deployment-group (id=f24347ec-3994-4455-9cc0-1580031133db)' already has an active Deployment 'd-W1Y8LQGGJ' (Service: AmazonCodeDeploy; Status Code: 400; Error Code: DeploymentLimitExceededException; Request ID: 7c603e72-65c3-4bd5-a1a7-42e6e47f1590; Proxy: null)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.handleErrorResponse(AmazonHttpClient.java:1912)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.handleServiceErrorResponse(AmazonHttpClient.java:1450)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeOneRequest(AmazonHttpClient.java:1419)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeHelper(AmazonHttpClient.java:1183)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.doExecute(AmazonHttpClient.java:838)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeWithTimer(AmazonHttpClient.java:805)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.execute(AmazonHttpClient.java:779)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutor.access$500(AmazonHttpClient.java:735)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient$RequestExecutionBuilderImpl.execute(AmazonHttpClient.java:717)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:581)
+09:35:28  	at PluginClassLoader for aws-java-sdk-minimal//com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:559)
+09:35:28  	at PluginClassLoader for aws-java-sdk-codedeploy//com.amazonaws.services.codedeploy.AmazonCodeDeployClient.doInvoke(AmazonCodeDeployClient.java:4389)
+09:35:28  	at PluginClassLoader for aws-java-sdk-codedeploy//com.amazonaws.services.codedeploy.AmazonCodeDeployClient.invoke(AmazonCodeDeployClient.java:4356)
+09:35:28  	at PluginClassLoader for aws-java-sdk-codedeploy//com.amazonaws.services.codedeploy.AmazonCodeDeployClient.invoke(AmazonCodeDeployClient.java:4345)
+09:35:28  	at PluginClassLoader for aws-java-sdk-codedeploy//com.amazonaws.services.codedeploy.AmazonCodeDeployClient.executeCreateDeployment(AmazonCodeDeployClient.java:1609)
+09:35:28  	at PluginClassLoader for aws-java-sdk-codedeploy//com.amazonaws.services.codedeploy.AmazonCodeDeployClient.createDeployment(AmazonCodeDeployClient.java:1578)
+09:35:28  	at PluginClassLoader for codedeploy//com.amazonaws.codedeploy.AWSCodeDeployPublisher.createDeployment(AWSCodeDeployPublisher.java:418)
+09:35:28  	at PluginClassLoader for codedeploy//com.amazonaws.codedeploy.AWSCodeDeployPublisher.perform(AWSCodeDeployPublisher.java:240)
+09:35:28  	at jenkins.tasks.SimpleBuildStep.perform(SimpleBuildStep.java:123)
+09:35:28  	at PluginClassLoader for workflow-basic-steps//org.jenkinsci.plugins.workflow.steps.CoreStep$Execution.run(CoreStep.java:101)
+09:35:28  	at PluginClassLoader for workflow-basic-steps//org.jenkinsci.plugins.workflow.steps.CoreStep$Execution.run(CoreStep.java:71)
+09:35:28  	at PluginClassLoader for workflow-step-api//org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:49)
+09:35:28  	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+09:35:28  	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+09:35:28  	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+09:35:28  	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+09:35:28  	at java.base/java.lang.Thread.run(Thread.java:1583)
 [Pipeline] }
 [Pipeline] // withCredentials
 [Pipeline] }
@@ -219,11 +302,11 @@ Running on tar-jobs-etar-tar-etar-web-env-sandbox00-5-mr7w8-k8bm6-hg8hn in /home
 [Pipeline] stage
 [Pipeline] { (Declarative: Post Actions)
 [Pipeline] echo
-09:10:19  Build Process complete.
+09:35:29  Build Process complete.
 [Pipeline] echo
-09:10:19  Build content was changed.
+09:35:29  Build content was changed.
 [Pipeline] echo
-09:10:19  Build encountered failures .
+09:35:29  Build encountered failures .
 [Pipeline] }
 [Pipeline] // stage
 [Pipeline] }
@@ -241,5 +324,5 @@ ERROR: null
 
 GitHub has been notified of this commit’s build result
 
-/var/lib/jenkins/jobs/TAR-Jobs/jobs/ETAR/jobs/tar-etar-web-env/workspace/sandbox00@tmp/jfrog/5/.jfrog deleted
+/var/lib/jenkins/jobs/TAR-Jobs/jobs/ETAR/jobs/tar-etar-web-env/workspace/sandbox00@tmp/jfrog/10/.jfrog deleted
 Finished: FAILURE
