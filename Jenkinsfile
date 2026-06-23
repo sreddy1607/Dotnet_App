@@ -8,7 +8,7 @@ updated, please indicate so at the beginning of this file.
 =======================================================================================
 */
 
-def branch = env.BRANCH_NAME ?: "sandbox00"
+def branch = env.BRANCH_NAME ?: "Dev"
 def workingDir = "/home/jenkins/agent"
 
 pipeline {
@@ -153,7 +153,7 @@ pipeline {
 
             env_deploy_env = "DEV"
 
-            echo "Current deployment environment is sandbox"
+            echo "Current deployment environment is ${env_deploy_env}"
 
             env_tag_name = "${branch}_${BUILD_NUMBER}_${env_current_git_commit}"
 
@@ -169,7 +169,7 @@ pipeline {
             echo "Tag will be applied to: ${env_current_git_commit}"
             
             def repositories = [
-                        [name: 'tar-surge-client', branch: 'sandbox00', url: 'https://github.com/ca-mmis/tar-surge-client.git'],
+                        [name: 'tar-surge-client', branch: 'master', url: 'https://github.com/ca-mmis/tar-surge-client.git'],
                         [name: 'tar-surge-app', branch: 'master', url: 'https://github.com/ca-mmis/tar-surge-app.git']
                     ]
 
@@ -246,10 +246,10 @@ pipeline {
         // Copy build + configs
           sh """
             cp -r build_output/* devops/codedeploy/SurgeUpdate/
-            cp tar-surge-client/Config/SANDBOX/* devops/codedeploy/SurgeUpdate/
+            cp tar-surge-client/Config/${env_deploy_env}/* devops/codedeploy/SurgeUpdate/
           
             cd devops/codedeploy/SurgeUpdate
-			zip -r SurgeUpdate_sandbox.ZIP .
+			zip -r SurgeUpdate_${env_deploy_env}.ZIP .
           """
         }
       }
@@ -298,12 +298,12 @@ stage('Sonar Scan') {
                   git pull
 
 				  # Prepare folders
-					  mkdir -p ${WORKSPACE}/deployrepo/deployments-combined-devops/SurgeAutoupdate/sandbox/SurgeUpdate
-					  rm -rf SurgeAutoupdate/sandbox/SurgeUpdate/*
+					  mkdir -p ${WORKSPACE}/deployrepo/deployments-combined-devops/SurgeAutoupdate/dev/SurgeUpdate
+					  rm -rf SurgeAutoupdate/dev/SurgeUpdate/*
 
 						
 					  echo "Copying ZIP to deployed combined repo"
-					  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_sandbox.ZIP SurgeAutoupdate/sandbox/SurgeUpdate/
+					  cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP SurgeAutoupdate/dev/SurgeUpdate/
 					
 					  # Commit and push
 					  git add .
@@ -358,18 +358,18 @@ stage('Sonar Scan') {
 
 					  echo "Removing BAT script from SurgeUpdate before zipping..."
 					  rm -f ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeInstall_${env_deploy_env}.bat || true
-					  rm -f ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_sandbox.ZIP	
+					  rm -f ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP	
 					  
 					  echo "Recreating ZIP again without BAT script..."
 					  cd ${WORKSPACE}/devops/codedeploy/SurgeUpdate
-					  zip -r SurgeUpdate_sandbox.ZIP .
+					  zip -r SurgeUpdate_${env_deploy_env}.ZIP .
 
 						
 						
 					  echo "Copying ZIP and BAT script separately..."
 					  cd ${WORKSPACE}/deployrepo/tar-surge-client-deployment
 		              
-		              cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_sandbox.ZIP tar-surge-client/
+		              cp ${WORKSPACE}/devops/codedeploy/SurgeUpdate/SurgeUpdate_${env_deploy_env}.ZIP tar-surge-client/
 		              cp ${WORKSPACE}/Config/${env_deploy_env}/SurgeInstall_${env_deploy_env}.bat tar-surge-client/
 		
 		              # Commit and push changes
@@ -380,8 +380,8 @@ stage('Sonar Scan') {
 		              fi
 		
 		              # Tag this deployment
-		              git tag -f -a "sandbox" -m "Deploying Thickclient - Tag ${env_tag_name}"
-		              git push origin "sandbox" --force
+		              git tag -f -a "${env_tag_name}" -m "Deploying Thickclient - Tag ${env_tag_name}"
+		              git push origin "${env_tag_name}" --force
 					  
                 """
               } //end withCredentials
