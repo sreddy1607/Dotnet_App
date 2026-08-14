@@ -1,82 +1,287 @@
-2026-08-14 18:38:18 LifecycleEvent - BeforeInstall
-2026-08-14 18:38:18 Script - \before-install.bat
-2026-08-14 18:38:18 [stdout]
-2026-08-14 18:38:18 [stdout]C:\Windows\System32>REM Install Internet Information Server (IIS).  
-2026-08-14 18:38:18 [stdout]
-2026-08-14 18:38:18 [stdout]C:\Windows\System32>c:\Windows\Sysnative\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command Import-Module -Name ServerManager 
-2026-08-14 18:38:18 [stdout]
-2026-08-14 18:38:18 [stdout]C:\Windows\System32>c:\Windows\Sysnative\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command Install-WindowsFeature Web-Server 
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]Success Restart Needed Exit Code      Feature Result                               
-2026-08-14 18:38:19 [stdout]------- -------------- ---------      --------------                               
-2026-08-14 18:38:19 [stdout]True    No             NoChangeNeeded {}                                           
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]C:\Windows\System32>REM Backup existing configuration for IIS 
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]C:\Windows\System32>C:\Windows\System32\inetsrv\appcmd.exe add backup 
-2026-08-14 18:38:19 [stdout]BACKUP object "20260814T183819" added
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]C:\Windows\System32>REM Ensure that api directory is empty before deploying files 
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]C:\Windows\System32>DEL /S /Q E:\tar-surge-Api-staging\Apiservices\* 
-2026-08-14 18:38:19 [stderr]The system cannot find the path specified.
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]C:\Windows\System32>DEL /S /Q E:\tar-surge-Api-staging\serverconfig\* 
-2026-08-14 18:38:19 [stderr]The system cannot find the path specified.
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]C:\Windows\System32>DEL /S /Q E:\tar-surge-Api-staging\environment\* 
-2026-08-14 18:38:19 [stderr]The system cannot find the path specified.
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]C:\Windows\System32>DEL /S /Q E:\tar-surge-Api-staging\scripts\* 
-2026-08-14 18:38:19 [stderr]The system cannot find the path specified.
-2026-08-14 18:38:19 [stdout]
-2026-08-14 18:38:19 [stdout]C:\Windows\System32>exit 0 
-2026-08-14 18:38:21 LifecycleEvent - AfterInstall
-2026-08-14 18:38:21 Script - \after-install.bat
-2026-08-14 18:38:21 [stdout]"ENVIRONMENT will be deployed"
-2026-08-14 18:38:22 [stdout]WARNING: Restarting this script under 64-bit Windows PowerShell.
-2026-08-14 18:38:22 [stdout]WARNING: Hello from C:\Windows\System32\WindowsPowerShell\v1.0
-2026-08-14 18:38:22 [stdout]WARNING:   (\SysWOW64\ = 32-bit mode, \System32\ = 64-bit mode)
-2026-08-14 18:38:22 [stdout]WARNING: Original arguments (if any): 
-2026-08-14 18:38:22 [stdout]Environment  : SANDBOX
-2026-08-14 18:38:22 [stdout]IIS Site     : Apiservices-SBX
-2026-08-14 18:38:22 [stdout]App Pool     : Apiservices-SBX
-2026-08-14 18:38:22 [stdout]Vault Addr   : https://np.secrets.cammis.medi-cal.ca.gov/v1/
-2026-08-14 18:38:22 [stdout]RPM Root     : E:/inetpub/ApiServices/RPM/dhcs_sbx/rpm_root
-2026-08-14 18:38:22 [stdout]WebAdministration module loaded
-2026-08-14 18:38:22 [stdout]appcmd.exe found at: C:\WINDOWS\system32\inetsrv\appcmd.exe
-2026-08-14 18:38:22 [stdout]--- Stopping IIS site and app pool ---
-2026-08-14 18:38:22 [stdout]Shutting down the  Apiservices-SBX
-2026-08-14 18:38:22 [stdout]    Apiservices-SBX status:  Started
-2026-08-14 18:38:22 [stdout]    Apiservices-SBX status:  Stopped
-2026-08-14 18:38:23 [stdout]Apiservices-SBX  stopped successfully
-2026-08-14 18:38:23 [stdout]Sleeping 5 seconds after site stop
-2026-08-14 18:38:28 [stdout]Shutting down the  Apiservices-SBX
-2026-08-14 18:38:28 [stdout]    Apiservices-SBX status:  Started
-2026-08-14 18:38:28 [stdout]    Apiservices-SBX status:  Stopping
-2026-08-14 18:38:29 [stdout]    Apiservices-SBX status:  Stopping
-2026-08-14 18:38:30 [stdout]Apiservices-SBX  stopped successfully
-2026-08-14 18:38:30 [stdout]Sleeping 5 seconds after app pool stop
-2026-08-14 18:38:35 [stdout]App pool state after stop:
-2026-08-14 18:38:35 [stdout]
-2026-08-14 18:38:35 [stdout]--- Checking for lingering w3wp.exe worker processes ---
-2026-08-14 18:38:35 [stdout]Killing w3wp.exe PID: 1428
-2026-08-14 18:38:35 [stdout]Sleeping 3 seconds after killing worker processes
-2026-08-14 18:38:38 [stdout]Worker processes cleared
-2026-08-14 18:38:38 [stdout]--- Applying environment variables via appcmd.exe ---
-2026-08-14 18:38:38 [stdout]Clearing existing environment variables...
-2026-08-14 18:38:39 [stdout]ERROR ( message:Unknown attribute "environmentVariables".  Replace with -? for help. )
-2026-08-14 18:38:39 [stdout]Existing environment variables cleared
-2026-08-14 18:38:39 [stdout]ERROR ( message:New add object missing required attributes. Cannot add duplicate collection entry of type 'add' with unique key attribute 'name' set to 'SURGE_ENVNAME'
-2026-08-14 18:38:39 [stdout]
-2026-08-14 18:38:39 [stdout]. )
-2026-08-14 18:38:39 [stdout]Name              State
-2026-08-14 18:38:39 [stdout]----              -----
-2026-08-14 18:38:39 [stdout]Apiservices-SBX Stopped
-2026-08-14 18:38:39 [stderr]E:\tar-surge-Api-staging\environment\deploy-environment.ps1 : Failed to set environment variable: SURGE_ENVNAME (exit 
-2026-08-14 18:38:39 [stderr]code 183)
-2026-08-14 18:38:39 [stderr]    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
-2026-08-14 18:38:39 [stderr]    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,deploy-environment.ps1
-2026-08-14 18:38:39 [stderr] 
+function Stop-Web-App-Pool($AppPoolName) {
+    if ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped" ) {
+        Write-Host $AppPoolName " already stopped"
+    }
+    else {
+        Write-Host "Shutting down the " $AppPoolName
+        Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
+        Stop-WebAppPool -Name $AppPoolName
+    }
+    do {
+        Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
+        Start-Sleep -Seconds 1
+    }
+    until ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped" )
+    Write-Host $AppPoolName " stopped successfully"
+}
+
+function Start-Web-App-Pool($AppPoolName) {
+    if ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Started" ) {
+        Write-Host $AppPoolName " already started"
+    }
+    else {
+        Write-Host "Starting up " $AppPoolName
+        Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
+        Start-WebAppPool -Name $AppPoolName
+    }
+    do {
+        Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
+        Start-Sleep -Seconds 1
+    }
+    until ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Started" )
+    Write-Host $AppPoolName " started successfully"
+}
+
+function Stop-Web-Site($WebsiteName) {
+    if ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped" ) {
+        Write-Host $WebsiteName " already stopped"
+    }
+    else {
+        Write-Host "Shutting down the " $WebsiteName
+        Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
+        Stop-Website -Name $WebsiteName
+    }
+    do {
+        Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
+        Start-Sleep -Seconds 1
+    }
+    until ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped" )
+    Write-Host $WebsiteName " stopped successfully"
+}
+
+function Start-Web-Site($WebsiteName) {
+    if ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Started" ) {
+        Write-Host $WebsiteName " already started"
+    }
+    else {
+        Write-Host "Starting up " $WebsiteName
+        Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
+        Start-Website -Name $WebsiteName
+    }
+    do {
+        Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
+        Start-Sleep -Seconds 1
+    }
+    until ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Started" )
+    Write-Host $WebsiteName " started successfully"
+}
+
+# This is needed because AWS CodeDeploy Agent runs in 32-bit mode,
+# script below needs to run in 64-bit mode.
+# Are you running in 32-bit mode?
+#   (\SysWOW64\ = 32-bit mode)
+
+if ($PSHOME -like "*SysWOW64*")
+{
+    Write-Warning "Restarting this script under 64-bit Windows PowerShell."
+
+    & (Join-Path ($PSHOME -replace "SysWOW64", "SysNative") powershell.exe) -File `
+        (Join-Path $PSScriptRoot $MyInvocation.MyCommand) @args
+
+    Exit $LastExitCode
+}
+
+Write-Warning "Hello from $PSHOME"
+Write-Warning "  (\SysWOW64\ = 32-bit mode, \System32\ = 64-bit mode)"
+Write-Warning "Original arguments (if any): $args"
+
+# ---------------------------------------------------------------------------
+# Tokenized variables - replaced by Jenkins sed during Prepare Deployment
+# ---------------------------------------------------------------------------
+
+$VaultAddress          = "{VAULT_ADDR}"
+$VaultAppRoleRoleId    = "{APPROLE_ROLE_ID}"
+$VaultAppRoleSecretId  = "{APPROLE_SECRET_ID}"
+$VaultSecretPath       = "{VAULT_SECRET_PATH}"
+$VaultSecretPathLtar   = "{VAULT_SECRET_PATH_LTAR}"
+$VaultSecretPathImgVwr = "{VAULT_SECRET_PATH_IMGVWR}"
+$VaultAppRoleAuthPath  = "{VAULT_APPROLE_AUTH_PATH}"
+$SurgeEnvName          = "{SURGE_ENVNAME}"
+$SurgeRpmRoot          = "{SURGE_RPM_ROOT}"
+
+# ---------------------------------------------------------------------------
+# IIS site and app pool names
+# ---------------------------------------------------------------------------
+
+$AppPoolName = "Apiservices-SBX"
+$SiteName    = "Apiservices-SBX"
+$appcmd      = "$env:SystemRoot\system32\inetsrv\appcmd.exe"
+
+Write-Host "Environment  : $SurgeEnvName"
+Write-Host "IIS Site     : $SiteName"
+Write-Host "App Pool     : $AppPoolName"
+Write-Host "Vault Addr   : $VaultAddress"
+Write-Host "RPM Root     : $SurgeRpmRoot"
+
+# ---------------------------------------------------------------------------
+# Validate IIS module is available before proceeding
+# ---------------------------------------------------------------------------
+
+if (-not (Get-Module -ListAvailable -Name WebAdministration)) {
+    Write-Error "WebAdministration module not found. Ensure IIS is installed."
+    Exit 1
+}
+Import-Module WebAdministration
+Write-Host "WebAdministration module loaded"
+
+# ---------------------------------------------------------------------------
+# Validate appcmd.exe exists
+# ---------------------------------------------------------------------------
+
+if (-not (Test-Path $appcmd)) {
+    Write-Error "appcmd.exe not found at: $appcmd"
+    Exit 1
+}
+Write-Host "appcmd.exe found at: $appcmd"
+
+# ---------------------------------------------------------------------------
+# Verify the site and app pool exist
+# ---------------------------------------------------------------------------
+
+if (-not (Test-Path "IIS:\Sites\$SiteName")) {
+    Write-Error "IIS site '$SiteName' does not exist."
+    Exit 1
+}
+
+if (-not (Test-Path "IIS:\AppPools\$AppPoolName")) {
+    Write-Error "IIS app pool '$AppPoolName' does not exist."
+    Exit 1
+}
+
+# ---------------------------------------------------------------------------
+# Stop site and app pool
+# ---------------------------------------------------------------------------
+
+Write-Host "--- Stopping IIS site and app pool ---"
+
+Stop-Web-Site($SiteName)
+Write-Host "Sleeping 5 seconds after site stop"
+Start-Sleep -Seconds 5
+
+Stop-Web-App-Pool($AppPoolName)
+Write-Host "Sleeping 5 seconds after app pool stop"
+Start-Sleep -Seconds 5
+
+Write-Host "App pool state after stop:"
+Get-IISAppPool -Name $AppPoolName | Select-Object Name, State
+
+# ---------------------------------------------------------------------------
+# Kill any lingering w3wp.exe worker processes
+# ---------------------------------------------------------------------------
+
+Write-Host "--- Checking for lingering w3wp.exe worker processes ---"
+
+$workers = Get-Process -Name "w3wp" -ErrorAction SilentlyContinue
+if ($workers) {
+    $workers | ForEach-Object {
+        Write-Host "Killing w3wp.exe PID: $($_.Id)"
+        Stop-Process -Id $_.Id -Force
+    }
+    Write-Host "Sleeping 3 seconds after killing worker processes"
+    Start-Sleep -Seconds 3
+    Write-Host "Worker processes cleared"
+} else {
+    Write-Host "No lingering w3wp.exe processes found"
+}
+
+# ---------------------------------------------------------------------------
+# Apply environment variables using appcmd.exe
+# This is the most reliable method on IIS 10 / Windows Server 2025.
+# ServerManager was abandoned due to null EnvironmentVariables collection.
+# Steps:
+#   1. Clear all existing env vars on the app pool
+#   2. Add each env var individually
+# ---------------------------------------------------------------------------
+
+Write-Host "--- Applying environment variables via appcmd.exe ---"
+
+# Step 1 - Clear all existing environment variables from the app pool
+Write-Host "Clearing existing environment variables..."
+& $appcmd set apppool "$AppPoolName" /environmentVariables
+Write-Host "Existing environment variables cleared"
+
+# Step 2 - Add each environment variable
+$envVars = @{
+    VAULT_ADDRESS            = $VaultAddress
+    VAULT_APPROLE_ROLE_ID    = $VaultAppRoleRoleId
+    VAULT_APPROLE_SECRET_ID  = $VaultAppRoleSecretId
+    VAULT_SECRET_PATH        = $VaultSecretPath
+    VAULT_SECRET_PATH_LTAR   = $VaultSecretPathLtar
+    VAULT_SECRET_PATH_IMGVWR = $VaultSecretPathImgVwr
+    VAULT_APPROLE_AUTH_PATH  = $VaultAppRoleAuthPath
+    SURGE_ENVNAME            = $SurgeEnvName
+    SURGE_RPM_ROOT           = $SurgeRpmRoot
+    SURGE_RPM_ONLINE_KEY     = "/online"
+    DD_LOGS_ENABLED          = "true"
+}
+
+$envVars.GetEnumerator() | ForEach-Object {
+    $name  = $_.Key
+    $value = $_.Value
+
+    & $appcmd set config `
+        -section:system.applicationHost/applicationPools `
+        /+"[name='$AppPoolName'].environmentVariables.[name='$name',value='$value']" `
+        /commit:apphost
+
+    if ($LASTEXITCODE -eq 0) {
+        if ($name -match "ROLE_ID|SECRET_ID") {
+            Write-Host "    Set: $name = ****"
+        } else {
+            Write-Host "    Set: $name = $value"
+        }
+    } else {
+        Write-Error "Failed to set environment variable: $name (exit code $LASTEXITCODE)"
+        Exit 1
+    }
+}
+
+Write-Host "All environment variables applied via appcmd.exe"
+
+# ---------------------------------------------------------------------------
+# Verify env vars were written - read back via appcmd.exe
+# ---------------------------------------------------------------------------
+
+Write-Host "--- Verifying environment variables ---"
+& $appcmd list config -section:system.applicationHost/applicationPools `
+    /xml | Select-String -Pattern "environmentVariable|$AppPoolName"
+
+# ---------------------------------------------------------------------------
+# Start app pool and site
+# ---------------------------------------------------------------------------
+
+Write-Host "--- Starting IIS app pool and site ---"
+
+Start-Web-App-Pool($AppPoolName)
+Write-Host "Sleeping 5 seconds after app pool start"
+Start-Sleep -Seconds 5
+
+Write-Host "App pool state after start:"
+Get-IISAppPool -Name $AppPoolName | Select-Object Name, State
+
+Start-Web-Site($SiteName)
+Write-Host "Sleeping 5 seconds after site start"
+Start-Sleep -Seconds 5
+
+Write-Host "Site state after start:"
+Get-WebsiteState -Name $SiteName
+
+# ---------------------------------------------------------------------------
+# Final health check
+# ---------------------------------------------------------------------------
+
+Write-Host "--- Final status check ---"
+
+$poolState = (Get-WebAppPoolState -Name $AppPoolName).Value
+$siteState = (Get-WebsiteState    -Name $SiteName).Value
+
+Write-Host "App pool '$AppPoolName' : $poolState"
+Write-Host "Site     '$SiteName'    : $siteState"
+
+if ($poolState -ne "Started" -or $siteState -ne "Started") {
+    Write-Error "Deployment incomplete - site or app pool did not reach Started state."
+    Exit 1
+}
+
+Write-Host "Environment Deploy Complete"
+Exit 0
