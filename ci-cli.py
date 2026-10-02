@@ -100,8 +100,8 @@ $SurgeEnvName          = "{SURGE_ENVNAME}"
 $SurgeRpmRoot          = "{SURGE_RPM_ROOT}"
 $SurgeApiPath          = "{SURGE_API_PATH}"
 
-$AppPoolName = "ETarApiService-SBX"
-$SiteName    = "ETarApiService-SBX"
+$AppPoolName = "ETarWeb-SBX"
+$SiteName    = "ETarWeb-SBX"
 $appcmd      = "$env:SystemRoot\system32\inetsrv\appcmd.exe"
 
 # ---------------------------------------------------------------------------
