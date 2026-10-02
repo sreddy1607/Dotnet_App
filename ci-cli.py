@@ -196,22 +196,26 @@ catch {
 }
 
 # ---------------------------------------------------------------------------
-# Apply environment variables using appcmd.exe
-# Proven approach on IIS 10 / Windows Server 2025
+# Apply environment variables via appcmd.exe
 # ---------------------------------------------------------------------------
 
 Write-Host "--- Applying environment variables via appcmd.exe ---"
 
-# Format RPM root path - convert forward slashes to backslashes
 $formattedRpmRoot = $SurgeRpmRoot -replace '/', [char]92
+$poolFilter = "system.applicationHost/applicationPools/add[@name='$AppPoolName']/environmentVariables"
 
-# Clear existing environment variables
+# Clear the pool's existing environmentVariables collection
 Write-Host "Clearing existing environment variables..."
-& $appcmd set apppool "$AppPoolName" /environmentVariables
+Clear-WebConfiguration -PSPath 'MACHINE/WEBROOT/APPHOST' -Filter $poolFilter -ErrorAction Stop
+
+$remaining = @(Get-WebConfiguration -PSPath 'MACHINE/WEBROOT/APPHOST' -Filter "$poolFilter/add")
+if ($remaining.Count -gt 0) {
+    Write-Error "Failed to clear environment variables ($($remaining.Count) still present)"
+    Exit 1
+}
 Write-Host "Existing environment variables cleared"
 
-# Build env vars hashtable
-$envVars = @{
+$envVars = [ordered]@{
     VAULT_ADDRESS            = $VaultAddress
     VAULT_APPROLE_ROLE_ID    = $VaultAppRoleRoleId
     VAULT_APPROLE_SECRET_ID  = $VaultAppRoleSecretId
@@ -226,26 +230,26 @@ $envVars = @{
     DD_LOGS_ENABLED          = "true"
 }
 
-# Add each environment variable
-$envVars.GetEnumerator() | ForEach-Object {
-    $name  = $_.Key
-    $value = $_.Value
+foreach ($kv in $envVars.GetEnumerator()) {
+    $name  = $kv.Key
+    $value = $kv.Value
 
-    & $appcmd set config `
-        -section:system.applicationHost/applicationPools `
-        /+"[name='$AppPoolName'].environmentVariables.[name='$name',value='$value']" `
-        /commit:apphost
+    if ([string]::IsNullOrEmpty($value) -or $value -match '^\{.+\}$') {
+        Write-Error "Environment variable $name is empty or still tokenized ('$value') - check Jenkins sed step"
+        Exit 1
+    }
 
-    if ($LASTEXITCODE -eq 0) {
-        if ($name -match "ROLE_ID|SECRET_ID") {
-            Write-Host "    Set: $name = ****"
-        } else {
-            Write-Host "    Set: $name = $value"
-        }
-    } else {
+    & $appcmd set config -section:system.applicationHost/applicationPools `
+        "/+[name='$AppPoolName'].environmentVariables.[name='$name',value='$value']" `
+        /commit:apphost | Out-Null
+
+    if ($LASTEXITCODE -ne 0) {
         Write-Error "Failed to set environment variable: $name (exit code $LASTEXITCODE)"
         Exit 1
     }
+
+    if ($name -match "ROLE_ID|SECRET_ID") { Write-Host "    Set: $name = ****" }
+    else                                  { Write-Host "    Set: $name = $value" }
 }
 
 Write-Host "All environment variables applied via appcmd.exe"
