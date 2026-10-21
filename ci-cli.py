@@ -1,295 +1,441 @@
-function Stop-Web-App-Pool($AppPoolName) {
-    if ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped" ) {
-        Write-Host $AppPoolName " already stopped"
+/*
+=======================================================================================
+This file is being updated constantly by the DevOps team to introduce new enhancements
+based on the template.  If you have suggestions for improvement,
+please contact the DevOps team so that we can incorporate the changes into the
+template.  In the meantime, if you have made changes here or don't want this file to be
+updated, please indicate so at the beginning of this file.
+=======================================================================================
+*/
+
+def branch = env.BRANCH_NAME ?: "master"
+def workingDir = "/home/jenkins/agent"
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+        apiVersion: v1
+        kind: Pod
+        spec:
+          serviceAccountName: jenkins
+          volumes:
+            - name: dockersock
+              hostPath:
+                path: /var/run/docker.sock
+            - emptyDir: {}
+              name: varlibcontainers
+            - name: jenkins-trusted-ca-bundle
+              configMap:
+                name: jenkins-trusted-ca-bundle
+                defaultMode: 420
+                optional: true
+          containers:
+            - name: dotnet
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammismspapp:1.0.34
+              tty: true
+              command: ["/bin/bash"]
+              securityContext:
+                privileged: true
+              workingDir: ${workingDir}
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+            - name: jnlp
+              securityContext:
+                privileged: true
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+            - name: node
+              image: registry.access.redhat.com/ubi8/nodejs-18:latest
+              tty: true
+              command: ["/bin/bash"]
+              securityContext:
+                privileged: true
+              workingDir: ${workingDir}
+              securityContext:
+                privileged: true
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+            - name: aws-boto3
+              image: 136299550619.dkr.ecr.us-west-2.amazonaws.com/cammisboto3:1.0.1
+              tty: true
+              command: ["/bin/bash"]
+              workingDir: ${workingDir}
+              envFrom:
+                - configMapRef:
+                    name: jenkins-agent-env
+                    optional: true
+              env:
+                - name: HOME
+                  value: ${workingDir}
+                - name: BRANCH
+                  value: ${branch}
+                - name: GIT_SSL_CAINFO
+                  value: "/etc/pki/tls/certs/ca-bundle.crt"
+              volumeMounts:
+                - name: jenkins-trusted-ca-bundle
+                  mountPath: /etc/pki/tls/certs
+      """
     }
-    else {
-        Write-Host "Shutting down the " $AppPoolName
-        Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
-        Stop-WebAppPool -Name $AppPoolName
+  }
+
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+    timeout(time:5 , unit: 'HOURS')
+    skipDefaultCheckout()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+  }
+
+  environment {
+    env_current_git_commit=""
+    env_accesskey=""
+    env_secretkey=""
+    env_tag_name=""
+    env_deploy_env=""
+    env_DEPLOY_ENVIRONMENT="false"
+    env_DEPLOY_FILES="true"
+    env_DEPLOY_CONFIG="false"
+    env_release_type=""
+    SONAR_TIMEOUT = 3
+    SONAR_SLEEP = 10000
+    SONAR_ERROR_MSG = "QUALITY GATE ERROR: Pipeline set to unstable"
+    SONAR_BUILD_RESULT = "UNSTABLE"
+    SONAR_SLACK_MSG = "Quality Gate Passed"	  
+  }
+
+  stages {
+     stage("initialize") {
+      steps {
+        container(name: "node") {
+          script {
+
+            properties([
+              parameters([
+                choice(name: 'RELEASE_TYPE', choices: ['PATCH','MINOR','MAJOR'], description: 'Enter Release type'),
+                booleanParam(name: 'USE_GIT_TAG', defaultValue: false, description: 'Use the selected git tag instead of LATEST commit'),
+                gitParameter(name: 'GIT_TAG', defaultValue: 'tar-surge-app_from_dev', description: 'git tag', type: 'PT_TAG'),
+                string(name: 'GIT_SHA',defaultValue: 'enter git sha(8+ chars)', description: 'enter git sha that you want to deploy') 
+              ])
+            ])
+
+            deleteDir()
+
+            env_release_type = params.RELEASE_TYPE
+            echo 'checkout source  and get the commit id'
+            env_current_git_commit = checkout(scm).GIT_COMMIT
+
+            // get the short version of commit
+            env_current_git_commit="${env_current_git_commit[0..7]}"
+
+            env_deploy_env = "DEV"
+
+            echo "Current deployment environment is ${env_deploy_env}"
+
+            env_tag_name = "${branch}_${BUILD_NUMBER}_${env_current_git_commit}"
+
+            if (params.USE_GIT_TAG == true) {
+              env_current_git_commit = params.GIT_TAG
+            }
+
+            if ( ! params.GIT_SHA.contains("enter") ) {
+              env_current_git_commit = params.GIT_SHA
+            }
+
+            echo "Tag to be applied is: ${env_tag_name}"
+            echo "Tag will be applied to: ${env_current_git_commit}"
+
+
+            if ( ( params.GIT_SHA.contains("enter")) && (params.USE_GIT_TAG == false)) {
+              // use latest commit to build and deploy to DEV
+              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                sh """#!/bin/bash
+                  git config --global --add safe.directory '*'
+                  git config --system --add safe.directory '*' 
+                  echo "The commit hash from the latest git current commit is ${env_current_git_commit}"
+                  echo "The current build number is: ${BUILD_NUMBER}"
+                  echo "The current branch is: ${branch}"
+                  tagMessage="${env_tag_name}"
+                  git checkout \${branch}
+                  echo "Checked out ${branch}"
+                  git config  --global user.email "jenkins@cammis.com"
+                  git config  --global user.name "jenkins"
+                  echo "The tagMessage is \$tagMessage"
+                  echo "About to fetch"
+                  git fetch --quiet --tags https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-app.git
+                  echo "About to tag commit with build and branch"
+                  git tag -f -a "\$tagMessage" -m "tag build" ${env_current_git_commit}
+                  echo "About to push tag"
+                  git push -f https://${NUSER}:${NPASS}@github.com/ca-mmis/tar-surge-app.git \$tagMessage
+                  echo "Push is done"
+                  echo "Checking out selected commit"
+                  git checkout ${env_current_git_commit}
+                  git show --stat ${env_current_git_commit} > commit-changes.txt
+                  echo "START OF FILES CHANGED"
+                  cat commit-changes.txt
+                  echo "END OF FILES CHANGED"
+                  echo "Checkout out ${env_current_git_commit}"
+                  """
+              }
+            } else if ( (params.USE_GIT_TAG == true) || ( ! params.GIT_SHA.contains("enter")) ) {
+  			      // using a git tag or git sha, ${env_current_git_commit}" is now the commit tag selected or git sha entered
+              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                sh """#!/bin/bash
+                  echo "Checking out SHA or TAG: ${env_current_git_commit}"
+                  git config --global --add safe.directory '*'
+                  git config --system --add safe.directory '*' 
+                  git checkout \${env_current_git_commit}
+                  echo "Since this is a previous commit, need to rebuild everything"
+                  echo "Cammis.Surge.Api" > commit-changes.txt
+                  echo "Cammis.Surge.Core" >> commit-changes.txt
+                  echo "Cammis.Surge.Server" >> commit-changes.txt
+		  echo "Cammis.Surge.Shared" >> commit-changes.txt
+                  cat commit-changes.txt
+                  echo "Checked out ${env_current_git_commit}"
+                  """
+              }
+            } 
+          } //END script
+        } //END container node
+      } //END steps
+    } //END stage
+
+stage('Build') {
+      steps {
+        container(name: "node") {
+          script {
+           sh '''
+              echo "Creating directory to build into and deploy from."
+              echo "Need to add the placeholder.txt file so AWS CodeDeploy deploys an empty directory"
+              mkdir -p devops/codedeploy/surgeapi
+              touch devops/codedeploy/surgeapi/placeholder.txt
+              
+            '''
+          }
+        }
+
+        container(name: "dotnet") {
+          script {
+           sh '''
+             echo " Cammis.Surge.Api.Sln needs to be built and deployed..."
+	    
+             dotnet publish Cammis.Surge.Api.sln -o devops/codedeploy/surgeapi --verbosity detailed /p:EnableWindowsTargeting=true
+	   
+            '''
+          }
+        }
+      } // end of steps
+    } // end of Build stage
+	  
+    stage('Sonar Scan') {
+      when {
+        expression {
+          env_DEPLOY_FILES == "true"
+        }
+      }
+      steps {
+        container(name: "dotnet") {
+          script {
+            sh """#!/bin/bash
+		      set +e
+                      echo 'Sonar Scan Stage....\n\n'
+                
+		      cd  Cammis.Surge.Api
+	              dotnet tool install dotnet-sonarscanner --global
+		      export PATH="$PATH:/home/jenkins/agent/.dotnet/tools"
+		      dotnet sonarscanner begin /key:"tar-surge-api" /d:sonar.host.url="http://sonarqube-tools.apps.bld.cammis.medi-cal.ca.gov"
+                      dotnet publish /p:EnableWindowsTargeting=true
+                      dotnet sonarscanner end   
+              """
+          }
+        }
+      }
     }
-    do {
-        Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
-        Start-Sleep -Seconds 1
-    }
-    until ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Stopped" )
-    Write-Host $AppPoolName " stopped successfully"
+	  
+    stage('Prepare Deployment') {
+      steps {
+        container(name: "aws-boto3") {
+          script {
+            withCredentials([string(credentialsId: 'APPROLE_SECRET_ID', variable: 'APPROLE_SECRET_ID')]) {
+              sh """#!/bin/bash
+                echo "Preparing Deployment"
+                sed -i "s,{DEPLOY_FILES},${env_DEPLOY_FILES}," devops/codedeploy/after-install.bat
+                sed -i "s,{server-environment},${env_deploy_env}," devops/codedeploy/serverconfig/index.html
+              """
+            }
+          } // end of script
+        } // end of container
+      } // end of steps
+    }  // end of Prepare Deployment Stage
+
+    stage('Deploy') {
+      steps {
+       lock(resource: 'codedeploy-ec2-lock') {	      
+        container(name: "aws-boto3") {
+          script {
+             sh """#!/bin/bash
+            echo "Deploy Using AWS CodeDeploy"
+            """
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-ecr-ecs', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              step([$class: 'AWSCodeDeployPublisher',
+                  applicationName: "tar-surge-app-${env_deploy_env}",
+                  awsAccessKey: "${AWS_ACCESS_KEY_ID}",
+                  awsSecretKey: "${AWS_SECRET_ACCESS_KEY}",
+                  credentials: 'awsAccessKey',
+                  deploymentConfig: "tar-surge-app-${env_deploy_env}-config",
+                  deploymentGroupAppspec: false,
+                  deploymentGroupName: "tar-surge-app-${env_deploy_env}-INPLACE-deployment-group",
+                  deploymentMethod: 'deploy',
+                  excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0,
+                  region: 'us-west-2', s3bucket: 'dhcs-codedeploy-app', 
+                  subdirectory: 'devops/codedeploy', versionFileName: '', waitForCompletion: true])
+            }
+          } // end of script
+        } // end of container
+       }
+        container(name: "jnlp") {
+          lock(resource: 'deployments-github-repo',inversePrecedence: false ) {
+           dir("${WORKSPACE}/deployrepo"){
+              withCredentials([usernamePassword(credentialsId: "github-key", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+                sh """
+                  git clone https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git --depth=1
+                  git config  --global user.email "jenkins@cammis.com"
+                  git config  --global user.name "jenkins"
+
+                  cd deployments-combined-devops
+                  git checkout master
+                  git pull
+
+                  cp ${WORKSPACE}/devops/codedeploy/serverconfig/index.html ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/dev
+
+                            
+                    echo "Cammis.Surge.Api was built, need to update deployment repository"
+                    echo "Comparing the directories with DIFF:"
+                    set +e
+                    diff -r ${WORKSPACE}/devops/codedeploy/surgeapi ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/dev/surgeapi
+                    set -e
+                    # remove and replace deployment for surgeapi
+                    rm -r ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/dev/surgeapi/*
+                    cp -a ${WORKSPACE}/devops/codedeploy/surgeapi/. ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/dev/surgeapi/
+                    rm ${WORKSPACE}/deployrepo/deployments-combined-devops/tar-surge-app/dev/surgeapi/placeholder.txt
+                    updates_to_deploy=true
+                  
+
+                  if [ "\$updates_to_deploy" = true ] ; then
+                    touch tar-surge-app/updates_to_deploy
+                  fi
+
+
+                """
+                
+                script {
+                   incrementVersion()
+                }
+
+                sh """
+                  cd ${WORKSPACE}/deployrepo/deployments-combined-devops
+                  if [ -f tar-surge-app/updates_to_deploy ] ; then
+                    echo 'Pushing to the deployment repository'
+                    rm tar-surge-app/updates_to_deploy
+                    echo "Will tag deploy repo with: \"Updated build artifacts for tar-surge-app build ${env_tag_name}\""
+                    git add -Av
+                    git commit -m "Updated build artifacts for tar-surge-app build ${env_tag_name}"
+                    git push https://${NUSER}:${NPASS}@github.com/ca-mmis/deployments-combined-devops.git
+                  else
+                    echo "Nothing needs to be pushed to deployment repository"
+                  fi
+                  pwd
+                """
+              } //end withCredentials
+            } //end dir
+          } //end lock
+        }  //end container
+
+      } // end of steps
+    } // end of Deploy stage
+  } // end of stages
+
+  //pipeline post actions
+  post {
+    always {
+        echo "Build Process complete."
+    } // always
+
+    success {
+        echo "Build Process was success."
+    } //success
+
+    unstable {
+        echo "Build is unstable."
+    } // unstable
+
+    aborted {
+        echo "Pipeline aborted."
+    } // aborted
+
+    failure {
+        echo "Build encountered failures ."
+    } // failure
+
+    changed {
+        echo "Build content was changed."
+    } // changed
+
+  } // post
 }
 
-function Start-Web-App-Pool($AppPoolName) {
-    if ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Started" ) {
-        Write-Host $AppPoolName " already started"
-    }
-    else {
-        Write-Host "Starting up " $AppPoolName
-        Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
-        Start-WebAppPool -Name $AppPoolName
-    }
-    do {
-        Write-Host "    $AppPoolName status: " (Get-WebAppPoolState $AppPoolName).Value
-        Start-Sleep -Seconds 1
-    }
-    until ( (Get-WebAppPoolState -Name $AppPoolName).Value -eq "Started" )
-    Write-Host $AppPoolName " started successfully"
+def incrementVersion() {
+  def versionInfo = readYaml file: "deployments-combined-devops/tar-surge-app/dev/release/version.yaml"
+  def Integer newMinor = versionInfo.app.version.minor
+  def Integer newMajor = versionInfo.app.version.major
+  def Integer newPatch = versionInfo.app.version.patch
+  
+  if(env_release_type == "PATCH" ) {
+    newPatch = newPatch+1
+  } else if (env_release_type == "MINOR") {
+    newMinor = newMinor+1
+    newPatch = 0
+  } else if (env_release_type == "MAJOR") {
+    newMajor = newMajor+1
+    newMinor = 0
+    newPatch = 0
+  }
+  
+  def updatedVersionInfo = versionInfo
+  def buildDate = new Date()
+  updatedVersionInfo.app.version.patch=newPatch
+  updatedVersionInfo.app.version.major=newMajor
+  updatedVersionInfo.app.version.full=updatedVersionInfo.app.version.major+"."+updatedVersionInfo.app.version.minor+"."+updatedVersionInfo.app.version.patch
+  updatedVersionInfo.app.build.date=buildDate.format("yyyy-MM-dd_HH:mm")
+  updatedVersionInfo.app.build.number="${BUILD_NUMBER}"
+  updatedVersionInfo.app.build.commit="${env_current_git_commit}"
+  println "Saving version.yaml file...\n${updatedVersionInfo}"
+  writeYaml file: "deployments-combined-devops/tar-surge-app/dev/release/version.yaml", data: updatedVersionInfo, overwrite: true
 }
-
-function Stop-Web-Site($WebsiteName) {
-    if ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped" ) {
-        Write-Host $WebsiteName " already stopped"
-    }
-    else {
-        Write-Host "Shutting down the " $WebsiteName
-        Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
-        Stop-Website -Name $WebsiteName
-    }
-    do {
-        Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
-        Start-Sleep -Seconds 1
-    }
-    until ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Stopped" )
-    Write-Host $WebsiteName " stopped successfully"
-}
-
-function Start-Web-Site($WebsiteName) {
-    if ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Started" ) {
-        Write-Host $WebsiteName " already started"
-    }
-    else {
-        Write-Host "Starting up " $WebsiteName
-        Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
-        Start-Website -Name $WebsiteName
-    }
-    do {
-        Write-Host "    $WebsiteName status: " (Get-WebsiteState $WebsiteName).Value
-        Start-Sleep -Seconds 1
-    }
-    until ( (Get-WebsiteState -Name $WebsiteName).Value -eq "Started" )
-    Write-Host $WebsiteName " started successfully"
-}
-
-# This is needed because AWS CodeDeploy Agent runs in 32-bit mode,
-# script below needs to run in 64-bit mode.
-# Are you running in 32-bit mode?
-#   (\SysWOW64\ = 32-bit mode)
-
-if ($PSHOME -like "*SysWOW64*")
-{
-    Write-Warning "Restarting this script under 64-bit Windows PowerShell."
-
-    & (Join-Path ($PSHOME -replace "SysWOW64", "SysNative") powershell.exe) -File `
-        (Join-Path $PSScriptRoot $MyInvocation.MyCommand) @args
-
-    Exit $LastExitCode
-}
-
-Write-Warning "Hello from $PSHOME"
-Write-Warning "  (\SysWOW64\ = 32-bit mode, \System32\ = 64-bit mode)"
-Write-Warning "Original arguments (if any): $args"
-
-# ---------------------------------------------------------------------------
-# Tokenized variables - replaced by Jenkins sed during Prepare Deployment
-# ---------------------------------------------------------------------------
-
-$VaultAddress          = "{VAULT_ADDR}"
-$VaultAppRoleRoleId    = "{APPROLE_ROLE_ID}"
-$VaultAppRoleSecretId  = "{APPROLE_SECRET_ID}"
-$VaultSecretPath       = "{VAULT_SECRET_PATH}"
-$VaultSecretPathLtar   = "{VAULT_SECRET_PATH_LTAR}"
-$VaultSecretPathImgVwr = "{VAULT_SECRET_PATH_IMGVWR}"
-$VaultAppRoleAuthPath  = "{VAULT_APPROLE_AUTH_PATH}"
-$SurgeEnvName          = "{SURGE_ENVNAME}"
-$SurgeRpmRoot          = "{SURGE_RPM_ROOT}"
-$SurgeApiPath          = "{SURGE_API_PATH}"
-
-$AppPoolName = "ETarWeb-SBX"
-$SiteName    = "ETarWeb-SBX"
-$appcmd      = "$env:SystemRoot\system32\inetsrv\appcmd.exe"
-
-# ---------------------------------------------------------------------------
-# Validate IIS module is available before proceeding
-# ---------------------------------------------------------------------------
-
-if (-not (Get-Module -ListAvailable -Name WebAdministration)) {
-    Write-Error "WebAdministration module not found. Ensure IIS is installed."
-    Exit 1
-}
-
-Import-Module WebAdministration
-Write-Host "WebAdministration module loaded"
-
-# ---------------------------------------------------------------------------
-# Validate appcmd.exe exists
-# ---------------------------------------------------------------------------
-
-if (-not (Test-Path $appcmd)) {
-    Write-Error "appcmd.exe not found at: $appcmd"
-    Exit 1
-}
-Write-Host "appcmd.exe found at: $appcmd"
-
-# ---------------------------------------------------------------------------
-# Verify the site and app pool exist
-# ---------------------------------------------------------------------------
-
-if (-not (Test-Path "IIS:\Sites\$SiteName")) {
-    Write-Error "IIS site '$SiteName' does not exist."
-    Exit 1
-}
-
-if (-not (Test-Path "IIS:\AppPools\$AppPoolName")) {
-    Write-Error "IIS app pool '$AppPoolName' does not exist."
-    Exit 1
-}
-
-# ---------------------------------------------------------------------------
-# Stop site and app pool
-# ---------------------------------------------------------------------------
-
-Write-Host "--- Stopping IIS site and app pool ---"
-
-Stop-Web-Site($SiteName)
-Write-Host "Sleeping 5 seconds after site stop"
-Start-Sleep -Seconds 5
-
-Stop-Web-App-Pool($AppPoolName)
-Write-Host "Sleeping 5 seconds after app pool stop"
-Start-Sleep -Seconds 5
-
-Write-Host "App pool state after stop:"
-Get-IISAppPool -Name $AppPoolName | Select-Object Name, State
-
-# ---------------------------------------------------------------------------
-# Kill any lingering w3wp.exe worker processes
-# w3wp.exe can keep applicationHost.config locked even after pool stops
-# ---------------------------------------------------------------------------
-
-Write-Host "--- Checking for lingering w3wp.exe worker processes ---"
-
-$workers = Get-Process -Name "w3wp" -ErrorAction SilentlyContinue
-if ($workers) {
-    $workers | ForEach-Object {
-        Write-Host "Killing w3wp.exe PID: $($_.Id)"
-        Stop-Process -Id $_.Id -Force
-    }
-    Write-Host "Sleeping 3 seconds after killing worker processes"
-    Start-Sleep -Seconds 3
-    Write-Host "Worker processes cleared"
-} else {
-    Write-Host "No lingering w3wp.exe processes found"
-}
-
-# ---------------------------------------------------------------------------
-# Unlock environmentVariables configuration section
-# ---------------------------------------------------------------------------
-
-Write-Host "--- Unlocking environmentVariables configuration section ---"
-
-try {
-    Set-WebConfiguration `
-        -Filter "system.applicationHost/applicationPools" `
-        -PSPath "MACHINE/WEBROOT" `
-        -Metadata overrideMode `
-        -Value Allow
-    Write-Host "Configuration section unlocked successfully"
-}
-catch {
-    Write-Warning "Unlock warning (non-fatal): $_"
-}
-
-# ---------------------------------------------------------------------------
-# Apply environment variables via appcmd.exe
-# ---------------------------------------------------------------------------
-
-Write-Host "--- Applying environment variables via appcmd.exe ---"
-
-$formattedRpmRoot = $SurgeRpmRoot -replace '/', [char]92
-$poolFilter = "system.applicationHost/applicationPools/add[@name='$AppPoolName']/environmentVariables"
-
-# Clear the pool's existing environmentVariables collection
-Write-Host "Clearing existing environment variables..."
-Clear-WebConfiguration -PSPath 'MACHINE/WEBROOT/APPHOST' -Filter $poolFilter -ErrorAction Stop
-
-$remaining = @(Get-WebConfiguration -PSPath 'MACHINE/WEBROOT/APPHOST' -Filter "$poolFilter/add")
-if ($remaining.Count -gt 0) {
-    Write-Error "Failed to clear environment variables ($($remaining.Count) still present)"
-    Exit 1
-}
-Write-Host "Existing environment variables cleared"
-
-$envVars = [ordered]@{
-    VAULT_ADDRESS            = $VaultAddress
-    VAULT_APPROLE_ROLE_ID    = $VaultAppRoleRoleId
-    VAULT_APPROLE_SECRET_ID  = $VaultAppRoleSecretId
-    VAULT_SECRET_PATH        = $VaultSecretPath
-    VAULT_SECRET_PATH_LTAR   = $VaultSecretPathLtar
-    VAULT_SECRET_PATH_IMGVWR = $VaultSecretPathImgVwr
-    VAULT_APPROLE_AUTH_PATH  = $VaultAppRoleAuthPath
-    APIPath                  = $SurgeApiPath
-    SURGE_ENVNAME            = $SurgeEnvName
-    SURGE_RPM_ROOT           = $formattedRpmRoot
-    SURGE_RPM_ONLINE_KEY     = "/online"
-    DD_LOGS_ENABLED          = "true"
-}
-
-foreach ($kv in $envVars.GetEnumerator()) {
-    $name  = $kv.Key
-    $value = $kv.Value
-
-    if ([string]::IsNullOrEmpty($value) -or $value -match '^\{.+\}$') {
-        Write-Error "Environment variable $name is empty or still tokenized ('$value') - check Jenkins sed step"
-        Exit 1
-    }
-
-    & $appcmd set config -section:system.applicationHost/applicationPools `
-        "/+[name='$AppPoolName'].environmentVariables.[name='$name',value='$value']" `
-        /commit:apphost | Out-Null
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Failed to set environment variable: $name (exit code $LASTEXITCODE)"
-        Exit 1
-    }
-
-    if ($name -match "ROLE_ID|SECRET_ID") { Write-Host "    Set: $name = ****" }
-    else                                  { Write-Host "    Set: $name = $value" }
-}
-
-Write-Host "All environment variables applied via appcmd.exe"
-
-# ---------------------------------------------------------------------------
-# Start app pool and site
-# ---------------------------------------------------------------------------
-
-Write-Host "--- Starting IIS app pool and site ---"
-
-Start-Web-App-Pool($AppPoolName)
-Write-Host "Sleeping 5 seconds after app pool start"
-Start-Sleep -Seconds 5
-
-Write-Host "App pool state after start:"
-Get-IISAppPool -Name $AppPoolName | Select-Object Name, State
-
-Start-Web-Site($SiteName)
-Write-Host "Sleeping 5 seconds after site start"
-Start-Sleep -Seconds 5
-
-Write-Host "Site state after start:"
-Get-WebsiteState -Name $SiteName
-
-# ---------------------------------------------------------------------------
-# Final health check
-# ---------------------------------------------------------------------------
-
-Write-Host "--- Final status check ---"
-
-$poolState = (Get-WebAppPoolState -Name $AppPoolName).Value
-$siteState = (Get-WebsiteState    -Name $SiteName).Value
-
-Write-Host "App pool '$AppPoolName' : $poolState"
-Write-Host "Site     '$SiteName'    : $siteState"
-
-if ($poolState -ne "Started" -or $siteState -ne "Started") {
-    Write-Error "Deployment incomplete - site or app pool did not reach Started state."
-    Exit 1
-}
-
-Write-Host "Environment Deploy Complete"
-Exit 0
